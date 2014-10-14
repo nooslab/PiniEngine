@@ -64,7 +64,14 @@ LanXVM.commands = {
 		    if o == "+" then vm.variable[arg["A"]] = L + R 
 		elseif o == "*" then vm.variable[arg["A"]] = L * R 
 		elseif o == "/" then if R == 0 then R=1 end vm.variable[arg["A"]] = L / R 
-		elseif o == "-" then vm.variable[arg["A"]] = L - R end
+		elseif o == "-" then vm.variable[arg["A"]] = L - R 
+		elseif o == "=="then vm.variable[arg["A"]] = L == R 
+		elseif o == ">="then vm.variable[arg["A"]] = L >= R 
+		elseif o == "<="then vm.variable[arg["A"]] = L <= R 
+		elseif o == "<" then vm.variable[arg["A"]] = L < R 
+		elseif o == ">" then vm.variable[arg["A"]] = L > R 
+		elseif o == "!="then vm.variable[arg["A"]] = L ~= R
+		end
 		
 		vm:doNext()
 	end,
@@ -82,6 +89,28 @@ LanXVM.commands = {
 		vm:GotoBookmark(name)
 		vm:doNext()
 	end,
+	t_ifgoto = function(vm,arg)
+		local compare  = vm.variable[arg["compare"]]
+		local bookname = arg["name"]
+		local bookelse = arg["bookelse"]
+		
+		if compare == 1 then
+			compare = true
+		elseif compare == 0 then
+			compare = false
+		end
+
+		if compare == false then
+			if #bookelse > 0 then
+				vm:GotoBookmark(bookelse)
+				print("jump > else !")
+			else
+				vm:GotoBookmark(bookname)
+				print("jump!")
+			end
+		end
+		vm:doNext()
+	end,
 	t_assign=function(vm,arg)
 		if arg["value"]["type"] == "id" then
 			vm.variable[arg["id"]] = vm.variable[arg["value"]["v"]]
@@ -95,15 +124,55 @@ LanXVM.commands = {
 }
 
 function LanXVM:init()
+	if self.require then 
+		for k,v in pairs(self.require) do
+			package.loaded[k] = nil
+		end
+		for k,v in pairs(self.module) do
+			package.loaded[k] = nil
+		end
+	end
+	
 	self.variable = {}
 	self.stack = {}
 	self.bookmark = {}
 	self.callstack = nil
 	self.luafunc = {}
 	self.customfunc = {}
+	self.require = {}
+	self.module = {}
 	self.running = false
 	self.next = false
-	self:call("global")
+	self.defaultStack = "global"
+	self:call(self.defaultStack)
+	self:defaultFunction()
+end
+
+function LanXVM:defaultFunction()
+	self:registFunc("스크립트",function(vm,arg)
+		local t = vm.variable["스크립트.파일명"] or nil
+		local beforeStack = vm.defaultStack;
+		vm.defaultStack = t
+		
+		local path = t:gsub(".scene","")
+		if self.require[path] == nil then
+			self.require[path] = require("scene_"..path)
+		end
+		self.require[path](vm)
+
+		vm.defaultStack = beforeStack
+		vm:call(t)
+
+		vm:doNext()
+	end)
+	self:registFunc("루아",function(vm,arg)
+		local t = vm.variable["루아.모듈명"] or nil
+		local path = "module/"..t
+		if self.module[path] == nil then
+			self.module[path] = require(path)
+		end
+		self.module[path](vm)
+	end)
 end
 
 function LanXVM:clearFunction(name)
@@ -124,7 +193,7 @@ function LanXVM:registFunc(i,f,a)
 end
 
 function LanXVM:pushCmd(cmd,arg,stackName)
-	if stackName == nil then stackName = "global" end
+	if stackName == nil then stackName = self.defaultStack end
 	if self.stack[stackName] == nil then
 		self.stack[stackName] = {}
 	end

@@ -3,113 +3,111 @@ require("utils")
 local function Emulate(luavm)
     local winSize = cc.Director:getInstance():getVisibleSize()
 	local scene = nil
-	local fs_position={
-		왼쪽상단=function(i)
-			i:setAnchorPoint(cc.p(0,1));
-			i:setPosition(0,winSize.height)
-		end,
-		오른쪽상단=function(i)
-			i:setAnchorPoint(cc.p(1,1));
-			i:setPosition(winSize.width,winSize.height)
-		end,
-		화면중앙=function(i)
-			i:setAnchorPoint(cc.p(0.5,0.5));
-			i:setPosition(winSize.width/2,winSize.height/2)
-		end,
-		왼쪽하단=function(i)
-			i:setAnchorPoint(cc.p(0,0));
-			i:setPosition(0,0)
-		end,
-		오른쪽하단=function(i)
-			i:setAnchorPoint(cc.p(1,0));
-			i:setPosition(winSize.width,0)
-		end
-	}
-	local fs_size = {
-		 원본크기=function(i)
-		 end,
-		 두배=function(i)
-		 	i:setScale(2)
-		 end,
-		 화면맞춤=function(i)
-		 	i:setScale(1)
-		 	size = i:getContentSize()
-		 	i:setScaleX( winSize.width / size.width )
-		 	i:setScaleY( winSize.height / size.height )
-		 end
-	}
-	local fs_imageEffect = {
-		업페이드=function(img,sec)
-			img:setPositionY(img:getPositionY()-10)
-			img:setOpacity(0)
-			local action = cc.Spawn:create(
-				cc.MoveBy:create(sec,cc.p(0,10)),
-				cc.FadeIn:create(sec)
-			)
-			img:runAction(action)
-		end,
-		다운페이드=function(img,sec)
-			img:setPositionY(img:getPositionY()+10)
-			img:setOpacity(0)
-			local action = cc.Spawn:create(
-				cc.MoveBy:create(sec,cc.p(0,-10)),
-				cc.FadeIn:create(sec)
-			)
-			img:runAction(action)
-		end,
-		줌인페이드=function(img,sec)
-			s = img:getScale()
-			img:setScale(s-0.1)
-			img:setOpacity(0)
-			local action = cc.Spawn:create(
-				cc.ScaleTo:create(sec,s),
-				cc.FadeIn:create(sec)
-			)
-			img:runAction(action)
-		end,
-		줌아웃페이드=function(img,sec)
-			s = img:getScale()
-			img:setScale(s+0.1)
-			img:setOpacity(0)
-			local action = cc.Spawn:create(
-				cc.ScaleTo:create(sec,s),
-				cc.FadeIn:create(sec)
-			)
-			img:runAction(action)
-		end
-	}
-	local fs_imageDeleteEffect = {
-		업페이드=function(img,sec)
-			local action = cc.Spawn:create(
-				cc.MoveBy:create(sec,cc.p(0,10)),
-				cc.FadeTo:create(sec,0)
-			)
-            img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
-		end,
-		다운페이드=function(img,sec)
-			local action = cc.Spawn:create(
-				cc.MoveBy:create(sec,cc.p(0,-10)),
-				cc.FadeTo:create(sec,0)
-			)
-			img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
-		end,
-		줌인페이드=function(img,sec)
-			local s = img:getScale()
-			local action = cc.Spawn:create(
-				cc.ScaleTo:create(sec,s-0.1),
-				cc.FadeTo:create(sec,0)
-			)
-			img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
-		end,
-		줌아웃페이드=function(img,sec)
-			local s = img:getScale()
-			local action = cc.Spawn:create(
-				cc.ScaleTo:create(sec,s+0.1),
-				cc.FadeTo:create(sec,0)
-			)
-			img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
-		end
-	}
+	local fs_position={}
+	fs_position["왼쪽상단"]=function(i)
+		i:setAnchorPoint(cc.p(0,1));
+		i:setPosition(0,winSize.height)
+	end
+	fs_position["오른쪽상단"]=function(i)
+		i:setAnchorPoint(cc.p(1,1));
+		i:setPosition(winSize.width,winSize.height)
+	end
+	fs_position["화면중앙"]=function(i)
+		i:setAnchorPoint(cc.p(0.5,0.5));
+		i:setPosition(winSize.width/2,winSize.height/2)
+	end
+	fs_position["왼쪽하단"]=function(i)
+		i:setAnchorPoint(cc.p(0,0));
+		i:setPosition(0,0)
+	end
+	fs_position["오른쪽하단"]=function(i)
+		i:setAnchorPoint(cc.p(1,0));
+		i:setPosition(winSize.width,0)
+	end
+	local fs_size = {}
+	fs_size["원본크기"]=function(i)
+	end
+	fs_size["두배"]=function(i)
+	 	i:setScale(2)
+	end
+	fs_size["화면맞춤"]=function(i)
+		i:setScale(1)
+		size = i:getContentSize()
+		i:setScaleX( winSize.width / size.width )
+		i:setScaleY( winSize.height / size.height )
+	end
+
+	local fs_imageEffect = {}
+	fs_imageEffect["업페이드"]=function(img,sec)
+		img:setPositionY(img:getPositionY()-10)
+		img:setOpacity(0)
+		local action = cc.Spawn:create(
+			cc.MoveBy:create(sec,cc.p(0,10)),
+			cc.FadeIn:create(sec)
+		)
+		img:runAction(action)
+	end
+	fs_imageEffect["다운페이드"]=function(img,sec)
+		img:setPositionY(img:getPositionY()+10)
+		img:setOpacity(0)
+		local action = cc.Spawn:create(
+			cc.MoveBy:create(sec,cc.p(0,-10)),
+			cc.FadeIn:create(sec)
+		)
+		img:runAction(action)
+	end
+	fs_imageEffect["줌인페이드"]=function(img,sec)
+		s = img:getScale()
+		img:setScale(s-0.1)
+		img:setOpacity(0)
+		local action = cc.Spawn:create(
+			cc.ScaleTo:create(sec,s),
+			cc.FadeIn:create(sec)
+		)
+		img:runAction(action)
+	end
+	fs_imageEffect["줌아웃페이드"]=function(img,sec)
+		s = img:getScale()
+		img:setScale(s+0.1)
+		img:setOpacity(0)
+		local action = cc.Spawn:create(
+			cc.ScaleTo:create(sec,s),
+			cc.FadeIn:create(sec)
+		)
+		img:runAction(action)
+	end
+
+	local fs_imageDeleteEffect = {}
+	fs_imageDeleteEffect["업페이드"]=function(img,sec)
+		local action = cc.Spawn:create(
+			cc.MoveBy:create(sec,cc.p(0,10)),
+			cc.FadeTo:create(sec,0)
+		)
+        img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
+	end
+	fs_imageDeleteEffect["다운페이드"]=function(img,sec)
+		local action = cc.Spawn:create(
+			cc.MoveBy:create(sec,cc.p(0,-10)),
+			cc.FadeTo:create(sec,0)
+		)
+		img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
+	end
+	fs_imageDeleteEffect["줌인페이드"]=function(img,sec)
+		local s = img:getScale()
+		local action = cc.Spawn:create(
+			cc.ScaleTo:create(sec,s-0.1),
+			cc.FadeTo:create(sec,0)
+		)
+		img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
+	end
+	fs_imageDeleteEffect["줌아웃페이드"]=function(img,sec)
+		local s = img:getScale()
+		local action = cc.Spawn:create(
+			cc.ScaleTo:create(sec,s+0.1),
+			cc.FadeTo:create(sec,0)
+		)
+		img:runAction(cc.Sequence:create(action,cc.RemoveSelf:create(true)))
+	end
 
 	local images = {}
 	local Dialog = {}
@@ -391,7 +389,7 @@ local function Emulate(luavm)
 		local effectSec = vm.variable["이미지.효과시간"] or 0.25
 		local size = vm.variable["이미지.크기"] or "0,0"
 		if path:len() > 0 then
-			local img = cc.Sprite:create(path)
+			local img = cc.Sprite:create("image/"..path)
 			scene.layer:addChild(img)
 			
 			if fs_position[pos] then
@@ -476,7 +474,6 @@ local function Emulate(luavm)
 		end
 		vm:doNext()
 	end)
-
 	luavm:pushCmd("t_function",{targ = {},name = "화면전환"})
 end
 
