@@ -1,1 +1,4 @@
-TEST
+T
+E
+S
+T
