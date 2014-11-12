@@ -1,23 +1,27 @@
 fs_animation={}
 fs_ease={}
 
-fs_ease["사인인"] = function(a) return cc.EaseSineIn:create(a) end
-fs_ease["사인아웃"] = function(a) return cc.EaseSineOut:create(a) end
-fs_ease["사인인아웃"] = function(a) return cc.EaseSineInOut:create(a) end
-fs_ease["바운스인"] = function(a) return cc.EaseBounceIn:create(a) end
-fs_ease["바운스아웃"] = function(a) return cc.EaseBounceOut:create(a) end
-fs_ease["바운스인아웃"] = function(a) return cc.EaseBounceInOut:create(a) end
-fs_ease["백인"] = function(a) return cc.EaseBackIn:create(a) end
-fs_ease["백아웃"] = function(a) return cc.EaseBackOut:create(a) end
-fs_ease["백인아웃"] = function(a) return cc.EaseBackInOut:create(a) end
-fs_ease["엘라스틱인"] = function(a) return cc.EaseElasticIn:create(a) end
-fs_ease["엘라스틱아웃"] = function(a) return cc.EaseElasticOut:create(a) end
-fs_ease["엘라스틱인아웃"] = function(a) return cc.EaseElasticInOut:create(a) end
+fs_ease["사인인"] = function(a) return pini.Anim.EaseSineIn(a) end
+fs_ease["사인아웃"] = function(a) return pini.Anim.EaseSineOut(a) end
+fs_ease["사인인아웃"] = function(a) return pini.Anim.EaseSineInOut(a) end
+fs_ease["바운스인"] = function(a) return pini.Anim.EaseBounceIn(a) end
+fs_ease["바운스아웃"] = function(a) return pini.Anim.EaseBounceOut(a) end
+fs_ease["바운스인아웃"] = function(a) return pini.Anim.EaseBounceInOut(a) end
+fs_ease["백인"] = function(a) return pini.Anim.EaseBackIn(a) end
+fs_ease["백아웃"] = function(a) return pini.Anim.EaseBackOut(a) end
+fs_ease["백인아웃"] = function(a) return pini.Anim.EaseBackInOut(a) end
+fs_ease["엘라스틱인"] = function(a) return pini.Anim.EaseElasticIn(a) end
+fs_ease["엘라스틱아웃"] = function(a) return pini.Anim.EaseElasticOut(a) end
+fs_ease["엘라스틱인아웃"] = function(a) return pini.Anim.EaseElasticInOut(a) end
 
-function posStrToPt(pos)
-    local winSize = cc.Director:getInstance():getVisibleSize()
+local function posStrToPt(pos)
+    local winSize = {width=WIN_WIDTH,height=WIN_HEIGHT}--cc.Director:getInstance():getVisibleSize()
 	local pos = pos:explode(",")
-	return cc.p(tonumber(pos[1]),winSize.height-tonumber(pos[2]))
+	if OnPreview then
+		return tonumber(pos[1] or 0),tonumber(pos[2] or 0)
+	else
+		return tonumber(pos[1] or 0),winSize.height-tonumber(pos[2] or 0)
+	end
 end
 
 fs_animation["이동"] = {
@@ -28,13 +32,14 @@ fs_animation["이동"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 		local rep = vm.variable["애니메이션.지속"] or "아니오"
 
-		local action = cc.MoveTo:create(sec,posStrToPt(pos))
+		local x,y = posStrToPt(pos)
+		local action = pini.Anim.MoveTo(sec,x,y)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -46,15 +51,15 @@ fs_animation["회전"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 		local rep = vm.variable["애니메이션.지속"] or "아니오"
 
-		local action = cc.RotateTo:create(sec,rot)
+		local action = pini.Anim.RotateTo(sec,rot)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.Repeat:create(action,999)
+			--action = cc.Repeat:create(action,999)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -76,36 +81,37 @@ fs_animation["크기"] = {
 		local sx = size[1] / origin.width / psx
 		local sy = size[2] / origin.height / psy
 
-		local action = cc.ScaleTo:create(sec,sx,sy)
+		local action = pini.Anim.ScaleTo(sec,sx,sy)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
 fs_animation["점프"] = {
-	"위치=\"100,0\" 횟수=\"1\" 높이=\"\" 시간=\"1\" 가속=\"\"",
+	"위치=\"100,0\" 횟수=\"1\" 높이=\"50\" 시간=\"1\" 가속=\"\"",
 	function(vm,node)
 		local pos = vm.variable["애니메이션.위치"] or "0,0"
 		local count = vm.variable["애니메이션.횟수"] or 0
 		local height = vm.variable["애니메이션.높이"] or 0
 		local sec = vm.variable["애니메이션.시간"] or 1
 		local ease = vm.variable["애니메이션.가속"] or ""
-
-		local action = cc.JumpTo:create(sec,posStrToPt(pos),height,count)
+		
+		local x,y = posStrToPt(pos)
+		local action = pini.Anim.JumpTo(sec,x,y,height,count)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -117,15 +123,15 @@ fs_animation["투명"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 
 		fade = fade*255
-		local action = cc.FadeTo:create(sec,fade)
+		local action = pini.Anim.FadeTo(sec,fade)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -136,15 +142,15 @@ fs_animation["블링크"] = {
 		local sec = vm.variable["애니메이션.시간"] or 1
 		local ease = vm.variable["애니메이션.가속"] or ""
 
-		local action = cc.Blink:create(sec,count)
+		local action = pini.Anim.Blink(sec,count)
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -156,15 +162,17 @@ fs_animation["색상"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 
 		color = color:explode(",")
-		local action = cc.TintTo:create(sec,color[1],color[2],color[3])
+		local action = pini.Anim.TintTo(sec,tonumber(color[1] or 255),
+											tonumber(color[2] or 255),
+											tonumber(color[3] or 255))
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -178,14 +186,14 @@ fs_animation["상하흔들기"] = {
 
 		local action = nil
 		for i=1,count,1 do 
-			local a = cc.Sequence:create(
-				cc.MoveBy:create(sec/(4*count),cc.p(0,width/2)),
-				cc.MoveBy:create(sec/(4*count),cc.p(0,-width/2)),
-				cc.MoveBy:create(sec/(4*count),cc.p(0,-width/2)),
-				cc.MoveBy:create(sec/(4*count),cc.p(0,width/2))
+			local a = pini.Anim.Sequence(
+				pini.Anim.MoveBy(sec/(4*count),0,width/2),
+				pini.Anim.MoveBy(sec/(4*count),0,-width/2),
+				pini.Anim.MoveBy(sec/(4*count),0,-width/2),
+				pini.Anim.MoveBy(sec/(4*count),0,width/2)
 			)
 			if action then
-				action = cc.Sequence:create(action,a)
+				action = pini.Anim.Sequence(action,a)
 			else
 				action = a
 			end
@@ -195,9 +203,9 @@ fs_animation["상하흔들기"] = {
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -211,14 +219,14 @@ fs_animation["좌우흔들기"] = {
 
 		local action = nil
 		for i=1,count,1 do 
-			local a = cc.Sequence:create(
-				cc.MoveBy:create(sec/(4*count),cc.p(width/2,0)),
-				cc.MoveBy:create(sec/(4*count),cc.p(-width/2,0)),
-				cc.MoveBy:create(sec/(4*count),cc.p(-width/2,0)),
-				cc.MoveBy:create(sec/(4*count),cc.p(width/2,0))
+			local a = pini.Anim.Sequence(
+				pini.Anim.MoveBy(sec/(4*count),width/2,0),
+				pini.Anim.MoveBy(sec/(4*count),-width/2,0),
+				pini.Anim.MoveBy(sec/(4*count),-width/2,0),
+				pini.Anim.MoveBy(sec/(4*count),width/2,0)
 			)
 			if action then
-				action = cc.Sequence:create(action,a)
+				action = pini.Anim.Sequence(action,a)
 			else
 				action = a
 			end
@@ -228,9 +236,9 @@ fs_animation["좌우흔들기"] = {
 			action = fs_ease[ease](action)
 		end
 		if rep == "예" then
-			action = cc.RepeatForever:create(action)
+			--action = cc.RepeatForever:create(action)
 		end
-		node:runAction(action)
+		action:run(node)
 	end
 }
 
@@ -242,22 +250,20 @@ fs_animation["떨림"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 
 		local actions = {}
-
 		local x,y = node:getPosition()
 
-		local scheduler = cc.Director:getInstance():getScheduler()
-		local scheduleEntry
-		local scheduleEntry1
-		scheduleEntry = scheduler:scheduleScriptFunc(function()
+		local t1,t2
+		t1=pini.Timer(pini:GetUUID(),0,function()
 			local dx = math.random()*width - width/2
 			local dy = math.random()*width - width/2
 			node:setPosition(dx+x,dy+y)
-		end, 0, false)
-		scheduleEntry1 = scheduler:scheduleScriptFunc(function()
-			scheduler:unscheduleScriptEntry(scheduleEntry)
-			scheduler:unscheduleScriptEntry(scheduleEntry1)
+		end,true)
+		t2=pini.Timer(pini:GetUUID(),sec,function()
+			t1:stop()
+			t2:stop()
 			node:setPosition(x,y)
-		end, sec, false)
-
+			t1 = nil
+			t2 = nil
+		end,true)
 	end
 }

@@ -222,6 +222,22 @@ function MoveTo:run(node)
 	end
 end
 ---------------------------------------------
+local RotateTo = class()
+function RotateTo:init(sec,rot)
+	self.opacity = op
+	self.rot = rot
+end
+function RotateTo:cocosObj()
+	return cc.RotateTo:create(self.sec,self.rot)
+end
+function RotateTo:run(node)
+	if OnPreview then
+		node:setRotate(self.rot)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
 local FadeTo = class()
 function FadeTo:init(sec,op)
 	self.opacity = op
@@ -324,11 +340,45 @@ function TintTo:init(sec,r,g,b)
 	self.sec = sec
 end
 function TintTo:cocosObj()
-	return cc.TintTo:create(self.sec,cc.c3b(r,g,b))
+	return cc.TintTo:create(self.sec,self.r,self.g,self.b)
 end
 function TintTo:run(node)
 	if OnPreview then
-		node:setColor(r,g,b)
+		node:setColor(self.r,self.g,self.b)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local JumpTo=class()
+function JumpTo:init(sec,x,y,height,count)
+	self.x = x
+	self.y = y
+	self.h = height
+	self.c = count
+	self.sec = sec
+end
+function JumpTo:cocosObj()
+	return cc.JumpTo:create(self.sec,cc.p(self.x,self.y),self.h,self.c)
+end
+function JumpTo:run(node)
+	if OnPreview then
+		node:setPosition(self.x,self.y)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local Blink=class()
+function Blink:init(sec,count)
+	self.sec = sec
+	self.c = count
+end
+function Blink:cocosObj()
+	return cc.Blink:create(self.sec,self.c)
+end
+function Blink:run(node)
+	if OnPreview then
 	else
 		node.node:runAction(self:cocosObj())
 	end
@@ -349,6 +399,186 @@ function Forever:run(node)
 	end
 end
 ---------------------------------------------
+local EaseSineIn=class()
+function EaseSineIn:init(action)
+	self.action = action
+end
+function EaseSineIn:cocosObj()
+	return cc.EaseSineIn:create(self.action:cocosObj())
+end
+function EaseSineIn:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseSineOut=class()
+function EaseSineOut:init(action)
+	self.action = action
+end
+function EaseSineOut:cocosObj()
+	return cc.EaseSineOut:create(self.action:cocosObj())
+end
+function EaseSineOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseSineInOut=class()
+function EaseSineInOut:init(action)
+	self.action = action
+end
+function EaseSineInOut:cocosObj()
+	return cc.EaseSineInOut:create(self.action:cocosObj())
+end
+function EaseSineInOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBounceIn=class()
+function EaseBounceIn:init(action)
+	self.action = action
+end
+function EaseBounceIn:cocosObj()
+	return cc.EaseBounceIn:create(self.action:cocosObj())
+end
+function EaseBounceIn:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBounceOut=class()
+function EaseBounceOut:init(action)
+	self.action = action
+end
+function EaseBounceOut:cocosObj()
+	return cc.EaseBounceOut:create(self.action:cocosObj())
+end
+function EaseBounceOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBounceInOut=class()
+function EaseBounceInOut:init(action)
+	self.action = action
+end
+function EaseBounceInOut:cocosObj()
+	return cc.EaseBounceInOut:create(self.action:cocosObj())
+end
+function EaseBounceInOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBackIn=class()
+function EaseBackIn:init(action)
+	self.action = action
+end
+function EaseBackIn:cocosObj()
+	return cc.EaseBackIn:create(self.action:cocosObj())
+end
+function EaseBackIn:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBackOut=class()
+function EaseBackOut:init(action)
+	self.action = action
+end
+function EaseBackOut:cocosObj()
+	return cc.EaseBackOut:create(self.action:cocosObj())
+end
+function EaseBackOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseBackInOut=class()
+function EaseBackInOut:init(action)
+	self.action = action
+end
+function EaseBackInOut:cocosObj()
+	return cc.EaseBackInOut:create(self.action:cocosObj())
+end
+function EaseBackInOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseElasticIn=class()
+function EaseElasticIn:init(action)
+	self.action = action
+end
+function EaseElasticIn:cocosObj()
+	return cc.EaseElasticIn:create(self.action:cocosObj())
+end
+function EaseElasticIn:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseElasticOut=class()
+function EaseElasticOut:init(action)
+	self.action = action
+end
+function EaseElasticOut:cocosObj()
+	return cc.EaseElasticOut:create(self.action:cocosObj())
+end
+function EaseElasticOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseElasticInOut=class()
+function EaseElasticInOut:init(action)
+	self.action = action
+end
+function EaseElasticInOut:cocosObj()
+	return cc.EaseElasticInOut:create(self.action:cocosObj())
+end
+function EaseElasticInOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
 local anim = {}
 anim["MoveBy"] = MoveBy
 anim["MoveTo"] = MoveTo
@@ -358,7 +588,24 @@ anim["ScaleBy"] = ScaleBy
 anim["TintTo"] = TintTo
 anim["Spawn"] = Spawn
 anim["Sequence"] = Sequence
+anim["RotateTo"] = RotateTo
+anim["JumpTo"] = JumpTo
+anim["Blink"] = Blink
 anim["Forever"] = Forever
+
+anim["EaseSineIn"] = EaseSineIn
+anim["EaseSineOut"] = EaseSineOut
+anim["EaseSineInOut"] = EaseSineInOut
+anim["EaseBounceIn"] = EaseBounceIn
+anim["EaseBounceOut"] = EaseBounceOut
+anim["EaseBounceInOut"] = EaseBounceInOut
+anim["EaseBackIn"] = EaseBackIn
+anim["EaseBackOut"] = EaseBackOut
+anim["EaseBackInOut"] = EaseBackInOut
+anim["EaseElasticIn"] = EaseElasticIn
+anim["EaseElasticOut"] = EaseElasticOut
+anim["EaseElasticInOut"] = EaseElasticInOut
+
 ---------------------------------------------
 -- Node 
 ---------------------------------------------
@@ -675,12 +922,29 @@ function Node:setOpacity(a)
 	end
 end
 
+function Node:setRotate(angle)
+	if OnPreview then
+		self.rotate = angle
+	else
+		self.node:setRotation(angle)
+	end
+end
+
+function Node:getRotate()
+	if OnPreview then
+		return self.rotate
+	else
+		return self.node:getRotation()
+	end
+end
+
 function Node:StopAction()
 	if OnPreview then
 	else
 		self.node:stopAllActions()
 	end
 end
+
 
 ---------------------------------------------
 -- Sprite 
@@ -835,9 +1099,9 @@ function Timer:stop()
 
 	else
 		if self.entry then
-		local scheduler=cc.Director:getInstance():getScheduler()
-		scheduler:unscheduleScriptEntry(self.entry)
-		self.entry = nil
+			local scheduler=cc.Director:getInstance():getScheduler()
+			scheduler:unscheduleScriptEntry(self.entry)
+			self.entry = nil
 		end
 	end
 end
@@ -1383,7 +1647,9 @@ function pini:GetUUID()
 	local uuid = time
 	local count = 0;
 	while true do
-		if self._regist_.Display[uuid] == nil then
+		if self._regist_.Display[uuid] == nil and 
+		   self._regist_.Timers[uuid] == nil  and 
+		   self._regist_.Sounds[uuid] == nil then
 			return uuid
 		end
 		uuid = time..count

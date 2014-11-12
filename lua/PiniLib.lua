@@ -167,12 +167,10 @@ function LNX_ANIMATION(vm,arg)
 	local id = vm.variable["애니메이션.아이디"] or ""
 	local t = vm.variable["애니메이션.타입"] or ""
 	
-	--[[
-	node = nodes[id] or systemNode[id]
+	node = pini._regist_.Display[id]
 	if node and fs_animation[t] then
 		fs_animation[t][2](vm,node)
 	end
-	]]
 	vm:doNext()
 end
 
