@@ -31,6 +31,7 @@ LanXVM.commands = {
 	t_function=function(vm,arg)
 		local f = vm.customfunc[arg["name"]]
 		if f then
+			vm.variable["system.arg"] = arg
 			vm:call(arg["name"])
 			vm:doNext()
 		else
@@ -48,7 +49,7 @@ LanXVM.commands = {
 		vm:doNext()
 	end,
 	t_registfunc = function(vm,arg)
-		vm:registFunc(arg["name"],arg["func"], arg["custom"])
+		vm:registFunc(arg["name"],arg["func"], arg["custom"],arg["default_arg"],arg["extens_arg"])
 		vm:doNext()
 	end,
 	t_operate = function(vm,arg)
@@ -61,18 +62,21 @@ LanXVM.commands = {
 		if L == nil then L =0 end
 		if R == nil then R =0 end
 
-		    if o == "+" then vm.variable[arg["A"]] = L + R 
-		elseif o == "*" then vm.variable[arg["A"]] = L * R 
-		elseif o == "/" then if R == 0 then R=1 end vm.variable[arg["A"]] = L / R 
-		elseif o == "-" then vm.variable[arg["A"]] = L - R 
-		elseif o == "=="then vm.variable[arg["A"]] = L == R 
-		elseif o == ">="then vm.variable[arg["A"]] = L >= R 
-		elseif o == "<="then vm.variable[arg["A"]] = L <= R 
-		elseif o == "<" then vm.variable[arg["A"]] = L < R 
-		elseif o == ">" then vm.variable[arg["A"]] = L > R 
-		elseif o == "!="then vm.variable[arg["A"]] = L ~= R
+		if type(L) == "string" or type(R) == "string" then
+			    if o == "+" then vm.variable[arg["A"]] = L .. R end
+		else
+			    if o == "+" then vm.variable[arg["A"]] = L + R 
+			elseif o == "*" then vm.variable[arg["A"]] = L * R 
+			elseif o == "/" then if R == 0 then R=1 end vm.variable[arg["A"]] = L / R 
+			elseif o == "-" then vm.variable[arg["A"]] = L - R 
+			elseif o == "=="then vm.variable[arg["A"]] = L == R 
+			elseif o == ">="then vm.variable[arg["A"]] = L >= R 
+			elseif o == "<="then vm.variable[arg["A"]] = L <= R 
+			elseif o == "<" then vm.variable[arg["A"]] = L < R 
+			elseif o == ">" then vm.variable[arg["A"]] = L > R 
+			elseif o == "!="then vm.variable[arg["A"]] = L ~= R
+			end
 		end
-		
 		vm:doNext()
 	end,
 	t_bookmark=function(vm,arg)
@@ -85,7 +89,7 @@ LanXVM.commands = {
 		end
 
 		local name = arg["v"]
-		print( name )
+		--print( name )
 		vm:GotoBookmark(name)
 		vm:doNext()
 	end,
@@ -93,7 +97,7 @@ LanXVM.commands = {
 		local compare  = vm.variable[arg["compare"]]
 		local bookname = arg["name"]
 		local bookelse = arg["bookelse"]
-		
+
 		if compare == 1 then
 			compare = true
 		elseif compare == 0 then
@@ -103,10 +107,8 @@ LanXVM.commands = {
 		if compare == false then
 			if #bookelse > 0 then
 				vm:GotoBookmark(bookelse)
-				print("jump > else !")
 			else
 				vm:GotoBookmark(bookname)
-				print("jump!")
 			end
 		end
 		vm:doNext()
@@ -131,14 +133,18 @@ function LanXVM:init()
 		for k,v in pairs(self.module) do
 			package.loaded[k] = nil
 		end
+		self.require = {}
+		self.module = {}
 	end
 	
+	self.pause = false
 	self.variable = {}
 	self.stack = {}
 	self.bookmark = {}
 	self.callstack = nil
 	self.luafunc = {}
 	self.customfunc = {}
+	self.funcInfo = {}
 	self.require = {}
 	self.module = {}
 	self.running = false
@@ -154,10 +160,17 @@ function LanXVM:defaultFunction()
 		local beforeStack = vm.defaultStack;
 		vm.defaultStack = t
 		
-		local path = t:gsub(".scene","")
-		if self.require[path] == nil then
-			self.require[path] = require("scene_"..path)
+		local path = "scene/"..t--..t:gsub(".scene","")
+		if FILES[path] == nil then
+			vm:doNext()
+			return 
 		end
+		path = FILES[path]:gsub(".lua","")
+		if self.require[path] == nil then
+			self.require[path] = require(path)
+		end
+
+		--print("require >> "..tostring(self.require[path]))
 		self.require[path](vm)
 
 		vm.defaultStack = beforeStack
@@ -167,12 +180,47 @@ function LanXVM:defaultFunction()
 	end)
 	self:registFunc("루아",function(vm,arg)
 		local t = vm.variable["루아.모듈명"] or nil
-		local path = "module/"..t
+		local path = "module/"..t..".lua"
+		if FILES[path] == nil then
+			vm:doNext()
+			return 
+		end
+		
+		path = FILES[path]:gsub(".lua","")
 		if self.module[path] == nil then
 			self.module[path] = require(path)
 		end
 		self.module[path](vm)
 	end)
+	self:registFunc("LUA_FUNCTION",function(vm,arg)
+		local name = vm.variable["LUA_FUNCTION.name"] or ""
+		if name:len() > 0 then
+			_G[name](vm,arg)
+			--print("LUAFUNCTION",name,_G[name])
+		end
+	end)
+end
+
+function LanXVM:CleanArgVariable()
+	--print("CleanArgVariable")
+	for k,v in pairs(self.variable) do 
+		--print(k,v,v:find("."))
+		if v:find(".") then
+			self.variable[k] = nil
+		end
+	end
+end
+
+function LanXVM:stop()
+	self.pause = true
+end
+
+function LanXVM:resume(bookmark)
+	self.pause = false
+	if bookmark then
+		self:GotoBookmark(bookmark)
+	end
+	self:doNext()
 end
 
 function LanXVM:clearFunction(name)
@@ -183,13 +231,16 @@ function LanXVM:registCommand(i,f)
 	self.commands[i] = f
 end
 
-function LanXVM:registFunc(i,f,a)
+function LanXVM:registFunc(i,f,a,default,extens)
 	if a then
 		self.customfunc[i] = true
 		f(self)
 	else
 		self.luafunc[i] = f
 	end
+	self.funcInfo[i] = {}
+	self.funcInfo[i]["default"] = default
+	self.funcInfo[i]["extens"] = extens
 end
 
 function LanXVM:pushCmd(cmd,arg,stackName)
@@ -205,6 +256,7 @@ function LanXVM:pushCmd(cmd,arg,stackName)
 		}
 	end
 
+	--print(">push cmd : ",stackName,cmd)
 	table.insert(self.stack[stackName],{self.commands[cmd],arg})
 end
 
@@ -239,7 +291,7 @@ function LanXVM:call(stackName)
 	c,s = self:CallStackDepth(self.callstack)
 	if c > 100 then
 		self.callstack = s
-		print("callstack overflow!")
+		--print("callstack overflow!")
 	end
 end
 
@@ -253,30 +305,37 @@ function LanXVM:_return()
 end
 
 function LanXVM:runCommand()
-	if self.stack[self.callstack.name] == nil then
-		return 
-	end
-	self.running = true
-	while true do
-		self.callstack.curLine = self.callstack.curLine+1
-		if #self.stack[self.callstack.name] < self.callstack.curLine then
-			if self:_return() == false then -- global stack end
-				if self.eventCallback then 
-					self.eventCallback("FIN")
-				end
-				return 
+	if self.stack[self.callstack.name] ~= nil then
+		self.running = true
+		while true do
+			if self.pause then
+				break
 			end
-			self:runCommand()
-			return 
-		end
+			self.callstack.curLine = self.callstack.curLine+1
+			if #self.stack[self.callstack.name] < self.callstack.curLine then
+				self.callstack.curLine = #self.stack[self.callstack.name]
+				if self:_return() == false then -- global stack end
+					if self.eventCallback then 
+						self.eventCallback({type="FIN"})
+					end
+					break
+				end
+				self:runCommand()
+				break 
+			end
 
-		self.next = false
+			self.next = false
 
-		--print("name:"..self.callstack.name.." ("..self.callstack.curLine.."/"..#self.stack[self.callstack.name]..")")
-		local v = self.stack[self.callstack.name][self.callstack.curLine]
-		v[1](self,v[2])
-		if self.next == false then
-			break
+			local v = self.stack[self.callstack.name][self.callstack.curLine]
+			--print(">run : ",self.callstack.name,self.callstack.curLine,v[1])
+
+			v[1](self,v[2])
+			if self.eventCallback then 
+				self.eventCallback({type="LINE",v=v[2]})
+			end
+			if self.next == false then
+				break
+			end
 		end
 	end
 	self.running = false
@@ -292,6 +351,18 @@ end
 
 function LanXVM:registEvent(func)
 	self.eventCallback = func
+end
+
+--------------------------------------------------------------
+--shows!
+--------------------------------------------------------------
+function LanXVM:showFuncs()
+	print(print_r(self.customfunc))
+	print(print_r(self.luafunc))
+end
+
+function LanXVM:showBookmark()
+	print(print_r(self.bookmark))
 end
 
 function LanXVM:showValues()
@@ -312,4 +383,5 @@ end
 function LanXVM:showCallStack()
 	print(print_r(self.callstack))
 end
+
 return LanXVM

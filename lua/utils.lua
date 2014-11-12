@@ -27,7 +27,6 @@ end
 local startsWith = function(self, piece)
   return string.sub(self, 1, string.len(piece)) == piece
 end
- 
 rawset(_G.string, "startsWith", startsWith)
 rawset(_G.string, "explode", explode)
 rawset(_G.table, "implode", implode)
@@ -35,13 +34,14 @@ rawset(_G.table, "implode", implode)
 local string = string
 local math = math
 function string.StripExtension( path )
-
 	local i = path:match( ".+()%.%w+$" )
 	if ( i ) then return path:sub(1, i-1) end
 	return path
-
 end
 
+function string.endsWith(String,End)
+   return End=='' or string.sub(String,-string.len(End))==End
+end
 --[[   
 
 -----------------------------------------------------------

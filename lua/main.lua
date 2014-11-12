@@ -3,6 +3,9 @@ require "Cocos2dConstants"
 require "ExtensionConstants"
 require "json"
 
+WIN_WIDTH = 0
+WIN_HEIGHT = 0
+
 local fileUtil = cc.FileUtils:getInstance()
 
 fileUtil:addSearchPath("src")
@@ -54,6 +57,9 @@ end
 
 local consoleBack = nil
 local function console(text)
+	if text:len()>50 then
+		text = text:sub(1,50)
+	end
 	if consoleBack then
 		if consoleBack.ttf == nil then
 			consoleBack.ttf = cc.Label:createWithSystemFont(pStrTitle, "Arial", 15)
@@ -90,7 +96,16 @@ function InitCocos2d(width,height)
 	else
 		glview:setDesignResolutionSize(width , height, cc.ResolutionPolicy.NO_BORDER)
 	end
-	director:setDisplayStats(true)
+
+	if width == nil or height == nil then
+		local s = cc.Director:getInstance():getVisibleSize()
+		WIN_WIDTH = s.width
+		WIN_HEIGHT = s.height
+	else
+		WIN_WIDTH = width
+		WIN_HEIGHT = height
+	end
+	director:setDisplayStats(false)
 	director:setAnimationInterval(1.0 / 60)
 end
 
@@ -101,6 +116,10 @@ function ScreenReSize(width,height)
 		glview:setDesignResolutionSize(width , height, cc.ResolutionPolicy.NO_BORDER)
 		glview:setFrameSize(width , height)
 	end
+
+	WIN_WIDTH = width
+	WIN_HEIGHT = height
+
 end
 
 local function LanX_start(start)
@@ -114,17 +133,54 @@ local function LanX_start(start)
 				ScreenReSize(proj.width,proj.height)
 			end
 
+			package.loaded["FILEMANS"] = nil
+			require 'FILEMANS'
+			
 			XVM = require("LanXVM")
 			XVM:init()
-			require("EmulateVM")(XVM)
+			if pini then
+				pini:Clear()
+			end
 
-			require(start)(XVM)
+
+			try{function()
+				require(FILES["module/libdef.lnx"]:gsub(".lua",""))(XVM)
+				end,
+				catch {function(error)
+					print("ERROR LOADING LIBDEF LNX",error)
+				end}
+			}
+
+			try{function()
+				require("PiniLib")(XVM)
+				end,
+				catch {function(error)
+					print("ERROR LOADING PINILIB")
+				end}
+			}
+
+			try{function()
+					require(FILES["scene/"..start..".scene"])(XVM)
+				end,
+				catch {function(error)
+					print("start 1 :",error)
+					try{function()
+							require(start)(XVM)
+						end,
+						catch {function(error)
+							print("start 2 :",error)
+							console("저장된 메인 씬이 없습니다 : \""..start.."\"")
+						end}
+					}
+				end}
+			}
 			XVM:runCommand()
 			consoleBack = nil
 		end,
 		catch {
 			function(error)
-				console("저장된 메인 씬이 없습니다.")
+				console("저장된 메인 씬이 없습니다 : \""..start.."\"")
+				print(error)
 		end
 		}
 	}
@@ -180,7 +236,7 @@ local function initRemoteScene(width,height)
 	consoleBack = pBackgroundButton
 
 	--BUTTONS
-	pButton = makeBtn("저장된 파일 실행하기",function() LanX_start("scene_main") end)
+	pButton = makeBtn("저장된 파일 실행하기",function() LanX_start("메인") end)
 	pButton:setPosition(cc.p (width/2, height/2-100))
 	pLayer:addChild(pButton)
 
@@ -280,7 +336,7 @@ local function main()
 		end
 
 		local function send(socket,order,payload)
-			console(order,payload)
+			console("<<"..order.."<<"..payload)
 			local size = tostring(#payload)
 			for i=#size,11-1,1 do
 				size = size.." "
@@ -288,6 +344,20 @@ local function main()
 			socket:send(order)
 			socket:send(size)
 			socket:send(payload)
+		end
+
+		local function recvedInt(str,c)
+			local buffer = ""
+			for i=1,c,1 do
+				local t = str:byte(i)
+				if t >= 48 and t <= 57 then
+					local c = string.char(t)
+					buffer = buffer..c
+				else
+					break
+				end
+			end
+			return tonumber(buffer)
 		end
 
 		console("리모트 서버 정상 작동")
@@ -314,12 +384,14 @@ local function main()
 					if clients[idx] == 0 then
 						console("명령 해석 중")
 						header = recv(input,4)
+						console("해더 입력 완료")
 						if header then 
 							size = recv(input,11)
+							size = tostring(size)
+							size = recvedInt(size,11)
 							
-							size = tonumber(size)
 							clients[idx] = {header,size,0}
-							console(size)
+							console("ok!")
 						else
 							console("정상 연결 해제.")
 						end
@@ -392,7 +464,7 @@ local function main()
 							console("업데이트 완료!")
 							console("===========================================")
 							console("씬 실행 "..startScene)
-							LanX_start("scene_"..startScene)
+							LanX_start(startScene:gsub(".lua",""))
 						
 							send(input,"ufin","finish")
 						elseif order == "ping" then

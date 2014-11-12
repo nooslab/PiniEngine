@@ -1,0 +1,1511 @@
+require("trycatch")
+if OnPreview then
+else
+	require("AudioEngine") 
+end
+
+function class(base, init)
+	local c = {}	 -- a new class instance
+	if not init and type(base) == 'function' then
+		init = base
+		base = nil
+	elseif type(base) == 'table' then
+		for i,v in pairs(base) do
+			c[i] = v
+		end
+		c._base = base
+	end
+	c.__index = c
+
+	local mt = {}
+	mt.__call = function(class_tbl, ...)
+		local obj = {}
+		setmetatable(obj,c)
+		if init then
+			init(obj,...)
+		elseif class_tbl.init then
+			class_tbl.init(obj,...)
+		else 
+			if base and base.init then
+			base.init(obj, ...)
+			end
+		end
+		return obj
+	end
+	c.init = init
+	c.is_a = function(self, klass)
+		local m = getmetatable(self)
+		while m do 
+			if m == klass then return true end
+			m = m._base
+		end
+		return false
+	end
+	setmetatable(c, mt)
+	return c
+end
+
+---------------------------------------------
+-- PINI API 
+---------------------------------------------
+
+---------------------------------------------------------------
+--위치 선정
+---------------------------------------------------------------
+fs_position={}
+fs_size = {}
+---------------------------------------------------------------
+fs_position["왼쪽상단"]=function(w,sx,sy)
+	return {sx/2,sy/2}
+end
+fs_position["오른쪽상단"]=function(w,sx,sy)
+	return {w.width-sx/2,sy/2}
+end
+fs_position["화면중앙"]=function(w,sx,sy)
+	return {w.width/2,w.height/2}
+end
+fs_position["왼쪽하단"]=function(w,sx,sy)
+	return {sx/2,w.height-sy/2}
+end
+fs_position["오른쪽하단"]=function(w,sx,sy)
+	return {w.width-sx/2,w.height-sy/2}
+end
+fs_position["100,100"]=nil
+fs_position["200,200"]=nil
+fs_position["300,300"]=nil
+
+---------------------------------------------------------------
+--사이즈 선정
+---------------------------------------------------------------
+
+fs_size["원본크기"]=function(w,sx,sy)
+	return {1,1}
+end
+fs_size["두배"]=function(w,sx,sy)
+	return {2,2}
+end
+fs_size["화면맞춤"]=function(w,sx,sy)
+	return {w.width/sx,w.height/sy}
+end
+
+---------------------------------------------------------------
+--이미지 등장 효과 관리
+---------------------------------------------------------------
+fs_imageEffect = {}
+fs_imageDeleteEffect = {}
+---------------------------------------------------------------
+fs_imageEffect["업페이드"]=function(node,sec)
+	local x,y
+	x,y = node:position()
+	node:setPosition(x,y+10)
+	node:setOpacity(0)
+	local action = pini.Anim.Spawn(
+		pini.Anim.MoveBy(sec,0,-10),
+		pini.Anim.FadeTo(sec,255)
+	)
+	action:run(node)
+end
+fs_imageEffect["다운페이드"]=function(node,sec)
+	local x,y
+	x,y = node:position()
+	node:setPosition(x,y+10)
+	node:setOpacity(0)
+	local action = pini.Anim.Spawn(
+		pini.Anim.MoveBy(sec,0,-10),
+		pini.Anim.FadeTo(sec,255)
+	)
+	action:run(node)
+end
+fs_imageEffect["줌인페이드"]=function(node,sec)
+	local x,y
+	x,y = node:scale()
+	node:setScale(x-0.1,y-0.1)
+	node:setOpacity(0)
+	local action = pini.Anim.Spawn(
+		pini.Anim.ScaleTo:create(sec,x,y),
+		pini.Anim.FadeTo:create(sec,255)
+	)
+	action:run(node)
+end
+fs_imageEffect["줌아웃페이드"]=function(node,sec)
+	local x,y
+	x,y = node:scale()
+	node:setScale(x+0.1,y+0.1)
+	node:setOpacity(0)
+	local action = pini.Anim.Spawn(
+		pini.Anim.ScaleTo:create(sec,x,y),
+		pini.Anim.FadeTo:create(sec,255)
+	)
+	action:run(node)
+end
+
+---------------------------------------------------------------
+--이미지 퇴장 효과 관리
+---------------------------------------------------------------
+fs_imageDeleteEffect["업페이드"]=function(node,sec)
+	local action = pini.Anim.Spawn(
+		pini.Anim.MoveBy(sec,0,10),
+		pini.Anim.FadeTo(sec,0)
+	)
+	action:run(node)
+end
+fs_imageDeleteEffect["다운페이드"]=function(node,sec)
+	local action = pini.Anim.Spawn(
+		pini.Anim.MoveBy(sec,0,-10),
+		pini.Anim.FadeTo(sec,0)
+	)
+	action:run(node)
+end
+fs_imageDeleteEffect["줌인페이드"]=function(node,sec)
+	local x,y
+	x,y = node:scale()
+	local action = pini.Anim.Spawn(
+		pini.Anim.ScaleTo(sec,x-0.1,y-0.1),
+		pini.Anim.FadeTo(sec,0)
+	)
+	action:run(node)
+end
+fs_imageDeleteEffect["줌아웃페이드"]=function(node,sec)
+	local x,y
+	x,y = node:scale()
+	local action = pini.Anim.Spawn(
+		pini.Anim.ScaleTo(sec,x+0.1,y+0.1),
+		pini.Anim.FadeTo(sec,0)
+	)
+	action:run(node)
+end
+
+---------------------------------------------
+-- Animation
+---------------------------------------------
+local MoveBy = class()
+function MoveBy:init(sec,x,y)
+	self.x = x
+	if OnPreview then
+		self.y = y
+	else
+		self.y = -y
+	end
+	self.sec = sec
+end
+function MoveBy:cocosObj()
+	return cc.MoveBy:create(self.sec,cc.p(self.x,self.y))
+end
+function MoveBy:run(node)
+	if OnPreview then
+		local x,y
+		x,y = node:position()
+		node:setPosition(self.x+x,self.y+y)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local MoveTo = class()
+function MoveTo:init(sec,x,y)
+	self.x = x
+	if OnPreview then
+		self.y = y
+	else
+		self.y = WIN_HEIGHT-y
+	end
+	self.sec = sec
+end
+function MoveTo:cocosObj()
+	return cc.MoveTo:create(self.sec,cc.p(self.x,self.y))
+end
+function MoveTo:run(node)
+	if OnPreview then
+		node:setPosition(x,y)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local FadeTo = class()
+function FadeTo:init(sec,op)
+	self.opacity = op
+	self.sec = sec
+end
+function FadeTo:cocosObj()
+	return cc.FadeTo:create(self.sec,self.opacity)
+end
+function FadeTo:run(node)
+	if OnPreview then
+		node:setOpacity(self.opacity)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local ScaleTo= class()
+function ScaleTo:init(sec,x,y)
+	self.x = x
+	self.y = y
+	self.sec = sec
+end
+function ScaleTo:cocosObj()
+	return cc.ScaleTo:create(self.sec,self.x,self.y)
+end
+function ScaleTo:run(node)
+	if OnPreview then
+		node:setScale(self.x,self.y)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local ScaleBy=class()
+function ScaleBy:init(sec,x,y)
+	self.x = x
+	self.y = y
+	self.sec = sec
+end
+function ScaleBy:cocosObj()
+	return cc.ScaleBy:create(self.sec,self.x,self.y)
+end
+function ScaleBy:run(node)
+	if OnPreview then
+		local x,y
+		x,y = node:scale()
+		node:setScale(x+self.x,y+self.y)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local Spawn=class()
+function Spawn:init(...)
+	self.list = {...}
+end
+function Spawn:cocosObj()
+	local _list = {}
+	for k,v in ipairs(self.list) do
+		table.insert(_list,v:cocosObj())
+	end
+	return cc.Spawn:create(unpack(_list))
+end
+function Spawn:run(node)
+	if OnPreview then
+		for i,v in ipairs(self.list) do
+			v:run(node)
+		end
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local Sequence=class()
+function Sequence:init(...)
+	self.list = {...}
+end
+function Sequence:cocosObj()
+	local _list = {}
+	for k,v in ipairs(self.list) do
+		table.insert(_list,v:cocosObj())
+	end
+	return cc.Sequence:create(unpack(_list))
+end
+function Sequence:run(node)
+	if OnPreview then
+		for i,v in ipairs(self.list) do
+			v:run(node)
+		end
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local TintTo=class()
+function TintTo:init(sec,r,g,b)
+	self.r = r
+	self.g = g
+	self.b = b
+	self.sec = sec
+end
+function TintTo:cocosObj()
+	return cc.TintTo:create(self.sec,cc.c3b(r,g,b))
+end
+function TintTo:run(node)
+	if OnPreview then
+		node:setColor(r,g,b)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local Forever=class()
+function Forever:init(action)
+	self.action = action
+end
+function Forever:cocosObj()
+	return cc.RepeatForever:create(self.action:cocosObj())
+end
+function Forever:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		node.node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local anim = {}
+anim["MoveBy"] = MoveBy
+anim["MoveTo"] = MoveTo
+anim["FadeTo"] = FadeTo
+anim["ScaleTo"] = ScaleTo
+anim["ScaleBy"] = ScaleBy
+anim["TintTo"] = TintTo
+anim["Spawn"] = Spawn
+anim["Sequence"] = Sequence
+anim["Forever"] = Forever
+---------------------------------------------
+-- Node 
+---------------------------------------------
+local Node = class()
+if OnPreview then
+	OnPreviewDrawOrder=0		
+end
+function Node:init(id)
+	self.id = id
+	if OnPreview then
+		self.type = "Node"
+		self:initialize()
+	else
+		self.node = cc.Node:create()
+		self.node.obj = self
+	end
+end
+function Node:initialize()
+	self.visible = true
+	self.x = 0
+	self.y = 0
+	self.scaleX = 1
+	self.scaleY = 1
+	self.rotate = 0
+	self.anchorX = 0.5
+	self.anchorY = 0.5
+	self.zOrder = 0
+	self.color = {255,255,255}
+	self.opacity = 255
+	self._children = {}
+	if OnPreview then
+		self.drawOrder = OnPreviewDrawOrder
+		OnPreviewDrawOrder = OnPreviewDrawOrder+1
+	end
+end
+
+function Node:retain()
+	if OnPreview then
+
+	else
+		self.node:retain()
+	end
+end
+
+function Node:setZ(z)
+	if OnPreview then
+		self.zOrder = z
+	else
+		self.node:setZOrder(z)
+	end
+end
+
+function Node:setVisible(v)
+	if OnPreview then
+		self.visible = v
+	else
+		self.node:setVisible(v)
+	end
+end
+
+function Node:isVisible(v)
+	if OnPreview then
+		return self.visible
+	else
+		return self.node:isVisible()
+	end
+end
+
+function Node:removeSelf(cleanup)
+	if OnPreview then
+		if self.parent then
+			k,v = self.parent:findChild(self.id)
+			if k then
+				table.remove(self.parent._children,k)
+				self.parent = nil
+
+				if cleanup ~= false then
+					self.node = nil
+				end
+			end
+		end
+	else
+		self.node:removeFromParent()
+		self.parent = nil
+		if cleanup ~= false then
+			self.node = nil
+		end
+	end
+end
+
+function Node:children()
+	if OnPreview then
+		return self._children
+	else
+		local ret = {}
+		local children = {}
+		try{
+			function()
+				children = self.node:getChildren()
+			end,
+			catch{function(error)end}
+		}
+		for k,v in ipairs(children)do
+			table.insert(ret,v.obj)
+		end
+		return ret
+	end
+end
+
+function Node:setContentSize(x,y)
+	if OnPreview then
+		if self.type == "ColorLayer" then
+			self.width  = x
+			self.height = y
+		end
+	else
+		self.node:setContentSize(cc.size(x,y))
+	end
+end
+
+function Node:findChild(idx)
+	if OnPreview then
+		for k,v in ipairs(self._children) do
+			if v.id == idx then
+				return k,v
+			end
+		end
+	else
+	end
+end
+
+function Node:addChild(node)
+	node.parent = self
+	if OnPreview then
+		table.insert(self._children,node)
+	else
+		self.node:addChild(node.node)
+	end
+end
+
+function Node:removeChild(node)
+	if OnPreview then
+
+	else
+		self.node:removeChild(node.node)
+		node.node = nil
+	end
+end
+
+function Node:setPositionX(x)
+	self._x = x
+	if OnPreview then
+		self.x = x
+	else
+		self.node:setPositionX(tonumber(x))
+	end
+end
+
+function Node:setPositionY(y)
+	self._y = y
+	if OnPreview then
+		self.y = y
+	else
+		local height = WIN_HEIGHT
+		if self.parent and self.parent.type ~= "Scene" then
+			height = self.parent:contentSize().height
+		end
+		self.node:setPositionY(height-tonumber(y))
+	end
+end
+
+function Node:position()
+	return self._x,self._y
+end
+
+function Node:anchor()
+	if OnPreview then
+		return self.anchorX,self.anchorY
+	else
+		local p = self.node:getAnchorPoint()
+		return p.x,p.y
+	end
+end
+
+function Node:setPosition(x,y)
+	if y == nil and tonumber(x) == nil then 
+		if fs_position[x] then
+			local sx,sy,psx,psy
+			local ps = self:parentSize()
+			local size = self:contentSize()
+			sx,sy = self:scale()
+			psx,psy = self:parentsNodeScale()
+			sx = size.width  * psx * sx
+			sy = size.height * psy * sy 
+			x = fs_position[x](ps,sx,sy)
+			x,y = x[1],x[2]
+		end
+	end
+	self._x = x
+	self._y = y
+	if OnPreview then
+		self.x = x
+		self.y = y
+	else
+		local height = WIN_HEIGHT
+		local dx = 0
+		local dy = 0
+		if self.parent then
+			local ax,ay,width
+
+			if self.parent.type ~= "Scene" then
+				width  = self.parent:contentSize().width
+				height = self.parent:contentSize().height
+				ax,ay  = self.parent:anchor()
+			else
+				width = WIN_WIDTH
+				ax,ay = 0,0
+			end
+
+			dx = width*ax
+			dy = height*ay
+		end
+		self.node:setPosition(tonumber(x)+dx,height-tonumber(y)-dy)
+	end
+end
+
+function Node:setScale(x,y)
+	if y == nil and tonumber(x) == nil then 
+		if fs_size[x] then
+			local sx,sy,psx,psy
+			local ps = self:parentSize()
+			local s = self:contentSize()
+			x = fs_size[x](ps,s.width,s.height)
+			x,y = x[1],x[2]
+		end
+	end
+	if OnPreview then
+		self.scaleX = x
+		self.scaleY = y
+	else
+		self.node:setScale(tonumber(x),tonumber(y))
+	end
+end
+
+function Node:parentSize()
+	local psx,psy
+	local ps = {width=WIN_WIDTH,height=WIN_HEIGHT}
+	if self.parent then
+		ps = self.parent:contentSize()
+		psx,psy = self:parentsNodeScale(self.parent)
+		ps.width  = ps.width * psx
+		ps.height = ps.height * psy
+	end
+	return ps
+end
+
+function Node:scale()
+	if OnPreview then
+		return self.scaleX,self.scaleY
+	else
+		return self.node:getScaleX(),self.node:getScaleY()
+	end
+end
+
+function Node:contentSize()
+	if OnPreview then
+		if self.type == "Sprite" then
+			local s = PiniLuaHelper:imageSize(self.path);
+			return {width=s[0],height=s[1]}
+		elseif self.type=="ColorLayer" then
+			return {width=self.width,height=self.height}
+		elseif self.type=="Label" then
+			local s = PiniLuaHelper:fontSize(self.text,self.size,self.font)
+			return {width=s[0],height=s[1]}
+		end
+	else
+		return self.node:getContentSize()
+	end
+end
+
+function Node:parentsNodeScale(node)
+	if OnPreview then
+		return 1,1
+	end
+
+	if node == nil then
+		node = self
+	end
+
+	local scaleX,scaleY
+	scaleX,scaleY = node:scale()
+	if node.parent and node.parent.type ~= "Scene" then
+		local sx,sy
+		sx,sy = self:parentsNodeScale(node.parent)
+		scaleX = scaleX * sx
+		scaleY = scaleY * sy
+	end
+	return scaleX,scaleY
+end
+
+function Node:setColor(r,g,b)
+	if OnPreview then
+		self.color = {r,g,b}
+	else
+		self.node:setColor(cc.c3b(r,g,b))
+	end
+end
+
+function Node:setOpacity(a)
+	if OnPreview then
+		self.opacity = a
+	else
+		self.node:setOpacity(a)
+	end
+end
+
+function Node:StopAction()
+	if OnPreview then
+	else
+		self.node:stopAllActions()
+	end
+end
+
+---------------------------------------------
+-- Sprite 
+---------------------------------------------
+local Sprite = class(Node)
+function Sprite:init(id,path)
+	self.id = id
+	if OnPreview then
+		self:initialize()
+		self.type = "Sprite"
+		self.path = path
+	else
+		self.node = cc.Sprite:create(FILES["image/"..path])
+		self.node.obj = self
+	end
+
+	self:setPosition(0,0)
+end
+
+---------------------------------------------
+-- Scene 
+---------------------------------------------
+local Scene=class()
+function Scene:init()
+	self.type = "Scene"
+	if OnPreview then
+	else
+		self.scene = cc.Scene:create()
+		self.layer = cc.Node:create()
+
+		self.scene:addChild(self.layer)
+		if cc.Director:getInstance():getRunningScene() then
+			cc.Director:getInstance():replaceScene(self.scene)
+		else
+			cc.Director:getInstance():runWithScene(self.scene)
+		end
+
+		local function onNodeEvent(tag)
+			if tag == "exit" then
+				pini:ClearDisplay()
+			end
+		end
+		self.scene:registerScriptHandler(onNodeEvent)
+	end
+	pini:SetScene(self)
+end
+function Scene:addChild(node)
+	if OnPreview then
+	else
+		self.layer:addChild(node.node)
+		node.parent = self
+	end
+end
+
+function Scene:removeChild(node)
+	if OnPreview then
+
+	else
+		self.layer:removeChild(node.node)
+		node.node = nil
+	end
+end
+function Scene:clear()
+	if OnPreview then
+
+	else
+		try{
+			function()
+				self.node:removeAllChildren(true)
+			end,
+			catch{function(error)end}
+		}
+	end
+end
+
+---------------------------------------------
+-- ColorRect 
+---------------------------------------------
+local ColorLayer=class(Node)
+function ColorLayer:init(id,r,g,b,a,w,h)
+	self.id = id
+	if OnPreview then
+		self:initialize()
+		self.type = "ColorLayer"
+		self.width  = w
+		self.height = h
+		self.color  = {r,g,b}
+		self.opacity = a
+		self.anchorX = 0.0
+		self.anchorY = 0.0
+	else
+		self.node = cc.LayerColor:create(cc.c4b(r,g,b,a),w,h)
+		self.node:setAnchorPoint(cc.p(0,0))
+		self.node.obj = self
+	end
+end
+
+---------------------------------------------
+-- label 
+---------------------------------------------
+local Label = class(Node)
+function Label:init(id,str,fnt,size)
+	self.id = id
+	if OnPreview then
+		self:initialize()
+		self.type = "Label"
+		self.text = str
+		self.font = fnt
+		self.size = size
+	else
+		self.node = cc.Label:createWithTTF(str,fnt..".ttf",size)
+		self.node.obj = self
+	end
+end
+
+---------------------------------------------
+-- Timer 
+---------------------------------------------
+local Timer = class()
+function Timer:init(id,time,func,re)
+	self.id = id
+	self.time = tonumber(time)
+	self.func = func
+	self.rep = re
+	self.entry = nil
+end
+function Timer:run()
+	if self.id then
+		pini:RegistTimer(self)
+	end
+	if OnPreview then
+		self.func()
+		self:stop()
+	else
+		if self.entry then
+			return 
+		end
+		local scheduler = cc.Director:getInstance():getScheduler()
+		self.entry = scheduler:scheduleScriptFunc(function()
+			self.func()
+			if self.rep == false then
+				self:stop()
+			end
+		end, self.time, false)
+	end
+end
+function Timer:stop()
+	if self.id then
+		pini:UnregistTimer(self)
+	end
+	if OnPreview then
+
+	else
+		if self.entry then
+		local scheduler=cc.Director:getInstance():getScheduler()
+		scheduler:unscheduleScriptEntry(self.entry)
+		self.entry = nil
+		end
+	end
+end
+
+--##########################################################################
+-- 터치 매니저
+--##########################################################################
+local TouchManager = nil
+if OnPreview then
+	TouchManager = {
+		SetScene = function(scene)
+		end,
+		clearNode = function()
+		end,
+		removeNode = function(node)
+		end,
+		registNode = function(node)
+		end,
+		onTouchBegan = function (touch, event)
+		end,
+		onTouchEnded = function (touch, event)
+		end
+	}
+else
+	TouchManager = {
+		nodes = {},
+		touchNode = nil,
+		SetScene = function(self,scene)
+			scene = scene.scene
+			
+			self:clearNode()
+
+			local listener = cc.EventListenerTouchOneByOne:create()
+			listener:registerScriptHandler(self.onTouchBegan,cc.Handler.EVENT_TOUCH_BEGAN )
+			listener:registerScriptHandler(self.onTouchEnded,cc.Handler.EVENT_TOUCH_ENDED )
+
+			local eventDispatcher = scene:getEventDispatcher()
+			eventDispatcher:addEventListenerWithSceneGraphPriority(listener, scene)
+		end,
+		clearNode = function(self)
+			self.nodes = {}
+		end,
+		removeNode = function(self,node)
+			for k,v in ipairs(self.nodes) do
+				if v == node then
+					table.remove(self.nodes,k)
+					if self.touchNode == v then
+						self.touchNode = nil
+					end
+					return
+				end
+			end
+		end,
+		registNode = function(self,node)
+			local function onNodeEvent(tag)
+				if tag == "exit" then
+					self:removeNode(node)
+				end
+			end
+			node.node:registerScriptHandler(onNodeEvent)
+			table.insert(self.nodes,node)
+		end,
+		onTouchBegan = function (touch, event)
+			local self = TouchManager
+			local nodes = self.nodes
+
+			local location = touch:getLocation()
+			for k,v in ipairs(nodes) do
+				local tloc = v.node:convertToNodeSpace(location);
+				local b = v:contentSize()
+				if tloc.x > 0 and tloc.y > 0 and tloc.x < b.width and tloc.y < b.height then
+					self.touchNode = v
+
+					if v.sx == nil then
+						v.sx,v.sy = v:scale()
+					end
+					if v.onTouchDown then
+						v.onTouchDown(location) 
+					end
+
+					local anim = pini.Anim.ScaleTo(0.2,v.sx+(10/b.width),v.sy+(10/b.height))
+					anim:run(v)
+
+					return true
+				end
+			end
+			return false
+		end,
+		onTouchEnded = function (touch, event)
+			local self = TouchManager
+			local v = self.touchNode
+			if v then
+				local location = touch:getLocation()
+				local tloc = v.node:convertToNodeSpace(location);
+				local b = v:contentSize()
+				if tloc.x > 0 and tloc.y > 0 and tloc.x < b.width and tloc.y < b.height then
+					if v.onTouchUp then
+						v.onTouchUp(location)
+					end
+				end
+				if v.node then
+					local anim = pini.Anim.ScaleTo(0.2,v.sx,v.sy)
+					anim:run(v)
+				end
+				self.touchNode = nil
+			end
+		end
+	}
+end
+-----------------------------------------------
+----- Dialog
+-----------------------------------------------
+local Dialog=class()
+function Dialog:init()
+	self.name = nil
+	self.targ = {}
+	self.linker = {}
+	self.background = nil
+	self.nameWindow = nil
+	self.cursor = nil
+	self.keepFlag = false
+	self.configs = {}
+	self.configIdx = nil
+	self.needUpdate = true
+	self.lastX = 0
+	self.lastY = 0
+	self.lastMaxY = 0
+end
+function Dialog:SetConfig(idx,data)
+	self.configs[idx] = data
+end
+function Dialog:UseConfig(idx)
+	if self.configIdx ~= idx then
+		self.needUpdate = true
+	end
+	self.configIdx = idx
+end
+function Dialog:Clear()
+	if self.background then
+		pini:DetachDisplay(self.background)
+	end
+	if self.nameWindow then
+		pini:DetachDisplay(self.nameWindow)
+	end
+--	if self.cursor then 
+--		pini:DetachDisplay(self.cursor)
+--	end
+	self.background = nil
+	self.nameWindow = nil
+	self.cursor = nil
+	self.cursor = nil
+	self.linker = {}
+end
+function Dialog:Reset()
+	self.lastX = 0
+	self.lastY = 0
+	self.lastMaxY = 0
+	self.targ = {}
+	self:Clear()
+end
+function Dialog:setKeep(keepFlag)
+	self.keepFlag = keepFlag;
+end
+function Dialog:_make()
+	local config = self.configs[self.configIdx]
+	if self.background == nil or self.background.node == nil then
+		self.needUpdate = true
+	end
+	if self.needUpdate then
+		self:Clear()
+		local x,y
+		-- create dialog window
+		x,y = config["x"] or 0 ,config["y"] or 0 
+		if config["path"] then
+			self.background = pini.Sprite("dialog_background",config["path"])
+			x,y = x+self.background:contentSize().width/2,y+self.background:contentSize().height/2
+		else
+			self.background = pini.ColorLayer("dialog_background",0,0,0,0,config["width"] or 300,config["height"] or 300)
+		end
+
+		local backColor = config["background_color"] or {255,255,255,255}
+		self.background:setColor(backColor[1] or 255,
+								 backColor[2] or 255,
+								 backColor[3] or 255)
+		self.background:setOpacity(backColor[4] or 255)
+		self.background:setPosition(x,y)
+		self.background:setZ(9000);
+		pini:AttachDisplay(self.background)
+
+		--create name window
+		if self.name then
+			local nameWindow = config["name"] or {}
+			x,y = nameWindow["x"] or 0 ,nameWindow["y"] or 0 
+			if nameWindow["path"] then
+				self.nameWindow = pini.Sprite("dialog_name",nameWindow["path"])
+				x,y = x+self.nameWindow:contentSize().width/2,y+self.nameWindow:contentSize().height/2
+			else
+				self.nameWindow = pini.ColorLayer("dialog_name",60,60,60,122,nameWindow["width"] or 300,nameWindow["height"] or 50)
+			end
+			local backColor = nameWindow["background_color"] or {255,255,255,255}
+			self.nameWindow:setColor(backColor[1] or 255,
+									 backColor[2] or 255,
+									 backColor[3] or 255)
+			self.nameWindow:setOpacity(backColor[4] or 255)
+			self.nameWindow:setPosition(x,y)
+			self.nameWindow:setZ(50000);
+			pini:AttachDisplay(self.nameWindow)
+		end
+
+		--create cursor
+		local cursorConf = config["cursor"] or {}
+		if cursorConf["sprite"] and cursorConf["sprite"]:len() > 0 then
+			self.cursor = pini.Sprite("dialog_cursor",cursorConf["sprite"])
+			--self.cursor:setAnchorPoint(0,0)
+		else
+			self.cursor = pini.ColorLayer("dialog_cursor",0,0,0,0,cursorConf["width"] or 20,cursorConf["height"] or 10)
+		end
+		local color = cursorConf["color"] or {255,255,255,255}
+		self.cursor:setColor(color[1] or 255,
+							 color[2] or 255,
+							 color[3] or 255)
+		self.cursor:setOpacity(color[4] or 255)
+		self.cursor:setVisible(false)
+		self.cursor:setZ(50000);
+		pini:AttachDisplay(self.cursor,self.background.id)
+
+		if cursorConf["anim"] then
+			local action = pini.Anim.Forever(cursorConf["anim"])
+			action:run(self.cursor)
+		end
+	end
+	self.needUpdate = false
+end
+function Dialog:build()
+	self:_make()
+
+	local config = self.configs[self.configIdx]
+	local args = self.targ
+	if self.name then
+		local nameConf = config["name"] or {}
+		local font = nameConf["font"] or config["font"] or "NanumBarunGothic"
+		local label = pini.Label(pini:GetUUID(),self.name,font,nameConf["text_size"] or 30)
+		pini:AttachDisplay(label,self.nameWindow.id)
+		label:setColor(nameConf["text_color"][1] or 255,
+					   nameConf["text_color"][2] or 255,
+					   nameConf["text_color"][3] or 255)
+		label:setPosition(nameConf["text_align"] or "화면중앙")
+	end
+	local font = config["font"] or "NanumBarunGothic"
+	local default_color = {255,255,255}
+	local default_size = 30
+					
+	local x = (config["marginX"] or 0)+self.lastX
+	local y = (config["marginY"] or 0)+self.lastY
+	local maxY = self.lastMaxY or default_size
+	local color = default_color
+	local size = default_size
+	local link = nil
+	local lineGap = 5
+	local wordGap = 0
+
+	for k,v in ipairs(args) do
+		print_str = nil
+		if v["type"] == "string" then
+			if v["v"] == "\n" then
+				x = 0
+				y = y+maxY+lineGap
+				maxY = default_size
+			elseif v["v"]:len() > 0 then
+				print_str = v["v"]
+			end
+		else
+			_v = v["v"]
+			_a = _v["args"]
+
+			if _v["name"] == "색상" then
+				color = {tonumber(_a[1]),tonumber(_a[2]),tonumber(_a[3])}
+			elseif _v["name"] == "/색상" then
+				color = default_color
+
+			elseif _v["name"] == "크기" then
+				size = tonumber(_a[1])
+			elseif _v["name"] == "/크기" then
+				size = default_size
+
+			elseif _v["name"] == "공백" then
+				x = x+tonumber(_a[1])
+ 
+			elseif _v["name"]:startsWith("=") then
+				local _id = _v["name"]:sub(2,#_v["name"])
+				print_str = tostring(self.vm.variable[_id])
+				
+			elseif _v["name"] == "연결" then
+				if #_a > 0 then 
+					link = _a[1]:sub(2,#_a[1]-1)
+				else 
+					link = ""
+				end
+			elseif _v["name"] == "/연결" then
+				link = nil
+			elseif _v["name"] == "클릭" then
+				table.insert(self.letters,1)
+			end
+		end
+		if print_str then 
+			local wordWrap = false
+			x,y,mY,wordWrap = self:makeBlock(x,y,print_str,color,size,link,wordGap,font,maxY)
+			if maxY < mY or wordWrap then maxY = mY end 
+			self.lastX = x
+			self.lastY = y
+			self.lastMaxY = mY
+			
+			self.cursor:setVisible(true)
+			self.cursor:setPosition(self.lastX,self.lastY+mY)
+			--if #blocks > 0 then
+			--	table.insert(self.linker,blocks)
+			--end
+		end
+	end
+end
+function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY)
+	local config = self.configs[self.configIdx]
+	local block = nil
+	function makeLink(x)
+		local lc = config["link_color"] or {255,255,255,60}
+		local back = pini.ColorLayer(pini:GetUUID(),lc[1] or 255,
+													lc[2] or 255,
+													lc[3] or 255,
+													lc[4] or 100,0,0)
+		back.link = link
+		back:setPositionX(x)
+		pini:AttachDisplay(back,self.background.id)
+		block = back;
+
+		table.insert(self.linker,back)
+	end
+	if link then
+		makeLink(startX)
+	end
+
+	local wordWrap = false
+	local strs  = {}
+	local p = ""
+	local x = startX
+	local y = startY
+	local width = 0
+
+	str:gsub(".",function(c)
+		table.insert(strs,c)
+	end)
+	
+	for k,v in ipairs(strs) do
+		local char = ""
+		if string.byte(v) < 127 then
+			char = v
+		else
+			p = p .. v
+			if p:len() == 3 then
+				char = p
+				p=""
+			end
+		end
+		if char:len() > 0 then
+			local label = pini.Label(pini:GetUUID(),char,font,size)
+			pini:AttachDisplay(label,self.background.id)
+			table.insert(self.letters,label)
+
+			local cs = label:contentSize()
+			if x + cs.width > self.background:contentSize().width then
+				x = 0
+				y = y+maxY
+				maxY = 0
+				width = 0
+				wordWrap = true
+				if block then 
+					makeLink(0)
+				end
+			end
+			
+			label:setPosition(x+cs.width/2,y+cs.height/2)
+			label:setColor(color[1],color[2],color[3])
+			label:setVisible(false)
+			x = x + cs.width + wordGap
+			width = width + cs.width + wordGap
+			if maxY < cs.height then
+				maxY = cs.height
+			end
+			if block then block:setPositionY(y+maxY) end
+			if block then block:setContentSize(width,maxY) end
+
+			table.insert(self.letters,label)
+		end
+	end
+	return x,y,maxY,wordWrap--,blocks
+end
+function Dialog:showAllLetters()
+	for k,v in ipairs(self.letters) do
+		if v ~= 1 then
+			v:setVisible(true)
+		end
+	end
+end
+function Dialog:setName(name)
+	self.name = name
+end
+function Dialog:Run(vm,targ)
+	local config = self.configs[self.configIdx]
+	if self.keepFlag == false then
+		self:Reset()
+	end
+
+	self.vm = vm
+	self.letters = {}
+	for k,v in pairs(targ) do
+		table.insert(self.targ,v)
+	end
+
+	if OnPreview then
+		if self.keepFlag then
+			table.remove(self.targ,#self.targ)
+		end
+		vm:doNext()
+	else
+		local touches = pini.Node("dialog_ClickWait")
+		function fin()
+			self.targ = {}
+			pini:DetachDisplay(touches)
+			pini:StopTimer("DialogUpdate")
+			if self.keepFlag == false then
+				self:Reset()
+			end
+			vm:doNext()
+		end
+
+		pini.Timer("DialogUpdate",config["time"] or 0,function()
+			if #self.letters > 0 then
+				local v = self.letters[1]
+				if v == 1 then
+					self.cursor:setVisible(true)
+					return
+				end
+				v:setVisible(true)
+
+				local x,y=v:position()
+				local s=v:contentSize()
+				self.cursor:setPosition(x+s.width/2,y+s.height/2)
+				self.cursor:setVisible(false)
+				
+				table.remove(self.letters,1)
+			else
+				self.cursor:setVisible(true)
+			end
+		end,true):run()
+		local config = self.configs[self.configIdx]
+		local lc = config["link_color"] or {255,255,255,60}
+		local linkOp = lc[4] or 60
+		touches:setContentSize(99999,99999)
+		touches.onTouchUp = function(location)
+			for k,v in ipairs(self.linker) do
+				v:StopAction()
+				v:setOpacity(linkOp)
+				local tloc = v.node:convertToNodeSpace(location);
+				local b = v:contentSize()
+				if tloc.x > 0 and tloc.y > 0 and tloc.x < b.width and tloc.y < b.height then
+					if v.focus then
+						vm:GotoBookmark(connect)
+						return fin()
+					else
+						local action = pini.Anim.Forever(
+							pini.Anim.Sequence(
+								pini.Anim.FadeTo(0.5,linkOp/10),
+								pini.Anim.FadeTo(0.5,linkOp)
+							)
+						)
+						action:run(v)
+						v.focus = true
+					end
+				else
+					v.focus = nil
+				end
+			end
+
+			if #self.letters > 0 then
+				if self.letters[1] == 1 then
+					table.remove(self.letters,1)
+				else
+					while #self.letters > 0 do 
+						local v = self.letters[1]
+						if v == 1 then 
+							self.cursor:setVisible(true)
+							return 
+						end
+						v:setVisible(true)
+
+						local x,y=v:position();
+						local s=v:contentSize()
+						self.cursor:setPosition(x+s.width/2,y+s.height/2)
+						table.remove(self.letters,1)
+					end
+				end
+			else
+				if #self.linker == 0 then
+					fin()
+				end
+			end
+		end
+		pini.TouchManager:registNode(touches)
+		pini:AttachDisplay(touches)
+
+		self:build()
+	end
+end
+-----------------------------------------------
+-----PINI MAINS
+-----------------------------------------------
+pini={
+	_regist_={
+		Sounds = {},
+		Display = {},
+		SystemNode = {},
+		Timers = {},
+		LatestScene=nil
+	}
+}
+
+pini["Node"] = Node
+pini["Sprite"] = Sprite
+pini["Scene"] = Scene
+pini["Timer"] = Timer
+pini["Label"] = Label
+pini["ColorLayer"] = ColorLayer
+pini["TouchManager"] = TouchManager
+pini["Dialog"] = Dialog()
+pini["Anim"] = anim
+
+function pini:SetScene(scene)
+	self._regist_.LatestScene = scene
+	TouchManager:SetScene(scene)
+end
+
+function pini:GetUUID()
+	local time = tostring(os.time())
+	local uuid = time
+	local count = 0;
+	while true do
+		if self._regist_.Display[uuid] == nil then
+			return uuid
+		end
+		uuid = time..count
+		count = count+1
+	end
+end
+
+function pini:AttachDisplay(node,parent)
+	local displays = self._regist_.Display
+
+	if node.id:len() > 0 then
+		if displays[node.id] then
+			local node = displays[node.id]
+			self:DetachDisplay(node)
+			node:removeSelf()
+		end
+		displays[node.id] = node
+	end
+	if parent and parent:len() > 0 and node.id ~= parent and displays[parent] then
+		displays[parent]:addChild(node)
+		return displays[parent]
+	else
+		self:scene():addChild(node)
+	end
+	return false
+end
+function pini:DetachDisplay(node,cleanup)
+	local displays = self._regist_.Display;
+	if cleanup ~= false then
+		for k,v in ipairs(node:children()) do
+			pini:DetachDisplay(v,cleanup)
+		end
+		displays[node.id] = nil
+	end
+	node:removeSelf(cleanup)
+end
+function pini:Clear()
+	self:ClearSound()
+	self:ClearTimer()
+	self:ClearDisplay()
+	self:ClearScene()
+end
+function pini:ClearScene()
+	if self._regist_.LatestScene then
+		self._regist_.LatestScene:clear()
+		--self._regist_.LatestScene:removeSelf()
+		self._regist_.LatestScene = nil
+	end
+end
+function pini:ClearSound()
+	for k in pairs(self._regist_.Sounds) do
+		self:StopSound(k)
+	end
+end
+function pini:ClearTimer()
+	for k in pairs(self._regist_.Timers) do
+		self:StopTimer(k)
+	end
+end
+function pini:ClearDisplay()
+	self.Dialog:Reset()
+	for k in pairs (self._regist_.Display) do
+		self._regist_.Display[k] = nil
+	end
+end
+function pini:RegistTimer(timer)
+	local timers = self._regist_.Timers
+	if timers[timer.id] then
+		timers[timer.id]:stop()
+	end
+	timers[timer.id] = timer
+end
+function pini:UnregistTimer(timer)
+	local timers = self._regist_.Timers
+	if timers[timer.id] then
+		timers[timer.id] = nil
+	end
+end
+function pini:StopTimer(idx)
+	local timers = self._regist_.Timers
+	if timers[idx] then
+		timers[idx]:stop()
+	end
+end
+function pini:PlaySound(idx,path)
+	if path:len() > 0 then
+		local sid
+		if OnPreview then
+		else
+			sid = AudioEngine.playEffect(FILES["sound/"..path])
+		end
+		if idx:len() > 0 then
+			self._regist_.Sounds[idx] = sid
+		end
+	end
+end
+function pini:StopSound(idx)
+	local sid = self._regist_.Sounds[idx]
+	if OnPreview then
+	else
+		AudioEngine.stopEffect(sid)
+		self._regist_.Sounds[idx] = nil
+	end
+end
+function pini:PlayBGM(path,brep)
+	if path:len() > 0 then
+		if OnPreview then
+		else
+			AudioEngine.stopMusic()
+			AudioEngine.playMusic(FILES["sound/"..path], brep )
+		end
+	end
+end
+function pini:StopBGM()
+	if OnPreview then
+	else
+		AudioEngine.stopMusic()
+	end
+end
+function pini:scene()
+	return self._regist_.LatestScene
+end
+function pini:FindNode(idx)
+	return self._regist_.Display[idx]
+end

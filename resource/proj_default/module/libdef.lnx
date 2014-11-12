@@ -1,0 +1,131 @@
+~노드아이디
+~사운드아이디
+~타이머아이디
+
+~노드입장효과
+~노드퇴장효과
+~애니메이션타입 
+
+~크기
+~위치
+
+~폰트파일
+~이미지파일
+~사운드파일
+
+~승락 "예" "아니오"
+~함수목록
+
+*시작 이미지
+!!아이디=""
+!!파일명="이미지파일"
+!위치="위치"
+!효과="노드입장효과","업페이드"
+!효과시간="",1
+!크기="크기","원본크기"
+!연결="북마크"
+!관계="노드아이디"
+[LUA_FUNCTION name="LNX_IMAGE"]
+*끝
+
+*시작 텍스트
+!!아이디=""
+!!텍스트=""
+!위치="위치","화면중앙"
+!효과="노드입장효과","업페이드"
+!효과시간="",0
+!글꼴="폰트","NanumBarunGothic"
+!크기="",20
+!색상="","255,255,255"
+!관계="노드아이디"
+[LUA_FUNCTION name="LNX_TEXT"]
+*끝
+
+*시작 삭제
+!!아이디="노드아이디"
+!효과="노드퇴장효과","업페이드"
+!효과시간="",1
+[LUA_FUNCTION name="LNX_DELETENODE"]
+*끝
+
+*시작 독백
+!유지="승락","아니오"
+[LUA_FUNCTION name="LNX_MONOLOG"]
+*끝
+
+*시작 대화
+!!이름="",""
+!유지="승락","아니오"
+[LUA_FUNCTION name="LNX_DIALOG"]
+*끝
+
+*시작 대화지우기
+[LUA_FUNCTION name="LNX_REMOVEDIALOG"]
+*끝
+
+*시작 애니메이션
+!!아이디="",""
+!!타입="애니메이션타입",""
+[LUA_FUNCTION name="LNX_ANIMATION"]
+*끝
+
+*시작 나가기
+[LUA_FUNCTION name="LNX_RETURN"]
+*끝
+
+*시작 멈춤
+[LUA_FUNCTION name="LNX_STOP"]
+*끝
+
+*시작 대기
+!!시간="",0
+[LUA_FUNCTION name="LNX_WAIT"]
+*끝
+
+*시작 클릭대기
+[LUA_FUNCTION name="LNX_CLICKWAIT"]
+*끝
+
+*시작 효과음
+!!아이디="사운드아이디",""
+!!파일명="사운드파일",""
+[LUA_FUNCTION name="LNX_PLAYSOUND"]
+*끝
+
+*시작 배경음
+!!파일명="사운드파일",""
+!!반복="승락",""
+[LUA_FUNCTION name="LNX_BGM"]
+*끝
+
+*시작 타이머
+!!아이디="타이머아이디",""
+!!함수="함수목록"
+!!시간="",1
+[LUA_FUNCTION name="LNX_TIMER"]
+*끝
+
+*시작 타이머종료
+!!아이디="타이머아이디",""
+[LUA_FUNCTION name="LNX_TIMER_EXIT"]
+*끝
+
+*시작 화면초기화
+[LUA_FUNCTION name="LNX_SCREENCLEAN"]
+*끝
+
+*시작 인자변수초기화
+[LUA_FUNCTION name="LNX_CLEARVARIABLE"]
+*끝
+
+*시작 전환
+!!아이디=""
+!!시간="",1
+!!인자이미지="이미지파일"
+!!이미지="이미지파일"
+[LUA_FUNCTION name="LNX_TRANSITION"]
+*끝
+
+*시작 화면전환
+[LUA_FUNCTION name="LNX_SCENE_TRANSITION"]
+*끝
