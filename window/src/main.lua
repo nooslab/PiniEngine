@@ -134,7 +134,7 @@ local function LanX_start(start)
 			end
 
 			package.loaded["FILEMANS"] = nil
-			require 'FILEMANS'
+			require('FILEMANS')
 			
 			XVM = require("LanXVM")
 			XVM:init()
@@ -160,7 +160,7 @@ local function LanX_start(start)
 			}
 
 			try{function()
-					require(FILES["scene/"..start..".scene"])(XVM)
+					require(FILES["scene/"..start..".lnx"]:gsub(".lua",""))(XVM)
 				end,
 				catch {function(error)
 					print("start 1 :",error)

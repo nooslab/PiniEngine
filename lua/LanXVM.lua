@@ -194,9 +194,8 @@ function LanXVM:defaultFunction()
 	end)
 	self:registFunc("LUA_FUNCTION",function(vm,arg)
 		local name = vm.variable["LUA_FUNCTION.name"] or ""
-		if name:len() > 0 then
+		if name:len() > 0 and _G[name] then
 			_G[name](vm,arg)
-			--print("LUAFUNCTION",name,_G[name])
 		end
 	end)
 end

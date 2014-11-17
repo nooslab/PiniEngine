@@ -44,8 +44,9 @@ function LNX_IMAGE(vm,arg)
 			end
 		end
 	else
-		if id:len() > 0 and nodes[id] then
-			local v = nodes[id]
+				--[[
+		if id:len() > 0 and pini._regist_.Display[id] then
+			local v = pini._regist_.Display[id]
 			if v then
 				v = v.obj
 
@@ -57,14 +58,14 @@ function LNX_IMAGE(vm,arg)
 					local p = pos:explode(",")
 					v:setPosition(p[1],p[2])
 				end
-				--[[
+
 				parent = v:getParent()
 				if parent == scene.layer then
 					parent = nil
 				end
-				]]
 			end
 		end
+		]]
 	end
 	vm:doNext()
 end
@@ -344,6 +345,7 @@ local ret = function(LanXVM)
 		background_color={60,60,60,122},
 		text_color={255,255,255,255},
 		link_color={255,255,255,60},
+--		path="textArea.png",
 		cursor={
 			width=20,
 			height=10,

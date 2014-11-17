@@ -94,6 +94,11 @@ end
 fs_imageEffect = {}
 fs_imageDeleteEffect = {}
 ---------------------------------------------------------------
+fs_imageEffect["페이드"]=function(node,sec)
+	node:setOpacity(0)
+	local action = pini.Anim.FadeTo(sec,255)
+	action:run(node)
+end
 fs_imageEffect["업페이드"]=function(node,sec)
 	local x,y
 	x,y = node:position()
@@ -122,8 +127,8 @@ fs_imageEffect["줌인페이드"]=function(node,sec)
 	node:setScale(x-0.1,y-0.1)
 	node:setOpacity(0)
 	local action = pini.Anim.Spawn(
-		pini.Anim.ScaleTo:create(sec,x,y),
-		pini.Anim.FadeTo:create(sec,255)
+		pini.Anim.ScaleTo(sec,x,y),
+		pini.Anim.FadeTo(sec,255)
 	)
 	action:run(node)
 end
@@ -133,8 +138,8 @@ fs_imageEffect["줌아웃페이드"]=function(node,sec)
 	node:setScale(x+0.1,y+0.1)
 	node:setOpacity(0)
 	local action = pini.Anim.Spawn(
-		pini.Anim.ScaleTo:create(sec,x,y),
-		pini.Anim.FadeTo:create(sec,255)
+		pini.Anim.ScaleTo(sec,x,y),
+		pini.Anim.FadeTo(sec,255)
 	)
 	action:run(node)
 end
@@ -142,6 +147,10 @@ end
 ---------------------------------------------------------------
 --이미지 퇴장 효과 관리
 ---------------------------------------------------------------
+fs_imageDeleteEffect["페이드"]=function(node,sec)
+	local action = pini.Anim.FadeTo(sec,0)
+	action:run(node)
+end
 fs_imageDeleteEffect["업페이드"]=function(node,sec)
 	local action = pini.Anim.Spawn(
 		pini.Anim.MoveBy(sec,0,10),
@@ -688,6 +697,10 @@ function Node:removeSelf(cleanup)
 			end
 		end
 	else
+		--print("****************************")
+		--print(self.id)
+		--print(debug.traceback())
+		--print("****************************")
 		self.node:removeFromParent()
 		self.parent = nil
 		if cleanup ~= false then
@@ -778,12 +791,12 @@ function Node:setPositionY(y)
 end
 
 function Node:position()
-	return self._x,self._y
+	return tonumber(self._x) or 0,tonumber(self._y) or 0
 end
 
 function Node:anchor()
 	if OnPreview then
-		return self.anchorX,self.anchorY
+		return tonumber(self.anchorX) or 0.5,tonumber(self.anchorY) or 0.5
 	else
 		local p = self.node:getAnchorPoint()
 		return p.x,p.y
@@ -802,6 +815,9 @@ function Node:setPosition(x,y)
 			sy = size.height * psy * sy 
 			x = fs_position[x](ps,sx,sy)
 			x,y = x[1],x[2]
+		else
+			x = tonumber(x) or 0
+			y = tonumber(y) or 0
 		end
 	end
 	self._x = x
@@ -840,6 +856,9 @@ function Node:setScale(x,y)
 			local s = self:contentSize()
 			x = fs_size[x](ps,s.width,s.height)
 			x,y = x[1],x[2]
+		else
+			x = tonumber(x) or 1
+			y = tonumber(y) or 1
 		end
 	end
 	if OnPreview then
@@ -864,7 +883,7 @@ end
 
 function Node:scale()
 	if OnPreview then
-		return self.scaleX,self.scaleY
+		return tonumber(self.scaleX) or 1,tonumber(self.scaleY) or 1
 	else
 		return self.node:getScaleX(),self.node:getScaleY()
 	end
@@ -1352,7 +1371,7 @@ function Dialog:build()
 	end
 	local font = config["font"] or "NanumBarunGothic"
 	local default_color = {255,255,255}
-	local default_size = 30
+	local default_size = 40
 					
 	local x = (config["marginX"] or 0)+self.lastX
 	local y = (config["marginY"] or 0)+self.lastY
@@ -1537,23 +1556,27 @@ function Dialog:Run(vm,targ)
 		end
 
 		pini.Timer("DialogUpdate",config["time"] or 0,function()
-			if #self.letters > 0 then
-				local v = self.letters[1]
-				if v == 1 then
-					self.cursor:setVisible(true)
-					return
-				end
-				v:setVisible(true)
+			local function e()
+				if #self.letters > 0 then
+					local v = self.letters[1]
+					if v == 1 then
+						self.cursor:setVisible(true)
+						return
+					end
+					v:setVisible(true)
 
-				local x,y=v:position()
-				local s=v:contentSize()
-				self.cursor:setPosition(x+s.width/2,y+s.height/2)
-				self.cursor:setVisible(false)
-				
-				table.remove(self.letters,1)
-			else
-				self.cursor:setVisible(true)
+					local x,y=v:position()
+					local s=v:contentSize()
+					self.cursor:setPosition(x+s.width/2,y+s.height/2)
+					self.cursor:setVisible(false)
+					
+					table.remove(self.letters,1)
+				else
+					self.cursor:setVisible(true)
+				end
 			end
+			e()
+			e()
 		end,true):run()
 		local config = self.configs[self.configIdx]
 		local lc = config["link_color"] or {255,255,255,60}
@@ -1567,7 +1590,7 @@ function Dialog:Run(vm,targ)
 				local b = v:contentSize()
 				if tloc.x > 0 and tloc.y > 0 and tloc.x < b.width and tloc.y < b.height then
 					if v.focus then
-						vm:GotoBookmark(connect)
+						vm:GotoBookmark(v.link)
 						return fin()
 					else
 						local action = pini.Anim.Forever(
@@ -1664,7 +1687,6 @@ function pini:AttachDisplay(node,parent)
 		if displays[node.id] then
 			local node = displays[node.id]
 			self:DetachDisplay(node)
-			node:removeSelf()
 		end
 		displays[node.id] = node
 	end
