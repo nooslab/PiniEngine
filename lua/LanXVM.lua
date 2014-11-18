@@ -49,7 +49,12 @@ LanXVM.commands = {
 		vm:doNext()
 	end,
 	t_registfunc = function(vm,arg)
-		vm:registFunc(arg["name"],arg["func"], arg["custom"],arg["default_arg"],arg["extens_arg"])
+		vm:registFunc(arg["name"],
+						arg["func"], 
+						arg["custom"],
+						arg["default_arg"],
+						arg["extens_arg"],
+						arg["explain"])
 		vm:doNext()
 	end,
 	t_operate = function(vm,arg)
@@ -230,7 +235,7 @@ function LanXVM:registCommand(i,f)
 	self.commands[i] = f
 end
 
-function LanXVM:registFunc(i,f,a,default,extens)
+function LanXVM:registFunc(i,f,a,default,extens,explain)
 	if a then
 		self.customfunc[i] = true
 		f(self)
@@ -240,6 +245,7 @@ function LanXVM:registFunc(i,f,a,default,extens)
 	self.funcInfo[i] = {}
 	self.funcInfo[i]["default"] = default
 	self.funcInfo[i]["extens"] = extens
+	self.funcInfo[i]["explain"] = explain
 end
 
 function LanXVM:pushCmd(cmd,arg,stackName)
@@ -370,6 +376,10 @@ end
 
 function LanXVM:showCommands()
 	print(print_r(self.commands))
+end
+
+function LanXVM:showFunctionInfo()
+	print(print_r(self.funcInfo))
 end
 
 function LanXVM:showCurrentStack()
