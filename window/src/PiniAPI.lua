@@ -225,7 +225,7 @@ function MoveTo:cocosObj()
 end
 function MoveTo:run(node)
 	if OnPreview then
-		node:setPosition(x,y)
+		node:setPosition(self.x,self.y)
 	else
 		node.node:runAction(self:cocosObj())
 	end
@@ -293,7 +293,7 @@ function ScaleBy:run(node)
 	if OnPreview then
 		local x,y
 		x,y = node:scale()
-		node:setScale(x+self.x,y+self.y)
+		node:setScale(x*self.x,y*self.y)
 	else
 		node.node:runAction(self:cocosObj())
 	end
@@ -362,7 +362,11 @@ end
 local JumpTo=class()
 function JumpTo:init(sec,x,y,height,count)
 	self.x = x
-	self.y = y
+	if OnPreview then
+		self.y = y
+	else
+		self.y = WIN_HEIGHT-y
+	end
 	self.h = height
 	self.c = count
 	self.sec = sec
@@ -794,6 +798,15 @@ function Node:position()
 	return tonumber(self._x) or 0,tonumber(self._y) or 0
 end
 
+function Node:setAnchorPoint(x,y)
+	if OnPreview then
+		self.anchorX = tonumber(x)
+		self.anchorY = tonumber(y)
+	else
+		self.node:setAnchorPoint(cc.p(x,y))
+	end
+end
+
 function Node:anchor()
 	if OnPreview then
 		return tonumber(self.anchorX) or 0.5,tonumber(self.anchorY) or 0.5
@@ -1103,7 +1116,12 @@ function Timer:run()
 		end
 		local scheduler = cc.Director:getInstance():getScheduler()
 		self.entry = scheduler:scheduleScriptFunc(function()
-			self.func()
+			try{
+				function()
+					self.func()
+				end,
+				catch{function(error)end}
+			}
 			if self.rep == false then
 				self:stop()
 			end
@@ -1249,6 +1267,9 @@ function Dialog:init()
 	self.lastY = 0
 	self.lastMaxY = 0
 end
+function Dialog:config(idx)
+	return self.configs[idx] 
+end
 function Dialog:SetConfig(idx,data)
 	self.configs[idx] = data
 end
@@ -1292,11 +1313,12 @@ function Dialog:_make()
 	if self.needUpdate then
 		self:Clear()
 		local x,y
+
 		-- create dialog window
 		x,y = config["x"] or 0 ,config["y"] or 0 
 		if config["path"] then
 			self.background = pini.Sprite("dialog_background",config["path"])
-			x,y = x+self.background:contentSize().width/2,y+self.background:contentSize().height/2
+			x,y = x+self.background:contentSize().width/2,y-self.background:contentSize().height/2
 		else
 			self.background = pini.ColorLayer("dialog_background",0,0,0,0,config["width"] or 300,config["height"] or 300)
 		end
@@ -1316,7 +1338,7 @@ function Dialog:_make()
 			x,y = nameWindow["x"] or 0 ,nameWindow["y"] or 0 
 			if nameWindow["path"] then
 				self.nameWindow = pini.Sprite("dialog_name",nameWindow["path"])
-				x,y = x+self.nameWindow:contentSize().width/2,y+self.nameWindow:contentSize().height/2
+				x,y = x+self.nameWindow:contentSize().width/2,y-self.nameWindow:contentSize().height/2
 			else
 				self.nameWindow = pini.ColorLayer("dialog_name",60,60,60,122,nameWindow["width"] or 300,nameWindow["height"] or 50)
 			end
@@ -1362,19 +1384,30 @@ function Dialog:build()
 	if self.name then
 		local nameConf = config["name"] or {}
 		local font = nameConf["font"] or config["font"] or "NanumBarunGothic"
+
+		local ax,ay = self.nameWindow:anchor()
+		local originX = -self.nameWindow:contentSize().width * ax
+		local originY = -self.nameWindow:contentSize().height* ay
+		
 		local label = pini.Label(pini:GetUUID(),self.name,font,nameConf["text_size"] or 30)
 		pini:AttachDisplay(label,self.nameWindow.id)
 		label:setColor(nameConf["text_color"][1] or 255,
 					   nameConf["text_color"][2] or 255,
 					   nameConf["text_color"][3] or 255)
 		label:setPosition(nameConf["text_align"] or "화면중앙")
+		local x,y = label:position()
+		label:setPosition(x+originX,y+originY)
 	end
 	local font = config["font"] or "NanumBarunGothic"
-	local default_color = {255,255,255}
-	local default_size = 40
-					
-	local x = (config["marginX"] or 0)+self.lastX
-	local y = (config["marginY"] or 0)+self.lastY
+	local default_color = config["text_color"] or {255,255,255}
+	local default_size = config["size"] or 40
+	
+	local ax,ay = self.background:anchor();
+	local originX = (config["marginX"] or 0)+self.lastX-self.background:contentSize().width * ax
+	local originY = (config["marginY"] or 0)+self.lastY-self.background:contentSize().height* ay
+	local x = originX
+	local y = originY
+
 	local maxY = self.lastMaxY or default_size
 	local color = default_color
 	local size = default_size
@@ -1386,7 +1419,7 @@ function Dialog:build()
 		print_str = nil
 		if v["type"] == "string" then
 			if v["v"] == "\n" then
-				x = 0
+				x = originX
 				y = y+maxY+lineGap
 				maxY = default_size
 			elseif v["v"]:len() > 0 then
@@ -1427,7 +1460,7 @@ function Dialog:build()
 		end
 		if print_str then 
 			local wordWrap = false
-			x,y,mY,wordWrap = self:makeBlock(x,y,print_str,color,size,link,wordGap,font,maxY)
+			x,y,mY,wordWrap = self:makeBlock(x,y,print_str,color,size,link,wordGap,font,maxY,originX,originY)
 			if maxY < mY or wordWrap then maxY = mY end 
 			self.lastX = x
 			self.lastY = y
@@ -1441,10 +1474,11 @@ function Dialog:build()
 		end
 	end
 end
-function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY)
+function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY,originX,originY)
 	local config = self.configs[self.configIdx]
 	local block = nil
 	function makeLink(x)
+		x = x-originX+(config["marginX"] or 0)
 		local lc = config["link_color"] or {255,255,255,60}
 		local back = pini.ColorLayer(pini:GetUUID(),lc[1] or 255,
 													lc[2] or 255,
@@ -1489,8 +1523,8 @@ function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY)
 			table.insert(self.letters,label)
 
 			local cs = label:contentSize()
-			if x + cs.width > self.background:contentSize().width then
-				x = 0
+			if x + cs.width - originX > config["width"] then
+				x = originX
 				y = y+maxY
 				maxY = 0
 				width = 0
@@ -1508,7 +1542,9 @@ function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY)
 			if maxY < cs.height then
 				maxY = cs.height
 			end
-			if block then block:setPositionY(y+maxY) end
+			if block then 
+				block:setPositionY(y+maxY-originY+(config["marginY"] or 0))
+			end
 			if block then block:setContentSize(width,maxY) end
 
 			table.insert(self.letters,label)

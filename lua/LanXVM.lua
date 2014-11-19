@@ -209,7 +209,7 @@ function LanXVM:CleanArgVariable()
 	--print("CleanArgVariable")
 	for k,v in pairs(self.variable) do 
 		--print(k,v,v:find("."))
-		if v:find(".") then
+		if k:find(".") then
 			self.variable[k] = nil
 		end
 	end

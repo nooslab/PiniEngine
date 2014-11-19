@@ -44,7 +44,7 @@ function LNX_IMAGE(vm,arg)
 			end
 		end
 	else
-				--[[
+		--[[
 		if id:len() > 0 and pini._regist_.Display[id] then
 			local v = pini._regist_.Display[id]
 			if v then
@@ -125,20 +125,23 @@ end
 
 function LNX_MONOLOG(vm,arg)
 	local forceOn = vm.variable["독백.유지"] or "아니오"
+	local window = vm.variable["독백.대사창"] or "독백"
 	local arg = vm.variable["system.arg"]
-
 	--print(">LNX_MONOLOG")
 	--print(print_r(arg))
 
+
+
 	pini.Dialog:setKeep(forceOn=="예")
 	pini.Dialog:setName(nil)
-	pini.Dialog:UseConfig("독백")
+	pini.Dialog:UseConfig(window)
 	pini.Dialog:Run(vm,arg["targ"])
 end
 
 function LNX_DIALOG(vm,arg)
 	local name = vm.variable["대화.이름"] or ""
 	local forceOn = vm.variable["대화.유지"] or "아니오"
+	local window = vm.variable["대화.대사창"] or "대화"
 	local arg = vm.variable["system.arg"]
 
 	--vm:showCallStack()
@@ -152,7 +155,7 @@ function LNX_DIALOG(vm,arg)
 		pini.Dialog:setName(nil)
 	end
 	pini.Dialog:setKeep(forceOn=="예")
-	pini.Dialog:UseConfig("대화")
+	pini.Dialog:UseConfig(window)
 	pini.Dialog:Run(vm,arg["targ"])
 end
 
@@ -180,6 +183,9 @@ function LNX_RETURN(vm,arg)
 end
 
 function LNX_STOP(vm,arg)
+	if OnPreview then
+		vm:doNext()
+	end
 end
 
 function LNX_WAIT(vm,arg)
@@ -314,6 +320,117 @@ end)
 
 function LNX_SCENE_TRANSITION(vm,arg)
 	pini.Scene()
+	vm:doNext()
+end
+
+function LNX_DIALOG_CONFIG(vm,arg)
+	local id 		  = vm.variable["대화창수정.아이디"] 
+
+	local margin	  = vm.variable["대화창수정.여백"] 
+	local size 		  = vm.variable["대화창수정.영역"] 
+	local pos 		  = vm.variable["대화창수정.위치"] 
+	local color 	  = vm.variable["대화창수정.색상"] 
+	local image 	  = vm.variable["대화창수정.이미지"]
+	local fnt 		  = vm.variable["대화창수정.폰트"] 
+	local fntcolor    = vm.variable["대화창수정.폰트색상"]
+	local fntsize     = vm.variable["대화창수정.폰트크기"]
+	
+	local cursorImg   = vm.variable["대화창수정.커서이미지"]
+	local cursorSize  = vm.variable["대화창수정.커서크기"]
+	local cursorColor = vm.variable["대화창수정.커서색상"]
+	
+	local namepos 		= vm.variable["대화창수정.이름창위치"]
+	local namesize 		= vm.variable["대화창수정.이름창영역"]
+	local namecolor 	= vm.variable["대화창수정.이름창색상"]
+	local nameimage 	= vm.variable["대화창수정.이름창이미지"]
+	local namefntsize 	= vm.variable["대화창수정.이름창폰트크기"]
+	local namefntcolor 	= vm.variable["대화창수정.이름창폰트색상"]
+	local namefnt 		= vm.variable["대화창수정.이름창폰트"]
+
+
+	if id then
+		local config = pini.Dialog:config(id) or {}
+		if pos then
+			local s = pos:explode(",")
+			config["x"] = tonumber(s[1] or config["x"])
+			config["y"] = tonumber(s[2] or config["y"])
+		end
+		if size then
+			local s = size:explode(",")
+			config["width"] = tonumber(s[1] or config["width"])
+			config["height"]= tonumber(s[2] or config["height"])
+		end
+		if color then
+			local s = color:explode(",")
+			config["background_color"] = {
+				tonumber(s[1] or config["background_color"][1]),
+				tonumber(s[2] or config["background_color"][2]),
+				tonumber(s[3] or config["background_color"][3]),
+				tonumber(s[4] or config["background_color"][4])
+			}
+		end
+		if fntcolor then
+			local s = fntcolor:explode(",")
+			config["text_color"] = {
+				tonumber(s[1] or config["text_color"][1]),
+				tonumber(s[2] or config["text_color"][2]),
+				tonumber(s[3] or config["text_color"][3]),
+				tonumber(s[4] or config["text_color"][4])
+			}
+		end
+		if margin then
+			local s = margin:explode(",")
+			config["marginX"] = tonumber(s[1] or config["marginX"])
+			config["marginY"] = tonumber(s[2] or config["marginY"])
+		end
+		config["font"] = fnt or config["font"]
+		config["path"] = image or config["path"]
+		config["size"] = tonumber(fntsize or config["size"])
+
+		-- name window!
+		config["name"] = config["name"] or {}
+		local nconfig = config["name"]
+		if namepos then
+			local s = namepos:explode(",")
+			nconfig["x"] = tonumber(s[1] or nconfig["x"])
+			nconfig["y"] = tonumber(s[2] or nconfig["y"])
+		end
+		if namesize then
+			local s = namesize:explode(",")
+			nconfig["width"] = tonumber(s[1] or nconfig["width"])
+			nconfig["height"]= tonumber(s[2] or nconfig["height"])
+		end
+		if namecolor then
+			local s = namecolor:explode(",")
+			nconfig["background_color"] = {
+				tonumber(s[1] or nconfig["background_color"][1]),
+				tonumber(s[2] or nconfig["background_color"][2]),
+				tonumber(s[3] or nconfig["background_color"][3]),
+				tonumber(s[4] or nconfig["background_color"][4])
+			}
+		end
+		if namefntcolor then
+			local s = namefntcolor:explode(",")
+			nconfig["text_color"] = {
+				tonumber(s[1] or nconfig["text_color"][1]),
+				tonumber(s[2] or nconfig["text_color"][2]),
+				tonumber(s[3] or nconfig["text_color"][3]),
+				tonumber(s[4] or nconfig["text_color"][4])
+			}
+		end
+		nconfig["font"] = namefnt or nconfig["font"]
+		nconfig["path"] = nameimage or nconfig["path"]
+		nconfig["text_size"] = tonumber(namefntsize or nconfig["text_size"])
+
+		pini.Dialog:SetConfig(id,config);
+	end
+
+	for k,v in pairs(vm.variable) do 
+		if k:startsWith("대화창수정.") then
+			vm.variable[k] = nil
+		end	
+	end
+
 	vm:doNext()
 end
 

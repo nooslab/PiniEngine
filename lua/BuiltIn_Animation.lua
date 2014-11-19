@@ -17,11 +17,11 @@ fs_ease["엘라스틱인아웃"] = function(a) return pini.Anim.EaseElasticInOut
 local function posStrToPt(pos)
     local winSize = {width=WIN_WIDTH,height=WIN_HEIGHT}--cc.Director:getInstance():getVisibleSize()
 	local pos = pos:explode(",")
-	if OnPreview then
+	--if OnPreview then
 		return tonumber(pos[1] or 0),tonumber(pos[2] or 0)
-	else
-		return tonumber(pos[1] or 0),winSize.height-tonumber(pos[2] or 0)
-	end
+	--else
+	--	return tonumber(pos[1] or 0),winSize.height-tonumber(pos[2] or 0)
+	--end
 end
 
 fs_animation["이동"] = {
@@ -250,7 +250,7 @@ fs_animation["떨림"] = {
 		local ease = vm.variable["애니메이션.가속"] or ""
 
 		local actions = {}
-		local x,y = node:getPosition()
+		local x,y = node:position()
 
 		local t1,t2
 		t1=pini.Timer(pini:GetUUID(),0,function()
@@ -265,5 +265,44 @@ fs_animation["떨림"] = {
 			t1 = nil
 			t2 = nil
 		end,true)
+	end
+}
+
+fs_animation["걷기"] = {
+	"폭=\"40\" 횟수=\"5\" 확대=\"1.3,1.3\" 시간=\"1\" 가속=\"\"",
+	function(vm,node)
+		local width = vm.variable["애니메이션.폭"] or 1
+		local count = vm.variable["애니메이션.횟수"] or 1
+		local sec = vm.variable["애니메이션.시간"] or 1
+		local ease = vm.variable["애니메이션.가속"] or ""
+		local scale = vm.variable["애니메이션.확대"] or ""
+
+		local action = nil
+		for i=1,count,1 do 
+			local a = pini.Anim.Sequence(
+				pini.Anim.MoveBy(sec/(2*count),0,width/2),
+				pini.Anim.MoveBy(sec/(2*count),0,-width/2)
+			)
+			if action then
+				action = pini.Anim.Sequence(action,a)
+			else
+				action = a
+			end
+		end
+
+		scale = scale:explode(",")
+
+		action = pini.Anim.Spawn(
+			pini.Anim.ScaleBy(sec,tonumber(scale[1]) or 1.3,tonumber(scale[2])or 1.3),
+			action
+		)
+
+		if fs_ease[ease] then
+			action = fs_ease[ease](action)
+		end
+		if rep == "예" then
+			--action = cc.RepeatForever:create(action)
+		end
+		action:run(node)
 	end
 }
