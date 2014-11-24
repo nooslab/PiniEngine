@@ -1348,7 +1348,7 @@ function Dialog:_make()
 			x,y = nameWindow["x"] or 0 ,nameWindow["y"] or 0 
 			if nameWindow["path"] then
 				self.nameWindow = pini.Sprite("dialog_name",nameWindow["path"])
-				x,y = x+self.nameWindow:contentSize().width/2,y-self.nameWindow:contentSize().height/2
+				self.nameWindow:setAnchorPoint(0,0);
 			else
 				self.nameWindow = pini.ColorLayer("dialog_name",60,60,60,122,nameWindow["width"] or 300,nameWindow["height"] or 50)
 			end
@@ -1397,7 +1397,7 @@ function Dialog:build()
 
 		local ax,ay = self.nameWindow:anchor()
 		local originX = -self.nameWindow:contentSize().width * ax
-		local originY = -self.nameWindow:contentSize().height* ay
+		local originY = -self.nameWindow:contentSize().height* (1-ay)
 		
 		local label = pini.Label(pini:GetUUID(),self.name,font,nameConf["text_size"] or 30)
 		pini:AttachDisplay(label,self.nameWindow.id)
