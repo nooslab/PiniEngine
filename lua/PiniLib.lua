@@ -360,6 +360,10 @@ function LNX_DIALOG_CONFIG(vm,arg)
 	local namefntcolor 	= vm.variable["대화창수정.이름창폰트색상"]
 	local namefnt 		= vm.variable["대화창수정.이름창폰트"]
 
+	local linkImg 		= vm.variable["대화창수정.연결이미지"]
+	local linkColor		= vm.variable["대화창수정.연결색상"]
+	local linkWidthFit	= vm.variable["대화창수정.연결넓이맞춤"]
+	local linkSelectImg = vm.variable["대화창수정.연결선택시이미지"]
 
 	if id then
 		local config = pini.Dialog:config(id) or {}
@@ -435,6 +439,24 @@ function LNX_DIALOG_CONFIG(vm,arg)
 		nconfig["path"] = nameimage or nconfig["path"]
 		nconfig["text_size"] = tonumber(namefntsize or nconfig["text_size"])
 
+		--link block
+		config["linkBlock"] = config["linkBlock"] or {}
+		bconfig = config["linkBlock"]
+		if linkColor then
+			local s = linkColor:explode(",")
+			bconfig["color"] = {
+				tonumber(s[1] or bconfig["color"][1]),
+				tonumber(s[2] or bconfig["color"][2]),
+				tonumber(s[3] or bconfig["color"][3]),
+				tonumber(s[4] or bconfig["color"][4])
+			}
+		end
+		if linkWidthFit then
+			bconfig["fitWidth"] = linkWidthFit == "예" 
+		end
+		bconfig["select"] = linkSelectImg or bconfig["select"]
+		bconfig["unselect"] = linkImg or bconfig["unselect"]
+		
 		pini.Dialog:SetConfig(id,config);
 	end
 
@@ -464,14 +486,15 @@ local ret = function(LanXVM)
 			color={255,255,255,255},
 			sprite=nil,
 			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
-		},
+		}
+		--[[,
 		linkBlock={
 			color={255,255,255,255},
 			select="select.png",
 			unselect="unselect.png",
 			fitWidth=true,
 			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
-		}
+		}]]
 	})
 	pini.Dialog:SetConfig("대화",{
 		x=10,
@@ -495,14 +518,14 @@ local ret = function(LanXVM)
 			text_color={255,255,255,255},
 			text_size=30,
 			text_align="화면중앙",
-		},
+		}--[[,
 		linkBlock={
 			color={255,255,255,60},
-			select="",
+			select="select.png",
 			unselect="unselect.png",
 			fitWidth=false,
 			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
-		}
+		}]]
 	})
 
 	LNX_SCENE_TRANSITION(LanXVM)

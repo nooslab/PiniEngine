@@ -851,11 +851,16 @@ function Node:setPosition(x,y)
 				ax,ay  = self.parent:anchor()
 			else
 				width = WIN_WIDTH
-				ax,ay = 0,0
+				ax,ay = 0,1
 			end
 
 			dx = width*ax
 			dy = height*(1-ay)
+		end
+		if self.type == "Sprite" then
+			print("***************************")
+			print(tonumber(x)+dx,height-tonumber(y)-dy)
+			print(tonumber(x),dx,height,tonumber(y),dy)
 		end
 		self.node:setPosition(tonumber(x)+dx,height-tonumber(y)-dy)
 	end
