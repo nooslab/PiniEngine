@@ -109,15 +109,17 @@ function LNX_DELETENODE(vm,arg)
 
 	if id:len() > 0 then
 		local node = pini:FindNode(id)
-		if effect:len() > 0 then
-			if fs_imageDeleteEffect[effect] then
-				fs_imageDeleteEffect[effect](node,effectSec)
-				pini.Timer(nil,effectSec,function()
-					pini:DetachDisplay(node)
-				end,false):run()
+		if node then 
+			if effect:len() > 0 then
+				if fs_imageDeleteEffect[effect] then
+					fs_imageDeleteEffect[effect](node,effectSec)
+					pini.Timer(nil,effectSec,function()
+						pini:DetachDisplay(node)
+					end,false):run()
+				end
+			else
+				pini:DetachDisplay(node)
 			end
-		else
-			pini:DetachDisplay(node)
 		end
 	end
 	vm:doNext()
@@ -225,6 +227,17 @@ function LNX_PLAYBGM(vm,arg)
 	local path = vm.variable["배경음.파일명"] or ""
 	local brep = vm.variable["배경음.반복"] or "예"
 	pini:PlayBGM(path,brep=="예")
+	vm:doNext()
+end
+
+function LNX_STOPBGM(vm,arg)
+	pini:StopBGM()
+	vm:doNext()
+end
+
+function LNX_STOPSOUND(vm,arg)
+	local id = vm.variable["효과음끄기.아이디"] or ""
+	pini:StopBGM(id)
 	vm:doNext()
 end
 
@@ -445,12 +458,18 @@ local ret = function(LanXVM)
 		height=WIN_HEIGHT-20,
 		background_color={60,60,60,122},
 		text_color={255,255,255,255},
-		link_color={255,255,255,60},
 		cursor={
 			width=20,
 			height=10,
 			color={255,255,255,255},
 			sprite=nil,
+			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
+		},
+		linkBlock={
+			color={255,255,255,255},
+			select="select.png",
+			unselect="unselect.png",
+			fitWidth=true,
 			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
 		}
 	})
@@ -461,7 +480,6 @@ local ret = function(LanXVM)
 		height=250,
 		background_color={60,60,60,122},
 		text_color={255,255,255,255},
-		link_color={255,255,255,60},
 --		path="textArea.png",
 		cursor={
 			width=20,
@@ -477,6 +495,13 @@ local ret = function(LanXVM)
 			text_color={255,255,255,255},
 			text_size=30,
 			text_align="화면중앙",
+		},
+		linkBlock={
+			color={255,255,255,60},
+			select="",
+			unselect="unselect.png",
+			fitWidth=false,
+			anim=pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255))
 		}
 	})
 

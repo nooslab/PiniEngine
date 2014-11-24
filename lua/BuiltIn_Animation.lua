@@ -72,16 +72,7 @@ fs_animation["크기"] = {
 		local rep = vm.variable["애니메이션.지속"] or "아니오"
 		
 		local size = size:explode(",")
-
-		local psx
-		local psy
-		psx,psy = nodeParentsScale(node:getParent())
-
-		local origin = node:getContentSize()
-		local sx = size[1] / origin.width / psx
-		local sy = size[2] / origin.height / psy
-
-		local action = pini.Anim.ScaleTo(sec,sx,sy)
+		local action = pini.Anim.ScaleTo(sec,tonumber(size[1]),tonumber(size[2]))
 
 		if fs_ease[ease] then
 			action = fs_ease[ease](action)

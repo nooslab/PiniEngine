@@ -113,6 +113,17 @@
 [LUA_FUNCTION name="LNX_PLAYBGM"]
 *끝
 
+*시작 효과음끄기
+!!!"<font color='#ffa02f'><b>효과음끄기</b></font><br>현재 출력되고 있는 효과음을 끕니다."
+!!아이디="사운드아이디",""
+[LUA_FUNCTION name="LNX_STOPSOUND"]
+*끝
+
+*시작 배경음끄기
+!!!"<font color='#ffa02f'><b>배경음끄기</b></font><br>현재 출력되고 있는 배경음을 끕니다."
+[LUA_FUNCTION name="LNX_STOPBGM"]
+*끝
+
 *시작 타이머
 !!!"<font color='#ffa02f'><b>타이머</b></font><br>지정한 '시간'에 한번씩 메크로를 호출합니다.."
 !!아이디="타이머아이디",""

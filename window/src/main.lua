@@ -126,12 +126,12 @@ local function LanX_start(start)
 	try{
 		function()
 			local targetPlatform = CCApplication:getInstance():getTargetPlatform()
-			if kTargetWindows == targetPlatform then
+			--if kTargetWindows == targetPlatform then
 				package.preload["ProjectInfo"] = nil
 				local proj = require("ProjectInfo")
 
 				ScreenReSize(proj.width,proj.height)
-			end
+			--end
 
 			package.loaded["FILEMANS"] = nil
 			require('FILEMANS')

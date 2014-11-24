@@ -628,8 +628,8 @@ if OnPreview then
 end
 function Node:init(id)
 	self.id = id
+	self.type = "Node"
 	if OnPreview then
-		self.type = "Node"
 		self:initialize()
 	else
 		self.node = cc.Node:create()
@@ -855,7 +855,7 @@ function Node:setPosition(x,y)
 			end
 
 			dx = width*ax
-			dy = height*ay
+			dy = height*(1-ay)
 		end
 		self.node:setPosition(tonumber(x)+dx,height-tonumber(y)-dy)
 	end
@@ -984,9 +984,9 @@ end
 local Sprite = class(Node)
 function Sprite:init(id,path)
 	self.id = id
+	self.type = "Sprite"
 	if OnPreview then
 		self:initialize()
-		self.type = "Sprite"
 		self.path = path
 	else
 		self.node = cc.Sprite:create(FILES["image/"..path])
@@ -994,6 +994,15 @@ function Sprite:init(id,path)
 	end
 
 	self:setPosition(0,0)
+end
+
+function Sprite:setSprite(path)
+	if OnPreview then
+	else
+		local texture = cc.TextureCache:getInstance():addImage(FILES["image/"..path])
+		self.node:setTexture(texture)
+		self.node:setTextureRect(texture:getContentSize())
+	end
 end
 
 ---------------------------------------------
@@ -1058,15 +1067,15 @@ end
 local ColorLayer=class(Node)
 function ColorLayer:init(id,r,g,b,a,w,h)
 	self.id = id
+	self.type = "ColorLayer"
 	if OnPreview then
 		self:initialize()
-		self.type = "ColorLayer"
 		self.width  = w
 		self.height = h
 		self.color  = {r,g,b}
 		self.opacity = a
 		self.anchorX = 0.0
-		self.anchorY = 0.0
+		self.anchorY = 1.0
 	else
 		self.node = cc.LayerColor:create(cc.c4b(r,g,b,a),w,h)
 		self.node:setAnchorPoint(cc.p(0,0))
@@ -1080,9 +1089,9 @@ end
 local Label = class(Node)
 function Label:init(id,str,fnt,size)
 	self.id = id
+	self.type = "Label"
 	if OnPreview then
 		self:initialize()
-		self.type = "Label"
 		self.text = str
 		self.font = fnt
 		self.size = size
@@ -1318,7 +1327,8 @@ function Dialog:_make()
 		x,y = config["x"] or 0 ,config["y"] or 0 
 		if config["path"] then
 			self.background = pini.Sprite("dialog_background",config["path"])
-			x,y = x+self.background:contentSize().width/2,y-self.background:contentSize().height/2
+			self.background:setAnchorPoint(0,0);
+			--x,y = x+self.background:contentSize().width/2,y-self.background:contentSize().height/2
 		else
 			self.background = pini.ColorLayer("dialog_background",0,0,0,0,config["width"] or 300,config["height"] or 300)
 		end
@@ -1403,9 +1413,20 @@ function Dialog:build()
 	local default_size = config["size"] or 40
 	
 	local ax,ay = self.background:anchor();
-	local originX = (config["marginX"] or 0)+self.lastX-self.background:contentSize().width * ax
-	local originY = (config["marginY"] or 0)+self.lastY-self.background:contentSize().height* ay
-	local x = originX
+
+	local additionalX = 0--self.background:contentSize().width * ax
+	local additionalY = self.background:contentSize().height*(1-ay)
+
+	local lastedX = self.lastX + additionalX-(config["marginX"] or 0)
+	local lastedY = self.lastY + additionalY
+	if (self.lastX ==0 and self.lastY == 0) or self.keepFlag == false then
+		lastedX = 0
+		lastedY = (config["marginY"] or 0)
+	end
+
+	local originX = (config["marginX"] or 0)-additionalX--lastedX-additionalX
+	local originY = lastedY-additionalY
+	local x = originX+lastedX
 	local y = originY
 
 	local maxY = self.lastMaxY or default_size
@@ -1436,12 +1457,19 @@ function Dialog:build()
 
 			elseif _v["name"] == "크기" then
 				size = tonumber(_a[1])
+
 			elseif _v["name"] == "/크기" then
 				size = default_size
 
 			elseif _v["name"] == "공백" then
 				x = x+tonumber(_a[1])
  
+			elseif _v["name"] == "자간" then
+				wordGap = tonumber(_a[1])
+
+			elseif _v["name"] == "행간" then
+				lineGap = tonumber(_a[1])+5
+
 			elseif _v["name"]:startsWith("=") then
 				local _id = _v["name"]:sub(2,#_v["name"])
 				print_str = tostring(self.vm.variable[_id])
@@ -1476,20 +1504,47 @@ function Dialog:build()
 end
 function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY,originX,originY)
 	local config = self.configs[self.configIdx]
+	local bconfig = config["linkBlock"] or {}
 	local block = nil
 	function makeLink(x)
 		x = x-originX+(config["marginX"] or 0)
-		local lc = config["link_color"] or {255,255,255,60}
-		local back = pini.ColorLayer(pini:GetUUID(),lc[1] or 255,
-													lc[2] or 255,
-													lc[3] or 255,
-													lc[4] or 100,0,0)
+
+		local c = bconfig["color"] or {}
+		local back=nil
+		if tostring(bconfig["unselect"] or ""):len() > 0 then
+			back = pini.Sprite(pini:GetUUID(),bconfig["unselect"])
+		else
+			back = pini.ColorLayer(pini:GetUUID(),c[1] or 255,c[2] or 255,c[3] or 255,c[4] or 100,0,0)
+		end
 		back.link = link
 		back:setPositionX(x)
+
 		pini:AttachDisplay(back,self.background.id)
 		block = back;
 
 		table.insert(self.linker,back)
+	end
+	function blockModify(y,w,h)
+		local my = y-originY+(config["marginY"] or 0)
+		if OnPreview then
+			my = y
+		end
+
+		if block.type=="Sprite" then
+			local size = block:contentSize()
+			local sx = w/size.width
+			if bconfig["fitWidth"] then
+				sx = (config["width"] or 0)/size.width
+				block:setPositionX(config["marginX"] or 0)
+			end
+			block:setPositionY(my)
+			block:setScale(sx,maxY/size.height)
+			block:setAnchorPoint(0,0)
+		else
+			block:setPositionY(my)
+			block:setContentSize(w,maxY)
+		end
+		
 	end
 	if link then
 		makeLink(startX)
@@ -1535,6 +1590,7 @@ function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY,or
 			end
 			
 			label:setPosition(x+cs.width/2,y+cs.height/2)
+			--label:setPosition(0,0)
 			label:setColor(color[1],color[2],color[3])
 			label:setVisible(false)
 			x = x + cs.width + wordGap
@@ -1543,9 +1599,8 @@ function Dialog:makeBlock(startX,startY,str,color,size,link,wordGap,font,maxY,or
 				maxY = cs.height
 			end
 			if block then 
-				block:setPositionY(y+maxY-originY+(config["marginY"] or 0))
+				blockModify(y+maxY,width,maxY)
 			end
-			if block then block:setContentSize(width,maxY) end
 
 			table.insert(self.letters,label)
 		end
@@ -1615,13 +1670,19 @@ function Dialog:Run(vm,targ)
 			e()
 		end,true):run()
 		local config = self.configs[self.configIdx]
-		local lc = config["link_color"] or {255,255,255,60}
+		local bconfig = config["linkBlock"] or {}
+		local lc = bconfig["color"] or {255,255,255,60}
 		local linkOp = lc[4] or 60
 		touches:setContentSize(99999,99999)
 		touches.onTouchUp = function(location)
 			for k,v in ipairs(self.linker) do
 				v:StopAction()
 				v:setOpacity(linkOp)
+
+				if tostring(bconfig["unselect"] or ""):len() > 0 then
+					v:setSprite(bconfig["unselect"])
+				end
+				
 				local tloc = v.node:convertToNodeSpace(location);
 				local b = v:contentSize()
 				if tloc.x > 0 and tloc.y > 0 and tloc.x < b.width and tloc.y < b.height then
@@ -1629,6 +1690,9 @@ function Dialog:Run(vm,targ)
 						vm:GotoBookmark(v.link)
 						return fin()
 					else
+						if tostring(bconfig["select"] or ""):len() > 0 then
+							v:setSprite(bconfig["select"])
+						end
 						local action = pini.Anim.Forever(
 							pini.Anim.Sequence(
 								pini.Anim.FadeTo(0.5,linkOp/10),
