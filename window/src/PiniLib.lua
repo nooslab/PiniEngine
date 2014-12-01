@@ -132,8 +132,6 @@ function LNX_MONOLOG(vm,arg)
 	--print(">LNX_MONOLOG")
 	--print(print_r(arg))
 
-
-
 	pini.Dialog:setKeep(forceOn=="예")
 	pini.Dialog:setName(nil)
 	pini.Dialog:UseConfig(window)
@@ -145,10 +143,6 @@ function LNX_DIALOG(vm,arg)
 	local forceOn = vm.variable["대화.유지"] or "아니오"
 	local window = vm.variable["대화.대사창"] or "대화"
 	local arg = vm.variable["system.arg"]
-
-	--vm:showCallStack()
-	--print(">LNX_DIALOG")
-	--print(print_r(arg))
 
 	name = tostring(name)
 	if name:len() > 0 then
@@ -297,7 +291,7 @@ LanXVM:registFunc("전환",function(vm,arg)
 	program:updateUniforms()
 	sprite:setGLProgram( program )
 
-	local glprogramstate = cc.GLProgramState:getOrCreateWithGLProgram(program);
+	local glprogramstate = cc.GLProgramState:getOrCreateWithGLProgram( program );
 	sprite:setGLProgramState(glprogramstate);
 
 	glprogramstate:setUniformTexture("u_fadetex", img1:getTexture():getName());
@@ -331,8 +325,57 @@ LanXVM:registFunc("전환",function(vm,arg)
 end)
 ]]
 
+function LNX_TRANSITION(vm,arg)
+	local id = vm.variable["전환.아이디"] or ""
+	local sec = vm.variable["전환.시간"] or ""
+	local scale = vm.variable["전환.인자이미지"] or ""
+	local path = vm.variable["전환.이미지"] or ""
+
+	-- 화면 전환 효과는 inGame에서만 작동됨
+	if OnPreview then
+		pini:ClearDisplay()
+
+		local img = pini.Sprite(id,path)
+		img:setScale("화면맞춤")
+		img:setPosition("화면중앙")
+		
+		pini:AttachDisplay(img)
+		vm:doNext()
+	else
+		pini:takeScreenShot(function(sprite)
+			pini:ClearDisplay()
+			pini:Scene():clear()
+
+			pini:AttachDisplay(sprite)
+			sprite:release()
+			
+			local shader = pini.Shader("transition.vsh", "transition.fsh")
+			shader:bind(sprite)
+
+			local img1 = pini.Sprite("transition1",scale)
+			local img2 = pini.Sprite("transition2",path)
+
+			shader:setUniformTexture("u_fadetex", img1)
+			shader:setUniformTexture("u_disttex", img2)
+
+			local threshold = 0
+			local timer = nil
+			timer = pini.Timer(pini:GetUUID(),0,function()
+				shader:setUniformFloat("threshold",threshold)
+				if threshold >= 1 then
+					timer:stop()
+				end
+				threshold = threshold+0.005
+			end,true)
+			timer:run()
+
+			vm:doNext()
+		end)
+	end
+end
+
 function LNX_SCENE_TRANSITION(vm,arg)
-	pini.Scene()
+	pini.Scene() 
 	vm:doNext()
 end
 

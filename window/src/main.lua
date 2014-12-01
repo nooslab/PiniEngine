@@ -251,6 +251,8 @@ local function initRemoteScene(width,height)
 	else
 		cc.Director:getInstance():runWithScene(pScene)
 	end
+
+	return pScene
 end
 
 
@@ -262,14 +264,24 @@ local function main()
 	local ROOT_PATH = fileUtil:getWritablePath()
 
 	local targetPlatform = CCApplication:getInstance():getTargetPlatform()
+	local scene
 	if kTargetWindows == targetPlatform then
 		InitCocos2d(800,600)
-		initRemoteScene(800,600)
+		scene=initRemoteScene(800,600)
 	else
 		InitCocos2d()
 		size = cc.Director:getInstance():getOpenGLView():getFrameSize()
-		initRemoteScene(size.width,size.height)
+		scene=initRemoteScene(size.width,size.height)
 	end
+--[[
+	require("PiniAPI")
+	local player = pini.VideoPlayer("PV.avi")
+	print("player 1")
+	player:play();
+	print("player 2",scene,player.node)
+	scene:addChild(player.node)
+	print("player 3")
+]]
 
 	console(tostring(kTargetWindows == targetPlatform))
 

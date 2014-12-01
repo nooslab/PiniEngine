@@ -233,7 +233,7 @@ end
 ---------------------------------------------
 local RotateTo = class()
 function RotateTo:init(sec,rot)
-	self.opacity = op
+	self.sec = sec
 	self.rot = rot
 end
 function RotateTo:cocosObj()
@@ -619,6 +619,45 @@ anim["EaseElasticIn"] = EaseElasticIn
 anim["EaseElasticOut"] = EaseElasticOut
 anim["EaseElasticInOut"] = EaseElasticInOut
 
+----------------------------------------------
+-- Shader
+----------------------------------------------
+local Shader = class()
+function Shader:init(vsh,fsh)
+	if OnPreview then
+	else
+		self.program = cc.GLProgram:create(vsh,fsh)
+		self.program:bindAttribLocation(cc.ATTRIBUTE_NAME_POSITION, cc.VERTEX_ATTRIB_POSITION) 
+		self.program:bindAttribLocation(cc.ATTRIBUTE_NAME_TEX_COORD, cc.VERTEX_ATTRIB_TEX_COORD)
+		self.program:link()
+		self.program:updateUniforms()
+
+		self.glprogramstate = cc.GLProgramState:getOrCreateWithGLProgram( self.program );
+	end
+end
+
+function Shader:bind(node)
+	if OnPreview then
+	else
+		node.node:setGLProgram( self.program )
+		node.node:setGLProgramState( self.glprogramstate );
+	end
+end
+
+function Shader:setUniformFloat(name,value)
+	if OnPreview then
+	else
+		self.glprogramstate:setUniformFloat(name,value)
+	end
+end
+
+function Shader:setUniformTexture(name,spr)
+	if OnPreview then
+	else
+		self.glprogramstate:setUniformTexture(name, spr:getTextureName());
+	end
+end
+
 ---------------------------------------------
 -- Node 
 ---------------------------------------------
@@ -652,6 +691,14 @@ function Node:initialize()
 	if OnPreview then
 		self.drawOrder = OnPreviewDrawOrder
 		OnPreviewDrawOrder = OnPreviewDrawOrder+1
+	end
+end
+
+function Node:release()
+	if OnPreview then
+
+	else
+		self.node:release()
 	end
 end
 
@@ -705,7 +752,14 @@ function Node:removeSelf(cleanup)
 		--print(self.id)
 		--print(debug.traceback())
 		--print("****************************")
-		self.node:removeFromParent()
+		try{
+			function()
+				self.node:removeFromParent()
+			end,
+			catch{function(error)
+				print(" error self.node:removeFromParent ")
+			end}
+		}
 		self.parent = nil
 		if cleanup ~= false then
 			self.node = nil
@@ -857,11 +911,6 @@ function Node:setPosition(x,y)
 			dx = width*ax
 			dy = height*(1-ay)
 		end
-		if self.type == "Sprite" then
-			print("***************************")
-			print(tonumber(x)+dx,height-tonumber(y)-dy)
-			print(tonumber(x),dx,height,tonumber(y),dy)
-		end
 		self.node:setPosition(tonumber(x)+dx,height-tonumber(y)-dy)
 	end
 end
@@ -982,6 +1031,12 @@ function Node:StopAction()
 	end
 end
 
+function Node:setFlippedY(b)
+	if OnPreview then
+	else
+		self.node:setFlippedY(b)
+	end
+end
 
 ---------------------------------------------
 -- Sprite 
@@ -994,7 +1049,11 @@ function Sprite:init(id,path)
 		self:initialize()
 		self.path = path
 	else
-		self.node = cc.Sprite:create(FILES["image/"..path])
+		if type(path) == "string" then
+			self.node = cc.Sprite:create(FILES["image/"..path])
+		else
+			self.node = cc.Sprite:createWithTexture(path)
+		end
 		self.node.obj = self
 	end
 
@@ -1007,6 +1066,13 @@ function Sprite:setSprite(path)
 		local texture = cc.TextureCache:getInstance():addImage(FILES["image/"..path])
 		self.node:setTexture(texture)
 		self.node:setTextureRect(texture:getContentSize())
+	end
+end
+
+function Sprite:getTextureName()
+	if OnPreview then
+	else
+		return self.node:getTexture():getName()
 	end
 end
 
@@ -1059,10 +1125,17 @@ function Scene:clear()
 	else
 		try{
 			function()
-				self.node:removeAllChildren(true)
+				self.layer:removeAllChildren(true)
 			end,
 			catch{function(error)end}
 		}
+	end
+end
+function Scene:visit()
+	if OnPreview then
+
+	else
+		self.layer:visit()
 	end
 end
 
@@ -1262,6 +1335,39 @@ else
 		end
 	}
 end
+-----------------------------------------------
+----- VideoPlayer
+-----------------------------------------------
+local VideoPlayer = class()
+function VideoPlayer:init(path)
+	if OnPreview then
+	else
+		self.req_video = require "npini.videoplayer"
+		self.node = self.req_video.create(path)
+	end
+end
+
+function VideoPlayer:play()
+	if OnPreview then
+	else
+		self.req_video.play(self.node)
+	end
+end
+
+function VideoPlayer:stop()
+	if OnPreview then
+	else
+		self.req_video.stop(self.node)
+	end
+end
+
+function VideoPlayer:setCallback()
+	if OnPreview then
+	else
+		self.req_video.setCallback(self.node)
+	end
+end
+
 -----------------------------------------------
 ----- Dialog
 -----------------------------------------------
@@ -1764,6 +1870,9 @@ pini["ColorLayer"] = ColorLayer
 pini["TouchManager"] = TouchManager
 pini["Dialog"] = Dialog()
 pini["Anim"] = anim
+pini["Shader"] = Shader
+pini["VideoPlayer"] = VideoPlayer
+
 
 function pini:SetScene(scene)
 	self._regist_.LatestScene = scene
@@ -1901,4 +2010,27 @@ function pini:scene()
 end
 function pini:FindNode(idx)
 	return self._regist_.Display[idx]
+end
+function pini:takeScreenShot(callback)
+	if OnPreview then
+		callback(nil)
+	else
+		local target = cc.RenderTexture:create(
+								WIN_WIDTH, 
+								WIN_HEIGHT, 
+								cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
+		target:clear(0,0,0,255)
+		target:begin()
+		self:scene():visit()
+		target:endToLua()
+
+		local sprite = pini.Sprite("ScreenShot",target:getSprite():getTexture())
+		sprite:setPosition(WIN_WIDTH/2, WIN_HEIGHT/2)
+		sprite:setFlippedY(true);
+		sprite:retain()
+
+		pini.Timer("takeScreenShot",0,function()
+			callback(sprite)
+		end,false):run()
+	end
 end
