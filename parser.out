@@ -1,0 +1,3471 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> statement
+Rule 1     statement -> statement statement
+Rule 2     statement -> type
+Rule 3     statement -> assign
+Rule 4     statement -> func_def BLOCK_END
+Rule 5     statement -> condition_def BLOCK_END
+Rule 6     statement -> bookmark
+Rule 7     statement -> goto
+Rule 8     statement -> autocomplete
+Rule 9     function -> LPAREN ID RPAREN
+Rule 10    function -> LPAREN ID assign RPAREN
+Rule 11    function -> function targ
+Rule 12    bookmark -> BOOKMARK ID
+Rule 13    goto -> GOTO ID
+Rule 14    func_def -> FUNCTION_DEF ID
+Rule 15    func_def -> func_def defargu
+Rule 16    func_def -> func_def statement
+Rule 17    condition_def -> CONDITION_DEF type
+Rule 18    condition_def -> condition_def statement
+Rule 19    condition_def -> condition_def condition_def_else
+Rule 20    condition_def_else -> condition_def_else statement
+Rule 21    condition_def_else -> CONDITION_ELSE
+Rule 22    autocomplete -> WAVE type
+Rule 23    autocomplete -> autocomplete type
+Rule 24    autocomplete -> autocomplete type COMMA type
+Rule 25    defargu -> defargu COMMA type
+Rule 26    defargu -> defargu COMMA type COMMA type
+Rule 27    defargu -> IMPORTANT defargu
+Rule 28    defargu -> IMPORTANT assign
+Rule 29    defargu -> IMPORTANT type
+Rule 30    assign -> ID ASSIGN type
+Rule 31    assign -> assign assign
+Rule 32    targ -> targ targ
+Rule 33    targ -> TABARGU
+Rule 34    type -> type PLUS type
+Rule 35    type -> type MINUS type
+Rule 36    type -> type TIMES type
+Rule 37    type -> type DIVIDE type
+Rule 38    type -> type GREATERTHEN type
+Rule 39    type -> type GREATERTHENEQUAL type
+Rule 40    type -> type LESSTHEN type
+Rule 41    type -> type LESSTHENEQUAL type
+Rule 42    type -> type NEGATION type
+Rule 43    type -> type EQUAL type
+Rule 44    type -> OLPAREN type ORPAREN
+Rule 45    type -> function
+Rule 46    type -> STRING
+Rule 47    type -> NUMBER
+Rule 48    type -> FLOAT
+Rule 49    type -> ID
+
+Terminals, with rules where they appear
+
+ASSIGN               : 30
+BLOCK_END            : 4 5
+BOOKMARK             : 12
+COMMA                : 24 25 26 26
+CONDITION_DEF        : 17
+CONDITION_ELSE       : 21
+DIVIDE               : 37
+EQUAL                : 43
+FLOAT                : 48
+FUNCTION_DEF         : 14
+GOTO                 : 13
+GREATERTHEN          : 38
+GREATERTHENEQUAL     : 39
+ID                   : 9 10 12 13 14 30 49
+IMPORTANT            : 27 28 29
+LESSTHEN             : 40
+LESSTHENEQUAL        : 41
+LPAREN               : 9 10
+MINUS                : 35
+NEGATION             : 42
+NUMBER               : 47
+OLPAREN              : 44
+ORPAREN              : 44
+PLUS                 : 34
+RPAREN               : 9 10
+STRING               : 46
+TABARGU              : 33
+TIMES                : 36
+WAVE                 : 22
+error                : 
+
+Nonterminals, with rules where they appear
+
+assign               : 3 10 28 31 31
+autocomplete         : 8 23 24
+bookmark             : 6
+condition_def        : 5 18 19
+condition_def_else   : 19 20
+defargu              : 15 25 26 27
+func_def             : 4 15 16
+function             : 11 45
+goto                 : 7
+statement            : 1 1 16 18 20 0
+targ                 : 11 32 32
+type                 : 2 17 22 23 24 24 25 26 26 29 30 34 34 35 35 36 36 37 37 38 38 39 39 40 40 41 41 42 42 43 43 44
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 4
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 1
+
+    (17) condition_def -> CONDITION_DEF . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 21
+
+state 2
+
+    (6) statement -> bookmark .
+
+    OLPAREN         reduce using rule 6 (statement -> bookmark .)
+    STRING          reduce using rule 6 (statement -> bookmark .)
+    NUMBER          reduce using rule 6 (statement -> bookmark .)
+    FLOAT           reduce using rule 6 (statement -> bookmark .)
+    ID              reduce using rule 6 (statement -> bookmark .)
+    FUNCTION_DEF    reduce using rule 6 (statement -> bookmark .)
+    CONDITION_DEF   reduce using rule 6 (statement -> bookmark .)
+    BOOKMARK        reduce using rule 6 (statement -> bookmark .)
+    GOTO            reduce using rule 6 (statement -> bookmark .)
+    WAVE            reduce using rule 6 (statement -> bookmark .)
+    LPAREN          reduce using rule 6 (statement -> bookmark .)
+    BLOCK_END       reduce using rule 6 (statement -> bookmark .)
+    CONDITION_ELSE  reduce using rule 6 (statement -> bookmark .)
+    IMPORTANT       reduce using rule 6 (statement -> bookmark .)
+    $end            reduce using rule 6 (statement -> bookmark .)
+
+
+state 3
+
+    (12) bookmark -> BOOKMARK . ID
+
+    ID              shift and go to state 23
+
+
+state 4
+
+    (0) S' -> statement .
+    (1) statement -> statement . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 24
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 5
+
+    (46) type -> STRING .
+
+    PLUS            reduce using rule 46 (type -> STRING .)
+    MINUS           reduce using rule 46 (type -> STRING .)
+    TIMES           reduce using rule 46 (type -> STRING .)
+    DIVIDE          reduce using rule 46 (type -> STRING .)
+    GREATERTHEN     reduce using rule 46 (type -> STRING .)
+    GREATERTHENEQUAL reduce using rule 46 (type -> STRING .)
+    LESSTHEN        reduce using rule 46 (type -> STRING .)
+    LESSTHENEQUAL   reduce using rule 46 (type -> STRING .)
+    NEGATION        reduce using rule 46 (type -> STRING .)
+    EQUAL           reduce using rule 46 (type -> STRING .)
+    OLPAREN         reduce using rule 46 (type -> STRING .)
+    STRING          reduce using rule 46 (type -> STRING .)
+    NUMBER          reduce using rule 46 (type -> STRING .)
+    FLOAT           reduce using rule 46 (type -> STRING .)
+    ID              reduce using rule 46 (type -> STRING .)
+    FUNCTION_DEF    reduce using rule 46 (type -> STRING .)
+    CONDITION_DEF   reduce using rule 46 (type -> STRING .)
+    BOOKMARK        reduce using rule 46 (type -> STRING .)
+    GOTO            reduce using rule 46 (type -> STRING .)
+    WAVE            reduce using rule 46 (type -> STRING .)
+    LPAREN          reduce using rule 46 (type -> STRING .)
+    $end            reduce using rule 46 (type -> STRING .)
+    BLOCK_END       reduce using rule 46 (type -> STRING .)
+    IMPORTANT       reduce using rule 46 (type -> STRING .)
+    CONDITION_ELSE  reduce using rule 46 (type -> STRING .)
+    COMMA           reduce using rule 46 (type -> STRING .)
+    ORPAREN         reduce using rule 46 (type -> STRING .)
+    RPAREN          reduce using rule 46 (type -> STRING .)
+
+
+state 6
+
+    (2) statement -> type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    OLPAREN         reduce using rule 2 (statement -> type .)
+    STRING          reduce using rule 2 (statement -> type .)
+    NUMBER          reduce using rule 2 (statement -> type .)
+    FLOAT           reduce using rule 2 (statement -> type .)
+    ID              reduce using rule 2 (statement -> type .)
+    FUNCTION_DEF    reduce using rule 2 (statement -> type .)
+    CONDITION_DEF   reduce using rule 2 (statement -> type .)
+    BOOKMARK        reduce using rule 2 (statement -> type .)
+    GOTO            reduce using rule 2 (statement -> type .)
+    WAVE            reduce using rule 2 (statement -> type .)
+    LPAREN          reduce using rule 2 (statement -> type .)
+    BLOCK_END       reduce using rule 2 (statement -> type .)
+    CONDITION_ELSE  reduce using rule 2 (statement -> type .)
+    IMPORTANT       reduce using rule 2 (statement -> type .)
+    $end            reduce using rule 2 (statement -> type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 7
+
+    (45) type -> function .
+    (11) function -> function . targ
+    (32) targ -> . targ targ
+    (33) targ -> . TABARGU
+
+    PLUS            reduce using rule 45 (type -> function .)
+    MINUS           reduce using rule 45 (type -> function .)
+    TIMES           reduce using rule 45 (type -> function .)
+    DIVIDE          reduce using rule 45 (type -> function .)
+    GREATERTHEN     reduce using rule 45 (type -> function .)
+    GREATERTHENEQUAL reduce using rule 45 (type -> function .)
+    LESSTHEN        reduce using rule 45 (type -> function .)
+    LESSTHENEQUAL   reduce using rule 45 (type -> function .)
+    NEGATION        reduce using rule 45 (type -> function .)
+    EQUAL           reduce using rule 45 (type -> function .)
+    OLPAREN         reduce using rule 45 (type -> function .)
+    STRING          reduce using rule 45 (type -> function .)
+    NUMBER          reduce using rule 45 (type -> function .)
+    FLOAT           reduce using rule 45 (type -> function .)
+    ID              reduce using rule 45 (type -> function .)
+    FUNCTION_DEF    reduce using rule 45 (type -> function .)
+    CONDITION_DEF   reduce using rule 45 (type -> function .)
+    BOOKMARK        reduce using rule 45 (type -> function .)
+    GOTO            reduce using rule 45 (type -> function .)
+    WAVE            reduce using rule 45 (type -> function .)
+    LPAREN          reduce using rule 45 (type -> function .)
+    $end            reduce using rule 45 (type -> function .)
+    BLOCK_END       reduce using rule 45 (type -> function .)
+    IMPORTANT       reduce using rule 45 (type -> function .)
+    CONDITION_ELSE  reduce using rule 45 (type -> function .)
+    COMMA           reduce using rule 45 (type -> function .)
+    ORPAREN         reduce using rule 45 (type -> function .)
+    RPAREN          reduce using rule 45 (type -> function .)
+    TABARGU         shift and go to state 36
+
+    targ                           shift and go to state 35
+
+state 8
+
+    (13) goto -> GOTO . ID
+
+    ID              shift and go to state 37
+
+
+state 9
+
+    (7) statement -> goto .
+
+    OLPAREN         reduce using rule 7 (statement -> goto .)
+    STRING          reduce using rule 7 (statement -> goto .)
+    NUMBER          reduce using rule 7 (statement -> goto .)
+    FLOAT           reduce using rule 7 (statement -> goto .)
+    ID              reduce using rule 7 (statement -> goto .)
+    FUNCTION_DEF    reduce using rule 7 (statement -> goto .)
+    CONDITION_DEF   reduce using rule 7 (statement -> goto .)
+    BOOKMARK        reduce using rule 7 (statement -> goto .)
+    GOTO            reduce using rule 7 (statement -> goto .)
+    WAVE            reduce using rule 7 (statement -> goto .)
+    LPAREN          reduce using rule 7 (statement -> goto .)
+    BLOCK_END       reduce using rule 7 (statement -> goto .)
+    CONDITION_ELSE  reduce using rule 7 (statement -> goto .)
+    IMPORTANT       reduce using rule 7 (statement -> goto .)
+    $end            reduce using rule 7 (statement -> goto .)
+
+
+state 10
+
+    (4) statement -> func_def . BLOCK_END
+    (15) func_def -> func_def . defargu
+    (16) func_def -> func_def . statement
+    (25) defargu -> . defargu COMMA type
+    (26) defargu -> . defargu COMMA type COMMA type
+    (27) defargu -> . IMPORTANT defargu
+    (28) defargu -> . IMPORTANT assign
+    (29) defargu -> . IMPORTANT type
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    BLOCK_END       shift and go to state 38
+    IMPORTANT       shift and go to state 40
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 41
+    defargu                        shift and go to state 39
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 11
+
+    (47) type -> NUMBER .
+
+    PLUS            reduce using rule 47 (type -> NUMBER .)
+    MINUS           reduce using rule 47 (type -> NUMBER .)
+    TIMES           reduce using rule 47 (type -> NUMBER .)
+    DIVIDE          reduce using rule 47 (type -> NUMBER .)
+    GREATERTHEN     reduce using rule 47 (type -> NUMBER .)
+    GREATERTHENEQUAL reduce using rule 47 (type -> NUMBER .)
+    LESSTHEN        reduce using rule 47 (type -> NUMBER .)
+    LESSTHENEQUAL   reduce using rule 47 (type -> NUMBER .)
+    NEGATION        reduce using rule 47 (type -> NUMBER .)
+    EQUAL           reduce using rule 47 (type -> NUMBER .)
+    OLPAREN         reduce using rule 47 (type -> NUMBER .)
+    STRING          reduce using rule 47 (type -> NUMBER .)
+    NUMBER          reduce using rule 47 (type -> NUMBER .)
+    FLOAT           reduce using rule 47 (type -> NUMBER .)
+    ID              reduce using rule 47 (type -> NUMBER .)
+    FUNCTION_DEF    reduce using rule 47 (type -> NUMBER .)
+    CONDITION_DEF   reduce using rule 47 (type -> NUMBER .)
+    BOOKMARK        reduce using rule 47 (type -> NUMBER .)
+    GOTO            reduce using rule 47 (type -> NUMBER .)
+    WAVE            reduce using rule 47 (type -> NUMBER .)
+    LPAREN          reduce using rule 47 (type -> NUMBER .)
+    $end            reduce using rule 47 (type -> NUMBER .)
+    BLOCK_END       reduce using rule 47 (type -> NUMBER .)
+    IMPORTANT       reduce using rule 47 (type -> NUMBER .)
+    CONDITION_ELSE  reduce using rule 47 (type -> NUMBER .)
+    COMMA           reduce using rule 47 (type -> NUMBER .)
+    ORPAREN         reduce using rule 47 (type -> NUMBER .)
+    RPAREN          reduce using rule 47 (type -> NUMBER .)
+
+
+state 12
+
+    (9) function -> LPAREN . ID RPAREN
+    (10) function -> LPAREN . ID assign RPAREN
+
+    ID              shift and go to state 42
+
+
+state 13
+
+    (22) autocomplete -> WAVE . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 43
+
+state 14
+
+    (49) type -> ID .
+    (30) assign -> ID . ASSIGN type
+
+    PLUS            reduce using rule 49 (type -> ID .)
+    MINUS           reduce using rule 49 (type -> ID .)
+    TIMES           reduce using rule 49 (type -> ID .)
+    DIVIDE          reduce using rule 49 (type -> ID .)
+    GREATERTHEN     reduce using rule 49 (type -> ID .)
+    GREATERTHENEQUAL reduce using rule 49 (type -> ID .)
+    LESSTHEN        reduce using rule 49 (type -> ID .)
+    LESSTHENEQUAL   reduce using rule 49 (type -> ID .)
+    NEGATION        reduce using rule 49 (type -> ID .)
+    EQUAL           reduce using rule 49 (type -> ID .)
+    OLPAREN         reduce using rule 49 (type -> ID .)
+    STRING          reduce using rule 49 (type -> ID .)
+    NUMBER          reduce using rule 49 (type -> ID .)
+    FLOAT           reduce using rule 49 (type -> ID .)
+    ID              reduce using rule 49 (type -> ID .)
+    FUNCTION_DEF    reduce using rule 49 (type -> ID .)
+    CONDITION_DEF   reduce using rule 49 (type -> ID .)
+    BOOKMARK        reduce using rule 49 (type -> ID .)
+    GOTO            reduce using rule 49 (type -> ID .)
+    WAVE            reduce using rule 49 (type -> ID .)
+    LPAREN          reduce using rule 49 (type -> ID .)
+    $end            reduce using rule 49 (type -> ID .)
+    BLOCK_END       reduce using rule 49 (type -> ID .)
+    IMPORTANT       reduce using rule 49 (type -> ID .)
+    CONDITION_ELSE  reduce using rule 49 (type -> ID .)
+    ASSIGN          shift and go to state 44
+
+
+state 15
+
+    (14) func_def -> FUNCTION_DEF . ID
+
+    ID              shift and go to state 45
+
+
+state 16
+
+    (48) type -> FLOAT .
+
+    PLUS            reduce using rule 48 (type -> FLOAT .)
+    MINUS           reduce using rule 48 (type -> FLOAT .)
+    TIMES           reduce using rule 48 (type -> FLOAT .)
+    DIVIDE          reduce using rule 48 (type -> FLOAT .)
+    GREATERTHEN     reduce using rule 48 (type -> FLOAT .)
+    GREATERTHENEQUAL reduce using rule 48 (type -> FLOAT .)
+    LESSTHEN        reduce using rule 48 (type -> FLOAT .)
+    LESSTHENEQUAL   reduce using rule 48 (type -> FLOAT .)
+    NEGATION        reduce using rule 48 (type -> FLOAT .)
+    EQUAL           reduce using rule 48 (type -> FLOAT .)
+    OLPAREN         reduce using rule 48 (type -> FLOAT .)
+    STRING          reduce using rule 48 (type -> FLOAT .)
+    NUMBER          reduce using rule 48 (type -> FLOAT .)
+    FLOAT           reduce using rule 48 (type -> FLOAT .)
+    ID              reduce using rule 48 (type -> FLOAT .)
+    FUNCTION_DEF    reduce using rule 48 (type -> FLOAT .)
+    CONDITION_DEF   reduce using rule 48 (type -> FLOAT .)
+    BOOKMARK        reduce using rule 48 (type -> FLOAT .)
+    GOTO            reduce using rule 48 (type -> FLOAT .)
+    WAVE            reduce using rule 48 (type -> FLOAT .)
+    LPAREN          reduce using rule 48 (type -> FLOAT .)
+    $end            reduce using rule 48 (type -> FLOAT .)
+    BLOCK_END       reduce using rule 48 (type -> FLOAT .)
+    IMPORTANT       reduce using rule 48 (type -> FLOAT .)
+    CONDITION_ELSE  reduce using rule 48 (type -> FLOAT .)
+    COMMA           reduce using rule 48 (type -> FLOAT .)
+    ORPAREN         reduce using rule 48 (type -> FLOAT .)
+    RPAREN          reduce using rule 48 (type -> FLOAT .)
+
+
+state 17
+
+    (8) statement -> autocomplete .
+    (23) autocomplete -> autocomplete . type
+    (24) autocomplete -> autocomplete . type COMMA type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    FUNCTION_DEF    reduce using rule 8 (statement -> autocomplete .)
+    CONDITION_DEF   reduce using rule 8 (statement -> autocomplete .)
+    BOOKMARK        reduce using rule 8 (statement -> autocomplete .)
+    GOTO            reduce using rule 8 (statement -> autocomplete .)
+    WAVE            reduce using rule 8 (statement -> autocomplete .)
+    BLOCK_END       reduce using rule 8 (statement -> autocomplete .)
+    CONDITION_ELSE  reduce using rule 8 (statement -> autocomplete .)
+    IMPORTANT       reduce using rule 8 (statement -> autocomplete .)
+    $end            reduce using rule 8 (statement -> autocomplete .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 8 (statement -> autocomplete .) ]
+  ! STRING          [ reduce using rule 8 (statement -> autocomplete .) ]
+  ! NUMBER          [ reduce using rule 8 (statement -> autocomplete .) ]
+  ! FLOAT           [ reduce using rule 8 (statement -> autocomplete .) ]
+  ! ID              [ reduce using rule 8 (statement -> autocomplete .) ]
+  ! LPAREN          [ reduce using rule 8 (statement -> autocomplete .) ]
+
+    function                       shift and go to state 7
+    type                           shift and go to state 46
+
+state 18
+
+    (44) type -> OLPAREN . type ORPAREN
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 47
+
+state 19
+
+    (5) statement -> condition_def . BLOCK_END
+    (18) condition_def -> condition_def . statement
+    (19) condition_def -> condition_def . condition_def_else
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (20) condition_def_else -> . condition_def_else statement
+    (21) condition_def_else -> . CONDITION_ELSE
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    BLOCK_END       shift and go to state 48
+    CONDITION_ELSE  shift and go to state 49
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    condition_def_else             shift and go to state 51
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 50
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 20
+
+    (3) statement -> assign .
+    (31) assign -> assign . assign
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+
+  ! shift/reduce conflict for ID resolved as shift
+    OLPAREN         reduce using rule 3 (statement -> assign .)
+    STRING          reduce using rule 3 (statement -> assign .)
+    NUMBER          reduce using rule 3 (statement -> assign .)
+    FLOAT           reduce using rule 3 (statement -> assign .)
+    FUNCTION_DEF    reduce using rule 3 (statement -> assign .)
+    CONDITION_DEF   reduce using rule 3 (statement -> assign .)
+    BOOKMARK        reduce using rule 3 (statement -> assign .)
+    GOTO            reduce using rule 3 (statement -> assign .)
+    WAVE            reduce using rule 3 (statement -> assign .)
+    LPAREN          reduce using rule 3 (statement -> assign .)
+    BLOCK_END       reduce using rule 3 (statement -> assign .)
+    CONDITION_ELSE  reduce using rule 3 (statement -> assign .)
+    IMPORTANT       reduce using rule 3 (statement -> assign .)
+    $end            reduce using rule 3 (statement -> assign .)
+    ID              shift and go to state 53
+
+  ! ID              [ reduce using rule 3 (statement -> assign .) ]
+
+    assign                         shift and go to state 52
+
+state 21
+
+    (17) condition_def -> CONDITION_DEF type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    BLOCK_END       reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    CONDITION_ELSE  reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    OLPAREN         reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    STRING          reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    NUMBER          reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    FLOAT           reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    ID              reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    FUNCTION_DEF    reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    CONDITION_DEF   reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    BOOKMARK        reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    GOTO            reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    WAVE            reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    LPAREN          reduce using rule 17 (condition_def -> CONDITION_DEF type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 22
+
+    (49) type -> ID .
+
+    COMMA           reduce using rule 49 (type -> ID .)
+    PLUS            reduce using rule 49 (type -> ID .)
+    MINUS           reduce using rule 49 (type -> ID .)
+    TIMES           reduce using rule 49 (type -> ID .)
+    DIVIDE          reduce using rule 49 (type -> ID .)
+    GREATERTHEN     reduce using rule 49 (type -> ID .)
+    GREATERTHENEQUAL reduce using rule 49 (type -> ID .)
+    LESSTHEN        reduce using rule 49 (type -> ID .)
+    LESSTHENEQUAL   reduce using rule 49 (type -> ID .)
+    NEGATION        reduce using rule 49 (type -> ID .)
+    EQUAL           reduce using rule 49 (type -> ID .)
+    OLPAREN         reduce using rule 49 (type -> ID .)
+    STRING          reduce using rule 49 (type -> ID .)
+    NUMBER          reduce using rule 49 (type -> ID .)
+    FLOAT           reduce using rule 49 (type -> ID .)
+    ID              reduce using rule 49 (type -> ID .)
+    LPAREN          reduce using rule 49 (type -> ID .)
+    FUNCTION_DEF    reduce using rule 49 (type -> ID .)
+    CONDITION_DEF   reduce using rule 49 (type -> ID .)
+    BOOKMARK        reduce using rule 49 (type -> ID .)
+    GOTO            reduce using rule 49 (type -> ID .)
+    WAVE            reduce using rule 49 (type -> ID .)
+    $end            reduce using rule 49 (type -> ID .)
+    BLOCK_END       reduce using rule 49 (type -> ID .)
+    IMPORTANT       reduce using rule 49 (type -> ID .)
+    CONDITION_ELSE  reduce using rule 49 (type -> ID .)
+    ORPAREN         reduce using rule 49 (type -> ID .)
+    RPAREN          reduce using rule 49 (type -> ID .)
+
+
+state 23
+
+    (12) bookmark -> BOOKMARK ID .
+
+    OLPAREN         reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    STRING          reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    NUMBER          reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    FLOAT           reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    ID              reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    FUNCTION_DEF    reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    CONDITION_DEF   reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    BOOKMARK        reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    GOTO            reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    WAVE            reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    LPAREN          reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    BLOCK_END       reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    CONDITION_ELSE  reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    $end            reduce using rule 12 (bookmark -> BOOKMARK ID .)
+    IMPORTANT       reduce using rule 12 (bookmark -> BOOKMARK ID .)
+
+
+state 24
+
+    (1) statement -> statement statement .
+    (1) statement -> statement . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for FUNCTION_DEF resolved as shift
+  ! shift/reduce conflict for CONDITION_DEF resolved as shift
+  ! shift/reduce conflict for BOOKMARK resolved as shift
+  ! shift/reduce conflict for GOTO resolved as shift
+  ! shift/reduce conflict for WAVE resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    BLOCK_END       reduce using rule 1 (statement -> statement statement .)
+    CONDITION_ELSE  reduce using rule 1 (statement -> statement statement .)
+    IMPORTANT       reduce using rule 1 (statement -> statement statement .)
+    $end            reduce using rule 1 (statement -> statement statement .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 1 (statement -> statement statement .) ]
+  ! STRING          [ reduce using rule 1 (statement -> statement statement .) ]
+  ! NUMBER          [ reduce using rule 1 (statement -> statement statement .) ]
+  ! FLOAT           [ reduce using rule 1 (statement -> statement statement .) ]
+  ! ID              [ reduce using rule 1 (statement -> statement statement .) ]
+  ! FUNCTION_DEF    [ reduce using rule 1 (statement -> statement statement .) ]
+  ! CONDITION_DEF   [ reduce using rule 1 (statement -> statement statement .) ]
+  ! BOOKMARK        [ reduce using rule 1 (statement -> statement statement .) ]
+  ! GOTO            [ reduce using rule 1 (statement -> statement statement .) ]
+  ! WAVE            [ reduce using rule 1 (statement -> statement statement .) ]
+  ! LPAREN          [ reduce using rule 1 (statement -> statement statement .) ]
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 24
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 25
+
+    (37) type -> type DIVIDE . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 54
+
+state 26
+
+    (43) type -> type EQUAL . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 55
+
+state 27
+
+    (42) type -> type NEGATION . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 56
+
+state 28
+
+    (40) type -> type LESSTHEN . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 57
+
+state 29
+
+    (36) type -> type TIMES . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 58
+
+state 30
+
+    (39) type -> type GREATERTHENEQUAL . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 59
+
+state 31
+
+    (34) type -> type PLUS . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 60
+
+state 32
+
+    (38) type -> type GREATERTHEN . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 61
+
+state 33
+
+    (41) type -> type LESSTHENEQUAL . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 62
+
+state 34
+
+    (35) type -> type MINUS . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 63
+
+state 35
+
+    (11) function -> function targ .
+    (32) targ -> targ . targ
+    (32) targ -> . targ targ
+    (33) targ -> . TABARGU
+
+  ! shift/reduce conflict for TABARGU resolved as shift
+    PLUS            reduce using rule 11 (function -> function targ .)
+    MINUS           reduce using rule 11 (function -> function targ .)
+    TIMES           reduce using rule 11 (function -> function targ .)
+    DIVIDE          reduce using rule 11 (function -> function targ .)
+    GREATERTHEN     reduce using rule 11 (function -> function targ .)
+    GREATERTHENEQUAL reduce using rule 11 (function -> function targ .)
+    LESSTHEN        reduce using rule 11 (function -> function targ .)
+    LESSTHENEQUAL   reduce using rule 11 (function -> function targ .)
+    NEGATION        reduce using rule 11 (function -> function targ .)
+    EQUAL           reduce using rule 11 (function -> function targ .)
+    OLPAREN         reduce using rule 11 (function -> function targ .)
+    STRING          reduce using rule 11 (function -> function targ .)
+    NUMBER          reduce using rule 11 (function -> function targ .)
+    FLOAT           reduce using rule 11 (function -> function targ .)
+    ID              reduce using rule 11 (function -> function targ .)
+    FUNCTION_DEF    reduce using rule 11 (function -> function targ .)
+    CONDITION_DEF   reduce using rule 11 (function -> function targ .)
+    BOOKMARK        reduce using rule 11 (function -> function targ .)
+    GOTO            reduce using rule 11 (function -> function targ .)
+    WAVE            reduce using rule 11 (function -> function targ .)
+    LPAREN          reduce using rule 11 (function -> function targ .)
+    $end            reduce using rule 11 (function -> function targ .)
+    BLOCK_END       reduce using rule 11 (function -> function targ .)
+    CONDITION_ELSE  reduce using rule 11 (function -> function targ .)
+    IMPORTANT       reduce using rule 11 (function -> function targ .)
+    COMMA           reduce using rule 11 (function -> function targ .)
+    ORPAREN         reduce using rule 11 (function -> function targ .)
+    RPAREN          reduce using rule 11 (function -> function targ .)
+    TABARGU         shift and go to state 36
+
+  ! TABARGU         [ reduce using rule 11 (function -> function targ .) ]
+
+    targ                           shift and go to state 64
+
+state 36
+
+    (33) targ -> TABARGU .
+
+    TABARGU         reduce using rule 33 (targ -> TABARGU .)
+    PLUS            reduce using rule 33 (targ -> TABARGU .)
+    MINUS           reduce using rule 33 (targ -> TABARGU .)
+    TIMES           reduce using rule 33 (targ -> TABARGU .)
+    DIVIDE          reduce using rule 33 (targ -> TABARGU .)
+    GREATERTHEN     reduce using rule 33 (targ -> TABARGU .)
+    GREATERTHENEQUAL reduce using rule 33 (targ -> TABARGU .)
+    LESSTHEN        reduce using rule 33 (targ -> TABARGU .)
+    LESSTHENEQUAL   reduce using rule 33 (targ -> TABARGU .)
+    NEGATION        reduce using rule 33 (targ -> TABARGU .)
+    EQUAL           reduce using rule 33 (targ -> TABARGU .)
+    OLPAREN         reduce using rule 33 (targ -> TABARGU .)
+    STRING          reduce using rule 33 (targ -> TABARGU .)
+    NUMBER          reduce using rule 33 (targ -> TABARGU .)
+    FLOAT           reduce using rule 33 (targ -> TABARGU .)
+    ID              reduce using rule 33 (targ -> TABARGU .)
+    FUNCTION_DEF    reduce using rule 33 (targ -> TABARGU .)
+    CONDITION_DEF   reduce using rule 33 (targ -> TABARGU .)
+    BOOKMARK        reduce using rule 33 (targ -> TABARGU .)
+    GOTO            reduce using rule 33 (targ -> TABARGU .)
+    WAVE            reduce using rule 33 (targ -> TABARGU .)
+    LPAREN          reduce using rule 33 (targ -> TABARGU .)
+    $end            reduce using rule 33 (targ -> TABARGU .)
+    BLOCK_END       reduce using rule 33 (targ -> TABARGU .)
+    CONDITION_ELSE  reduce using rule 33 (targ -> TABARGU .)
+    IMPORTANT       reduce using rule 33 (targ -> TABARGU .)
+    COMMA           reduce using rule 33 (targ -> TABARGU .)
+    ORPAREN         reduce using rule 33 (targ -> TABARGU .)
+    RPAREN          reduce using rule 33 (targ -> TABARGU .)
+
+
+state 37
+
+    (13) goto -> GOTO ID .
+
+    OLPAREN         reduce using rule 13 (goto -> GOTO ID .)
+    STRING          reduce using rule 13 (goto -> GOTO ID .)
+    NUMBER          reduce using rule 13 (goto -> GOTO ID .)
+    FLOAT           reduce using rule 13 (goto -> GOTO ID .)
+    ID              reduce using rule 13 (goto -> GOTO ID .)
+    FUNCTION_DEF    reduce using rule 13 (goto -> GOTO ID .)
+    CONDITION_DEF   reduce using rule 13 (goto -> GOTO ID .)
+    BOOKMARK        reduce using rule 13 (goto -> GOTO ID .)
+    GOTO            reduce using rule 13 (goto -> GOTO ID .)
+    WAVE            reduce using rule 13 (goto -> GOTO ID .)
+    LPAREN          reduce using rule 13 (goto -> GOTO ID .)
+    $end            reduce using rule 13 (goto -> GOTO ID .)
+    BLOCK_END       reduce using rule 13 (goto -> GOTO ID .)
+    IMPORTANT       reduce using rule 13 (goto -> GOTO ID .)
+    CONDITION_ELSE  reduce using rule 13 (goto -> GOTO ID .)
+
+
+state 38
+
+    (4) statement -> func_def BLOCK_END .
+
+    OLPAREN         reduce using rule 4 (statement -> func_def BLOCK_END .)
+    STRING          reduce using rule 4 (statement -> func_def BLOCK_END .)
+    NUMBER          reduce using rule 4 (statement -> func_def BLOCK_END .)
+    FLOAT           reduce using rule 4 (statement -> func_def BLOCK_END .)
+    ID              reduce using rule 4 (statement -> func_def BLOCK_END .)
+    FUNCTION_DEF    reduce using rule 4 (statement -> func_def BLOCK_END .)
+    CONDITION_DEF   reduce using rule 4 (statement -> func_def BLOCK_END .)
+    BOOKMARK        reduce using rule 4 (statement -> func_def BLOCK_END .)
+    GOTO            reduce using rule 4 (statement -> func_def BLOCK_END .)
+    WAVE            reduce using rule 4 (statement -> func_def BLOCK_END .)
+    LPAREN          reduce using rule 4 (statement -> func_def BLOCK_END .)
+    BLOCK_END       reduce using rule 4 (statement -> func_def BLOCK_END .)
+    CONDITION_ELSE  reduce using rule 4 (statement -> func_def BLOCK_END .)
+    IMPORTANT       reduce using rule 4 (statement -> func_def BLOCK_END .)
+    $end            reduce using rule 4 (statement -> func_def BLOCK_END .)
+
+
+state 39
+
+    (15) func_def -> func_def defargu .
+    (25) defargu -> defargu . COMMA type
+    (26) defargu -> defargu . COMMA type COMMA type
+
+    BLOCK_END       reduce using rule 15 (func_def -> func_def defargu .)
+    IMPORTANT       reduce using rule 15 (func_def -> func_def defargu .)
+    OLPAREN         reduce using rule 15 (func_def -> func_def defargu .)
+    STRING          reduce using rule 15 (func_def -> func_def defargu .)
+    NUMBER          reduce using rule 15 (func_def -> func_def defargu .)
+    FLOAT           reduce using rule 15 (func_def -> func_def defargu .)
+    ID              reduce using rule 15 (func_def -> func_def defargu .)
+    FUNCTION_DEF    reduce using rule 15 (func_def -> func_def defargu .)
+    CONDITION_DEF   reduce using rule 15 (func_def -> func_def defargu .)
+    BOOKMARK        reduce using rule 15 (func_def -> func_def defargu .)
+    GOTO            reduce using rule 15 (func_def -> func_def defargu .)
+    WAVE            reduce using rule 15 (func_def -> func_def defargu .)
+    LPAREN          reduce using rule 15 (func_def -> func_def defargu .)
+    COMMA           shift and go to state 65
+
+
+state 40
+
+    (27) defargu -> IMPORTANT . defargu
+    (28) defargu -> IMPORTANT . assign
+    (29) defargu -> IMPORTANT . type
+    (25) defargu -> . defargu COMMA type
+    (26) defargu -> . defargu COMMA type COMMA type
+    (27) defargu -> . IMPORTANT defargu
+    (28) defargu -> . IMPORTANT assign
+    (29) defargu -> . IMPORTANT type
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    IMPORTANT       shift and go to state 40
+    ID              shift and go to state 68
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 67
+    assign                         shift and go to state 69
+    defargu                        shift and go to state 66
+
+state 41
+
+    (16) func_def -> func_def statement .
+    (1) statement -> statement . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for FUNCTION_DEF resolved as shift
+  ! shift/reduce conflict for CONDITION_DEF resolved as shift
+  ! shift/reduce conflict for BOOKMARK resolved as shift
+  ! shift/reduce conflict for GOTO resolved as shift
+  ! shift/reduce conflict for WAVE resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    BLOCK_END       reduce using rule 16 (func_def -> func_def statement .)
+    IMPORTANT       reduce using rule 16 (func_def -> func_def statement .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! STRING          [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! NUMBER          [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! FLOAT           [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! ID              [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! FUNCTION_DEF    [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! CONDITION_DEF   [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! BOOKMARK        [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! GOTO            [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! WAVE            [ reduce using rule 16 (func_def -> func_def statement .) ]
+  ! LPAREN          [ reduce using rule 16 (func_def -> func_def statement .) ]
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 24
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 42
+
+    (9) function -> LPAREN ID . RPAREN
+    (10) function -> LPAREN ID . assign RPAREN
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+
+    RPAREN          shift and go to state 71
+    ID              shift and go to state 53
+
+    assign                         shift and go to state 70
+
+state 43
+
+    (22) autocomplete -> WAVE type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    OLPAREN         reduce using rule 22 (autocomplete -> WAVE type .)
+    STRING          reduce using rule 22 (autocomplete -> WAVE type .)
+    NUMBER          reduce using rule 22 (autocomplete -> WAVE type .)
+    FLOAT           reduce using rule 22 (autocomplete -> WAVE type .)
+    ID              reduce using rule 22 (autocomplete -> WAVE type .)
+    LPAREN          reduce using rule 22 (autocomplete -> WAVE type .)
+    FUNCTION_DEF    reduce using rule 22 (autocomplete -> WAVE type .)
+    CONDITION_DEF   reduce using rule 22 (autocomplete -> WAVE type .)
+    BOOKMARK        reduce using rule 22 (autocomplete -> WAVE type .)
+    GOTO            reduce using rule 22 (autocomplete -> WAVE type .)
+    WAVE            reduce using rule 22 (autocomplete -> WAVE type .)
+    $end            reduce using rule 22 (autocomplete -> WAVE type .)
+    BLOCK_END       reduce using rule 22 (autocomplete -> WAVE type .)
+    IMPORTANT       reduce using rule 22 (autocomplete -> WAVE type .)
+    CONDITION_ELSE  reduce using rule 22 (autocomplete -> WAVE type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 44
+
+    (30) assign -> ID ASSIGN . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 72
+
+state 45
+
+    (14) func_def -> FUNCTION_DEF ID .
+
+    BLOCK_END       reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    IMPORTANT       reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    OLPAREN         reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    STRING          reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    NUMBER          reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    FLOAT           reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    ID              reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    FUNCTION_DEF    reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    CONDITION_DEF   reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    BOOKMARK        reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    GOTO            reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    WAVE            reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+    LPAREN          reduce using rule 14 (func_def -> FUNCTION_DEF ID .)
+
+
+state 46
+
+    (23) autocomplete -> autocomplete type .
+    (24) autocomplete -> autocomplete type . COMMA type
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    OLPAREN         reduce using rule 23 (autocomplete -> autocomplete type .)
+    STRING          reduce using rule 23 (autocomplete -> autocomplete type .)
+    NUMBER          reduce using rule 23 (autocomplete -> autocomplete type .)
+    FLOAT           reduce using rule 23 (autocomplete -> autocomplete type .)
+    ID              reduce using rule 23 (autocomplete -> autocomplete type .)
+    LPAREN          reduce using rule 23 (autocomplete -> autocomplete type .)
+    FUNCTION_DEF    reduce using rule 23 (autocomplete -> autocomplete type .)
+    CONDITION_DEF   reduce using rule 23 (autocomplete -> autocomplete type .)
+    BOOKMARK        reduce using rule 23 (autocomplete -> autocomplete type .)
+    GOTO            reduce using rule 23 (autocomplete -> autocomplete type .)
+    WAVE            reduce using rule 23 (autocomplete -> autocomplete type .)
+    $end            reduce using rule 23 (autocomplete -> autocomplete type .)
+    BLOCK_END       reduce using rule 23 (autocomplete -> autocomplete type .)
+    IMPORTANT       reduce using rule 23 (autocomplete -> autocomplete type .)
+    CONDITION_ELSE  reduce using rule 23 (autocomplete -> autocomplete type .)
+    COMMA           shift and go to state 73
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 47
+
+    (44) type -> OLPAREN type . ORPAREN
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    ORPAREN         shift and go to state 74
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 48
+
+    (5) statement -> condition_def BLOCK_END .
+
+    OLPAREN         reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    STRING          reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    NUMBER          reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    FLOAT           reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    ID              reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    FUNCTION_DEF    reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    CONDITION_DEF   reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    BOOKMARK        reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    GOTO            reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    WAVE            reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    LPAREN          reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    BLOCK_END       reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    CONDITION_ELSE  reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    IMPORTANT       reduce using rule 5 (statement -> condition_def BLOCK_END .)
+    $end            reduce using rule 5 (statement -> condition_def BLOCK_END .)
+
+
+state 49
+
+    (21) condition_def_else -> CONDITION_ELSE .
+
+    OLPAREN         reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    STRING          reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    NUMBER          reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    FLOAT           reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    ID              reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    FUNCTION_DEF    reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    CONDITION_DEF   reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    BOOKMARK        reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    GOTO            reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    WAVE            reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    LPAREN          reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    BLOCK_END       reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+    CONDITION_ELSE  reduce using rule 21 (condition_def_else -> CONDITION_ELSE .)
+
+
+state 50
+
+    (18) condition_def -> condition_def statement .
+    (1) statement -> statement . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for FUNCTION_DEF resolved as shift
+  ! shift/reduce conflict for CONDITION_DEF resolved as shift
+  ! shift/reduce conflict for BOOKMARK resolved as shift
+  ! shift/reduce conflict for GOTO resolved as shift
+  ! shift/reduce conflict for WAVE resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    BLOCK_END       reduce using rule 18 (condition_def -> condition_def statement .)
+    CONDITION_ELSE  reduce using rule 18 (condition_def -> condition_def statement .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! STRING          [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! NUMBER          [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! FLOAT           [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! ID              [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! FUNCTION_DEF    [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! CONDITION_DEF   [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! BOOKMARK        [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! GOTO            [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! WAVE            [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+  ! LPAREN          [ reduce using rule 18 (condition_def -> condition_def statement .) ]
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 24
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 51
+
+    (19) condition_def -> condition_def condition_def_else .
+    (20) condition_def_else -> condition_def_else . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for FUNCTION_DEF resolved as shift
+  ! shift/reduce conflict for CONDITION_DEF resolved as shift
+  ! shift/reduce conflict for BOOKMARK resolved as shift
+  ! shift/reduce conflict for GOTO resolved as shift
+  ! shift/reduce conflict for WAVE resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    BLOCK_END       reduce using rule 19 (condition_def -> condition_def condition_def_else .)
+    CONDITION_ELSE  reduce using rule 19 (condition_def -> condition_def condition_def_else .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! STRING          [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! NUMBER          [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! FLOAT           [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! ID              [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! FUNCTION_DEF    [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! CONDITION_DEF   [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! BOOKMARK        [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! GOTO            [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! WAVE            [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+  ! LPAREN          [ reduce using rule 19 (condition_def -> condition_def condition_def_else .) ]
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 75
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 52
+
+    (31) assign -> assign assign .
+    (31) assign -> assign . assign
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+
+  ! shift/reduce conflict for ID resolved as shift
+    COMMA           reduce using rule 31 (assign -> assign assign .)
+    BLOCK_END       reduce using rule 31 (assign -> assign assign .)
+    IMPORTANT       reduce using rule 31 (assign -> assign assign .)
+    OLPAREN         reduce using rule 31 (assign -> assign assign .)
+    STRING          reduce using rule 31 (assign -> assign assign .)
+    NUMBER          reduce using rule 31 (assign -> assign assign .)
+    FLOAT           reduce using rule 31 (assign -> assign assign .)
+    FUNCTION_DEF    reduce using rule 31 (assign -> assign assign .)
+    CONDITION_DEF   reduce using rule 31 (assign -> assign assign .)
+    BOOKMARK        reduce using rule 31 (assign -> assign assign .)
+    GOTO            reduce using rule 31 (assign -> assign assign .)
+    WAVE            reduce using rule 31 (assign -> assign assign .)
+    LPAREN          reduce using rule 31 (assign -> assign assign .)
+    CONDITION_ELSE  reduce using rule 31 (assign -> assign assign .)
+    $end            reduce using rule 31 (assign -> assign assign .)
+    RPAREN          reduce using rule 31 (assign -> assign assign .)
+    ID              shift and go to state 53
+
+  ! ID              [ reduce using rule 31 (assign -> assign assign .) ]
+
+    assign                         shift and go to state 52
+
+state 53
+
+    (30) assign -> ID . ASSIGN type
+
+    ASSIGN          shift and go to state 44
+
+
+state 54
+
+    (37) type -> type DIVIDE type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    PLUS            reduce using rule 37 (type -> type DIVIDE type .)
+    MINUS           reduce using rule 37 (type -> type DIVIDE type .)
+    TIMES           reduce using rule 37 (type -> type DIVIDE type .)
+    DIVIDE          reduce using rule 37 (type -> type DIVIDE type .)
+    GREATERTHEN     reduce using rule 37 (type -> type DIVIDE type .)
+    GREATERTHENEQUAL reduce using rule 37 (type -> type DIVIDE type .)
+    LESSTHEN        reduce using rule 37 (type -> type DIVIDE type .)
+    LESSTHENEQUAL   reduce using rule 37 (type -> type DIVIDE type .)
+    NEGATION        reduce using rule 37 (type -> type DIVIDE type .)
+    EQUAL           reduce using rule 37 (type -> type DIVIDE type .)
+    OLPAREN         reduce using rule 37 (type -> type DIVIDE type .)
+    STRING          reduce using rule 37 (type -> type DIVIDE type .)
+    NUMBER          reduce using rule 37 (type -> type DIVIDE type .)
+    FLOAT           reduce using rule 37 (type -> type DIVIDE type .)
+    ID              reduce using rule 37 (type -> type DIVIDE type .)
+    FUNCTION_DEF    reduce using rule 37 (type -> type DIVIDE type .)
+    CONDITION_DEF   reduce using rule 37 (type -> type DIVIDE type .)
+    BOOKMARK        reduce using rule 37 (type -> type DIVIDE type .)
+    GOTO            reduce using rule 37 (type -> type DIVIDE type .)
+    WAVE            reduce using rule 37 (type -> type DIVIDE type .)
+    LPAREN          reduce using rule 37 (type -> type DIVIDE type .)
+    $end            reduce using rule 37 (type -> type DIVIDE type .)
+    BLOCK_END       reduce using rule 37 (type -> type DIVIDE type .)
+    IMPORTANT       reduce using rule 37 (type -> type DIVIDE type .)
+    CONDITION_ELSE  reduce using rule 37 (type -> type DIVIDE type .)
+    COMMA           reduce using rule 37 (type -> type DIVIDE type .)
+    ORPAREN         reduce using rule 37 (type -> type DIVIDE type .)
+    RPAREN          reduce using rule 37 (type -> type DIVIDE type .)
+
+  ! PLUS            [ shift and go to state 31 ]
+  ! MINUS           [ shift and go to state 34 ]
+  ! TIMES           [ shift and go to state 29 ]
+  ! DIVIDE          [ shift and go to state 25 ]
+  ! GREATERTHEN     [ shift and go to state 32 ]
+  ! GREATERTHENEQUAL [ shift and go to state 30 ]
+  ! LESSTHEN        [ shift and go to state 28 ]
+  ! LESSTHENEQUAL   [ shift and go to state 33 ]
+  ! NEGATION        [ shift and go to state 27 ]
+  ! EQUAL           [ shift and go to state 26 ]
+
+
+state 55
+
+    (43) type -> type EQUAL type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 43 (type -> type EQUAL type .)
+    STRING          reduce using rule 43 (type -> type EQUAL type .)
+    NUMBER          reduce using rule 43 (type -> type EQUAL type .)
+    FLOAT           reduce using rule 43 (type -> type EQUAL type .)
+    ID              reduce using rule 43 (type -> type EQUAL type .)
+    FUNCTION_DEF    reduce using rule 43 (type -> type EQUAL type .)
+    CONDITION_DEF   reduce using rule 43 (type -> type EQUAL type .)
+    BOOKMARK        reduce using rule 43 (type -> type EQUAL type .)
+    GOTO            reduce using rule 43 (type -> type EQUAL type .)
+    WAVE            reduce using rule 43 (type -> type EQUAL type .)
+    LPAREN          reduce using rule 43 (type -> type EQUAL type .)
+    $end            reduce using rule 43 (type -> type EQUAL type .)
+    BLOCK_END       reduce using rule 43 (type -> type EQUAL type .)
+    IMPORTANT       reduce using rule 43 (type -> type EQUAL type .)
+    CONDITION_ELSE  reduce using rule 43 (type -> type EQUAL type .)
+    COMMA           reduce using rule 43 (type -> type EQUAL type .)
+    ORPAREN         reduce using rule 43 (type -> type EQUAL type .)
+    RPAREN          reduce using rule 43 (type -> type EQUAL type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! MINUS           [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! TIMES           [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! DIVIDE          [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! GREATERTHEN     [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! LESSTHEN        [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! NEGATION        [ reduce using rule 43 (type -> type EQUAL type .) ]
+  ! EQUAL           [ reduce using rule 43 (type -> type EQUAL type .) ]
+
+
+state 56
+
+    (42) type -> type NEGATION type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 42 (type -> type NEGATION type .)
+    STRING          reduce using rule 42 (type -> type NEGATION type .)
+    NUMBER          reduce using rule 42 (type -> type NEGATION type .)
+    FLOAT           reduce using rule 42 (type -> type NEGATION type .)
+    ID              reduce using rule 42 (type -> type NEGATION type .)
+    FUNCTION_DEF    reduce using rule 42 (type -> type NEGATION type .)
+    CONDITION_DEF   reduce using rule 42 (type -> type NEGATION type .)
+    BOOKMARK        reduce using rule 42 (type -> type NEGATION type .)
+    GOTO            reduce using rule 42 (type -> type NEGATION type .)
+    WAVE            reduce using rule 42 (type -> type NEGATION type .)
+    LPAREN          reduce using rule 42 (type -> type NEGATION type .)
+    $end            reduce using rule 42 (type -> type NEGATION type .)
+    BLOCK_END       reduce using rule 42 (type -> type NEGATION type .)
+    IMPORTANT       reduce using rule 42 (type -> type NEGATION type .)
+    CONDITION_ELSE  reduce using rule 42 (type -> type NEGATION type .)
+    COMMA           reduce using rule 42 (type -> type NEGATION type .)
+    ORPAREN         reduce using rule 42 (type -> type NEGATION type .)
+    RPAREN          reduce using rule 42 (type -> type NEGATION type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! MINUS           [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! TIMES           [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! DIVIDE          [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! GREATERTHEN     [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! LESSTHEN        [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! NEGATION        [ reduce using rule 42 (type -> type NEGATION type .) ]
+  ! EQUAL           [ reduce using rule 42 (type -> type NEGATION type .) ]
+
+
+state 57
+
+    (40) type -> type LESSTHEN type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 40 (type -> type LESSTHEN type .)
+    STRING          reduce using rule 40 (type -> type LESSTHEN type .)
+    NUMBER          reduce using rule 40 (type -> type LESSTHEN type .)
+    FLOAT           reduce using rule 40 (type -> type LESSTHEN type .)
+    ID              reduce using rule 40 (type -> type LESSTHEN type .)
+    FUNCTION_DEF    reduce using rule 40 (type -> type LESSTHEN type .)
+    CONDITION_DEF   reduce using rule 40 (type -> type LESSTHEN type .)
+    BOOKMARK        reduce using rule 40 (type -> type LESSTHEN type .)
+    GOTO            reduce using rule 40 (type -> type LESSTHEN type .)
+    WAVE            reduce using rule 40 (type -> type LESSTHEN type .)
+    LPAREN          reduce using rule 40 (type -> type LESSTHEN type .)
+    $end            reduce using rule 40 (type -> type LESSTHEN type .)
+    BLOCK_END       reduce using rule 40 (type -> type LESSTHEN type .)
+    IMPORTANT       reduce using rule 40 (type -> type LESSTHEN type .)
+    CONDITION_ELSE  reduce using rule 40 (type -> type LESSTHEN type .)
+    COMMA           reduce using rule 40 (type -> type LESSTHEN type .)
+    ORPAREN         reduce using rule 40 (type -> type LESSTHEN type .)
+    RPAREN          reduce using rule 40 (type -> type LESSTHEN type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! MINUS           [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! TIMES           [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! DIVIDE          [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! GREATERTHEN     [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! LESSTHEN        [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! NEGATION        [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+  ! EQUAL           [ reduce using rule 40 (type -> type LESSTHEN type .) ]
+
+
+state 58
+
+    (36) type -> type TIMES type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    PLUS            reduce using rule 36 (type -> type TIMES type .)
+    MINUS           reduce using rule 36 (type -> type TIMES type .)
+    TIMES           reduce using rule 36 (type -> type TIMES type .)
+    DIVIDE          reduce using rule 36 (type -> type TIMES type .)
+    GREATERTHEN     reduce using rule 36 (type -> type TIMES type .)
+    GREATERTHENEQUAL reduce using rule 36 (type -> type TIMES type .)
+    LESSTHEN        reduce using rule 36 (type -> type TIMES type .)
+    LESSTHENEQUAL   reduce using rule 36 (type -> type TIMES type .)
+    NEGATION        reduce using rule 36 (type -> type TIMES type .)
+    EQUAL           reduce using rule 36 (type -> type TIMES type .)
+    OLPAREN         reduce using rule 36 (type -> type TIMES type .)
+    STRING          reduce using rule 36 (type -> type TIMES type .)
+    NUMBER          reduce using rule 36 (type -> type TIMES type .)
+    FLOAT           reduce using rule 36 (type -> type TIMES type .)
+    ID              reduce using rule 36 (type -> type TIMES type .)
+    FUNCTION_DEF    reduce using rule 36 (type -> type TIMES type .)
+    CONDITION_DEF   reduce using rule 36 (type -> type TIMES type .)
+    BOOKMARK        reduce using rule 36 (type -> type TIMES type .)
+    GOTO            reduce using rule 36 (type -> type TIMES type .)
+    WAVE            reduce using rule 36 (type -> type TIMES type .)
+    LPAREN          reduce using rule 36 (type -> type TIMES type .)
+    $end            reduce using rule 36 (type -> type TIMES type .)
+    BLOCK_END       reduce using rule 36 (type -> type TIMES type .)
+    IMPORTANT       reduce using rule 36 (type -> type TIMES type .)
+    CONDITION_ELSE  reduce using rule 36 (type -> type TIMES type .)
+    COMMA           reduce using rule 36 (type -> type TIMES type .)
+    ORPAREN         reduce using rule 36 (type -> type TIMES type .)
+    RPAREN          reduce using rule 36 (type -> type TIMES type .)
+
+  ! PLUS            [ shift and go to state 31 ]
+  ! MINUS           [ shift and go to state 34 ]
+  ! TIMES           [ shift and go to state 29 ]
+  ! DIVIDE          [ shift and go to state 25 ]
+  ! GREATERTHEN     [ shift and go to state 32 ]
+  ! GREATERTHENEQUAL [ shift and go to state 30 ]
+  ! LESSTHEN        [ shift and go to state 28 ]
+  ! LESSTHENEQUAL   [ shift and go to state 33 ]
+  ! NEGATION        [ shift and go to state 27 ]
+  ! EQUAL           [ shift and go to state 26 ]
+
+
+state 59
+
+    (39) type -> type GREATERTHENEQUAL type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    STRING          reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    NUMBER          reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    FLOAT           reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    ID              reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    FUNCTION_DEF    reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    CONDITION_DEF   reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    BOOKMARK        reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    GOTO            reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    WAVE            reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    LPAREN          reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    $end            reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    BLOCK_END       reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    IMPORTANT       reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    CONDITION_ELSE  reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    COMMA           reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    ORPAREN         reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    RPAREN          reduce using rule 39 (type -> type GREATERTHENEQUAL type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! MINUS           [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! TIMES           [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! DIVIDE          [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! GREATERTHEN     [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! LESSTHEN        [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! NEGATION        [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+  ! EQUAL           [ reduce using rule 39 (type -> type GREATERTHENEQUAL type .) ]
+
+
+state 60
+
+    (34) type -> type PLUS type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    PLUS            reduce using rule 34 (type -> type PLUS type .)
+    MINUS           reduce using rule 34 (type -> type PLUS type .)
+    GREATERTHEN     reduce using rule 34 (type -> type PLUS type .)
+    GREATERTHENEQUAL reduce using rule 34 (type -> type PLUS type .)
+    LESSTHEN        reduce using rule 34 (type -> type PLUS type .)
+    LESSTHENEQUAL   reduce using rule 34 (type -> type PLUS type .)
+    NEGATION        reduce using rule 34 (type -> type PLUS type .)
+    EQUAL           reduce using rule 34 (type -> type PLUS type .)
+    OLPAREN         reduce using rule 34 (type -> type PLUS type .)
+    STRING          reduce using rule 34 (type -> type PLUS type .)
+    NUMBER          reduce using rule 34 (type -> type PLUS type .)
+    FLOAT           reduce using rule 34 (type -> type PLUS type .)
+    ID              reduce using rule 34 (type -> type PLUS type .)
+    FUNCTION_DEF    reduce using rule 34 (type -> type PLUS type .)
+    CONDITION_DEF   reduce using rule 34 (type -> type PLUS type .)
+    BOOKMARK        reduce using rule 34 (type -> type PLUS type .)
+    GOTO            reduce using rule 34 (type -> type PLUS type .)
+    WAVE            reduce using rule 34 (type -> type PLUS type .)
+    LPAREN          reduce using rule 34 (type -> type PLUS type .)
+    $end            reduce using rule 34 (type -> type PLUS type .)
+    BLOCK_END       reduce using rule 34 (type -> type PLUS type .)
+    IMPORTANT       reduce using rule 34 (type -> type PLUS type .)
+    CONDITION_ELSE  reduce using rule 34 (type -> type PLUS type .)
+    COMMA           reduce using rule 34 (type -> type PLUS type .)
+    ORPAREN         reduce using rule 34 (type -> type PLUS type .)
+    RPAREN          reduce using rule 34 (type -> type PLUS type .)
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+
+  ! TIMES           [ reduce using rule 34 (type -> type PLUS type .) ]
+  ! DIVIDE          [ reduce using rule 34 (type -> type PLUS type .) ]
+  ! PLUS            [ shift and go to state 31 ]
+  ! MINUS           [ shift and go to state 34 ]
+  ! GREATERTHEN     [ shift and go to state 32 ]
+  ! GREATERTHENEQUAL [ shift and go to state 30 ]
+  ! LESSTHEN        [ shift and go to state 28 ]
+  ! LESSTHENEQUAL   [ shift and go to state 33 ]
+  ! NEGATION        [ shift and go to state 27 ]
+  ! EQUAL           [ shift and go to state 26 ]
+
+
+state 61
+
+    (38) type -> type GREATERTHEN type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 38 (type -> type GREATERTHEN type .)
+    STRING          reduce using rule 38 (type -> type GREATERTHEN type .)
+    NUMBER          reduce using rule 38 (type -> type GREATERTHEN type .)
+    FLOAT           reduce using rule 38 (type -> type GREATERTHEN type .)
+    ID              reduce using rule 38 (type -> type GREATERTHEN type .)
+    FUNCTION_DEF    reduce using rule 38 (type -> type GREATERTHEN type .)
+    CONDITION_DEF   reduce using rule 38 (type -> type GREATERTHEN type .)
+    BOOKMARK        reduce using rule 38 (type -> type GREATERTHEN type .)
+    GOTO            reduce using rule 38 (type -> type GREATERTHEN type .)
+    WAVE            reduce using rule 38 (type -> type GREATERTHEN type .)
+    LPAREN          reduce using rule 38 (type -> type GREATERTHEN type .)
+    $end            reduce using rule 38 (type -> type GREATERTHEN type .)
+    BLOCK_END       reduce using rule 38 (type -> type GREATERTHEN type .)
+    IMPORTANT       reduce using rule 38 (type -> type GREATERTHEN type .)
+    CONDITION_ELSE  reduce using rule 38 (type -> type GREATERTHEN type .)
+    COMMA           reduce using rule 38 (type -> type GREATERTHEN type .)
+    ORPAREN         reduce using rule 38 (type -> type GREATERTHEN type .)
+    RPAREN          reduce using rule 38 (type -> type GREATERTHEN type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! MINUS           [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! TIMES           [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! DIVIDE          [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! GREATERTHEN     [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! LESSTHEN        [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! NEGATION        [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+  ! EQUAL           [ reduce using rule 38 (type -> type GREATERTHEN type .) ]
+
+
+state 62
+
+    (41) type -> type LESSTHENEQUAL type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+  ! shift/reduce conflict for TIMES resolved as shift
+  ! shift/reduce conflict for DIVIDE resolved as shift
+  ! shift/reduce conflict for GREATERTHEN resolved as shift
+  ! shift/reduce conflict for GREATERTHENEQUAL resolved as shift
+  ! shift/reduce conflict for LESSTHEN resolved as shift
+  ! shift/reduce conflict for LESSTHENEQUAL resolved as shift
+  ! shift/reduce conflict for NEGATION resolved as shift
+  ! shift/reduce conflict for EQUAL resolved as shift
+    OLPAREN         reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    STRING          reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    NUMBER          reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    FLOAT           reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    ID              reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    FUNCTION_DEF    reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    CONDITION_DEF   reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    BOOKMARK        reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    GOTO            reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    WAVE            reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    LPAREN          reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    $end            reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    BLOCK_END       reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    IMPORTANT       reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    CONDITION_ELSE  reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    COMMA           reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    ORPAREN         reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    RPAREN          reduce using rule 41 (type -> type LESSTHENEQUAL type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! PLUS            [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! MINUS           [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! TIMES           [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! DIVIDE          [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! GREATERTHEN     [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! GREATERTHENEQUAL [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! LESSTHEN        [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! LESSTHENEQUAL   [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! NEGATION        [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+  ! EQUAL           [ reduce using rule 41 (type -> type LESSTHENEQUAL type .) ]
+
+
+state 63
+
+    (35) type -> type MINUS type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    PLUS            reduce using rule 35 (type -> type MINUS type .)
+    MINUS           reduce using rule 35 (type -> type MINUS type .)
+    GREATERTHEN     reduce using rule 35 (type -> type MINUS type .)
+    GREATERTHENEQUAL reduce using rule 35 (type -> type MINUS type .)
+    LESSTHEN        reduce using rule 35 (type -> type MINUS type .)
+    LESSTHENEQUAL   reduce using rule 35 (type -> type MINUS type .)
+    NEGATION        reduce using rule 35 (type -> type MINUS type .)
+    EQUAL           reduce using rule 35 (type -> type MINUS type .)
+    OLPAREN         reduce using rule 35 (type -> type MINUS type .)
+    STRING          reduce using rule 35 (type -> type MINUS type .)
+    NUMBER          reduce using rule 35 (type -> type MINUS type .)
+    FLOAT           reduce using rule 35 (type -> type MINUS type .)
+    ID              reduce using rule 35 (type -> type MINUS type .)
+    FUNCTION_DEF    reduce using rule 35 (type -> type MINUS type .)
+    CONDITION_DEF   reduce using rule 35 (type -> type MINUS type .)
+    BOOKMARK        reduce using rule 35 (type -> type MINUS type .)
+    GOTO            reduce using rule 35 (type -> type MINUS type .)
+    WAVE            reduce using rule 35 (type -> type MINUS type .)
+    LPAREN          reduce using rule 35 (type -> type MINUS type .)
+    $end            reduce using rule 35 (type -> type MINUS type .)
+    BLOCK_END       reduce using rule 35 (type -> type MINUS type .)
+    IMPORTANT       reduce using rule 35 (type -> type MINUS type .)
+    CONDITION_ELSE  reduce using rule 35 (type -> type MINUS type .)
+    COMMA           reduce using rule 35 (type -> type MINUS type .)
+    ORPAREN         reduce using rule 35 (type -> type MINUS type .)
+    RPAREN          reduce using rule 35 (type -> type MINUS type .)
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+
+  ! TIMES           [ reduce using rule 35 (type -> type MINUS type .) ]
+  ! DIVIDE          [ reduce using rule 35 (type -> type MINUS type .) ]
+  ! PLUS            [ shift and go to state 31 ]
+  ! MINUS           [ shift and go to state 34 ]
+  ! GREATERTHEN     [ shift and go to state 32 ]
+  ! GREATERTHENEQUAL [ shift and go to state 30 ]
+  ! LESSTHEN        [ shift and go to state 28 ]
+  ! LESSTHENEQUAL   [ shift and go to state 33 ]
+  ! NEGATION        [ shift and go to state 27 ]
+  ! EQUAL           [ shift and go to state 26 ]
+
+
+state 64
+
+    (32) targ -> targ targ .
+    (32) targ -> targ . targ
+    (32) targ -> . targ targ
+    (33) targ -> . TABARGU
+
+  ! shift/reduce conflict for TABARGU resolved as shift
+    PLUS            reduce using rule 32 (targ -> targ targ .)
+    MINUS           reduce using rule 32 (targ -> targ targ .)
+    TIMES           reduce using rule 32 (targ -> targ targ .)
+    DIVIDE          reduce using rule 32 (targ -> targ targ .)
+    GREATERTHEN     reduce using rule 32 (targ -> targ targ .)
+    GREATERTHENEQUAL reduce using rule 32 (targ -> targ targ .)
+    LESSTHEN        reduce using rule 32 (targ -> targ targ .)
+    LESSTHENEQUAL   reduce using rule 32 (targ -> targ targ .)
+    NEGATION        reduce using rule 32 (targ -> targ targ .)
+    EQUAL           reduce using rule 32 (targ -> targ targ .)
+    OLPAREN         reduce using rule 32 (targ -> targ targ .)
+    STRING          reduce using rule 32 (targ -> targ targ .)
+    NUMBER          reduce using rule 32 (targ -> targ targ .)
+    FLOAT           reduce using rule 32 (targ -> targ targ .)
+    ID              reduce using rule 32 (targ -> targ targ .)
+    FUNCTION_DEF    reduce using rule 32 (targ -> targ targ .)
+    CONDITION_DEF   reduce using rule 32 (targ -> targ targ .)
+    BOOKMARK        reduce using rule 32 (targ -> targ targ .)
+    GOTO            reduce using rule 32 (targ -> targ targ .)
+    WAVE            reduce using rule 32 (targ -> targ targ .)
+    LPAREN          reduce using rule 32 (targ -> targ targ .)
+    $end            reduce using rule 32 (targ -> targ targ .)
+    BLOCK_END       reduce using rule 32 (targ -> targ targ .)
+    CONDITION_ELSE  reduce using rule 32 (targ -> targ targ .)
+    IMPORTANT       reduce using rule 32 (targ -> targ targ .)
+    COMMA           reduce using rule 32 (targ -> targ targ .)
+    ORPAREN         reduce using rule 32 (targ -> targ targ .)
+    RPAREN          reduce using rule 32 (targ -> targ targ .)
+    TABARGU         shift and go to state 36
+
+  ! TABARGU         [ reduce using rule 32 (targ -> targ targ .) ]
+
+    targ                           shift and go to state 64
+
+state 65
+
+    (25) defargu -> defargu COMMA . type
+    (26) defargu -> defargu COMMA . type COMMA type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 76
+
+state 66
+
+    (27) defargu -> IMPORTANT defargu .
+    (25) defargu -> defargu . COMMA type
+    (26) defargu -> defargu . COMMA type COMMA type
+
+  ! shift/reduce conflict for COMMA resolved as shift
+    BLOCK_END       reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    IMPORTANT       reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    OLPAREN         reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    STRING          reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    NUMBER          reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    FLOAT           reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    ID              reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    FUNCTION_DEF    reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    CONDITION_DEF   reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    BOOKMARK        reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    GOTO            reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    WAVE            reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    LPAREN          reduce using rule 27 (defargu -> IMPORTANT defargu .)
+    COMMA           shift and go to state 65
+
+  ! COMMA           [ reduce using rule 27 (defargu -> IMPORTANT defargu .) ]
+
+
+state 67
+
+    (29) defargu -> IMPORTANT type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    COMMA           reduce using rule 29 (defargu -> IMPORTANT type .)
+    BLOCK_END       reduce using rule 29 (defargu -> IMPORTANT type .)
+    IMPORTANT       reduce using rule 29 (defargu -> IMPORTANT type .)
+    OLPAREN         reduce using rule 29 (defargu -> IMPORTANT type .)
+    STRING          reduce using rule 29 (defargu -> IMPORTANT type .)
+    NUMBER          reduce using rule 29 (defargu -> IMPORTANT type .)
+    FLOAT           reduce using rule 29 (defargu -> IMPORTANT type .)
+    ID              reduce using rule 29 (defargu -> IMPORTANT type .)
+    FUNCTION_DEF    reduce using rule 29 (defargu -> IMPORTANT type .)
+    CONDITION_DEF   reduce using rule 29 (defargu -> IMPORTANT type .)
+    BOOKMARK        reduce using rule 29 (defargu -> IMPORTANT type .)
+    GOTO            reduce using rule 29 (defargu -> IMPORTANT type .)
+    WAVE            reduce using rule 29 (defargu -> IMPORTANT type .)
+    LPAREN          reduce using rule 29 (defargu -> IMPORTANT type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 68
+
+    (30) assign -> ID . ASSIGN type
+    (49) type -> ID .
+
+    ASSIGN          shift and go to state 44
+    PLUS            reduce using rule 49 (type -> ID .)
+    MINUS           reduce using rule 49 (type -> ID .)
+    TIMES           reduce using rule 49 (type -> ID .)
+    DIVIDE          reduce using rule 49 (type -> ID .)
+    GREATERTHEN     reduce using rule 49 (type -> ID .)
+    GREATERTHENEQUAL reduce using rule 49 (type -> ID .)
+    LESSTHEN        reduce using rule 49 (type -> ID .)
+    LESSTHENEQUAL   reduce using rule 49 (type -> ID .)
+    NEGATION        reduce using rule 49 (type -> ID .)
+    EQUAL           reduce using rule 49 (type -> ID .)
+    COMMA           reduce using rule 49 (type -> ID .)
+    BLOCK_END       reduce using rule 49 (type -> ID .)
+    IMPORTANT       reduce using rule 49 (type -> ID .)
+    OLPAREN         reduce using rule 49 (type -> ID .)
+    STRING          reduce using rule 49 (type -> ID .)
+    NUMBER          reduce using rule 49 (type -> ID .)
+    FLOAT           reduce using rule 49 (type -> ID .)
+    ID              reduce using rule 49 (type -> ID .)
+    FUNCTION_DEF    reduce using rule 49 (type -> ID .)
+    CONDITION_DEF   reduce using rule 49 (type -> ID .)
+    BOOKMARK        reduce using rule 49 (type -> ID .)
+    GOTO            reduce using rule 49 (type -> ID .)
+    WAVE            reduce using rule 49 (type -> ID .)
+    LPAREN          reduce using rule 49 (type -> ID .)
+
+
+state 69
+
+    (28) defargu -> IMPORTANT assign .
+    (31) assign -> assign . assign
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+
+  ! shift/reduce conflict for ID resolved as shift
+    COMMA           reduce using rule 28 (defargu -> IMPORTANT assign .)
+    BLOCK_END       reduce using rule 28 (defargu -> IMPORTANT assign .)
+    IMPORTANT       reduce using rule 28 (defargu -> IMPORTANT assign .)
+    OLPAREN         reduce using rule 28 (defargu -> IMPORTANT assign .)
+    STRING          reduce using rule 28 (defargu -> IMPORTANT assign .)
+    NUMBER          reduce using rule 28 (defargu -> IMPORTANT assign .)
+    FLOAT           reduce using rule 28 (defargu -> IMPORTANT assign .)
+    FUNCTION_DEF    reduce using rule 28 (defargu -> IMPORTANT assign .)
+    CONDITION_DEF   reduce using rule 28 (defargu -> IMPORTANT assign .)
+    BOOKMARK        reduce using rule 28 (defargu -> IMPORTANT assign .)
+    GOTO            reduce using rule 28 (defargu -> IMPORTANT assign .)
+    WAVE            reduce using rule 28 (defargu -> IMPORTANT assign .)
+    LPAREN          reduce using rule 28 (defargu -> IMPORTANT assign .)
+    ID              shift and go to state 53
+
+  ! ID              [ reduce using rule 28 (defargu -> IMPORTANT assign .) ]
+
+    assign                         shift and go to state 52
+
+state 70
+
+    (10) function -> LPAREN ID assign . RPAREN
+    (31) assign -> assign . assign
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+
+    RPAREN          shift and go to state 77
+    ID              shift and go to state 53
+
+    assign                         shift and go to state 52
+
+state 71
+
+    (9) function -> LPAREN ID RPAREN .
+
+    TABARGU         reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    PLUS            reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    MINUS           reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    TIMES           reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    DIVIDE          reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    GREATERTHEN     reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    GREATERTHENEQUAL reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    LESSTHEN        reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    LESSTHENEQUAL   reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    NEGATION        reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    EQUAL           reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    OLPAREN         reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    STRING          reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    NUMBER          reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    FLOAT           reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    ID              reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    FUNCTION_DEF    reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    CONDITION_DEF   reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    BOOKMARK        reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    GOTO            reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    WAVE            reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    LPAREN          reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    $end            reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    BLOCK_END       reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    CONDITION_ELSE  reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    IMPORTANT       reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    COMMA           reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    ORPAREN         reduce using rule 9 (function -> LPAREN ID RPAREN .)
+    RPAREN          reduce using rule 9 (function -> LPAREN ID RPAREN .)
+
+
+state 72
+
+    (30) assign -> ID ASSIGN type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    ID              reduce using rule 30 (assign -> ID ASSIGN type .)
+    COMMA           reduce using rule 30 (assign -> ID ASSIGN type .)
+    BLOCK_END       reduce using rule 30 (assign -> ID ASSIGN type .)
+    IMPORTANT       reduce using rule 30 (assign -> ID ASSIGN type .)
+    OLPAREN         reduce using rule 30 (assign -> ID ASSIGN type .)
+    STRING          reduce using rule 30 (assign -> ID ASSIGN type .)
+    NUMBER          reduce using rule 30 (assign -> ID ASSIGN type .)
+    FLOAT           reduce using rule 30 (assign -> ID ASSIGN type .)
+    FUNCTION_DEF    reduce using rule 30 (assign -> ID ASSIGN type .)
+    CONDITION_DEF   reduce using rule 30 (assign -> ID ASSIGN type .)
+    BOOKMARK        reduce using rule 30 (assign -> ID ASSIGN type .)
+    GOTO            reduce using rule 30 (assign -> ID ASSIGN type .)
+    WAVE            reduce using rule 30 (assign -> ID ASSIGN type .)
+    LPAREN          reduce using rule 30 (assign -> ID ASSIGN type .)
+    CONDITION_ELSE  reduce using rule 30 (assign -> ID ASSIGN type .)
+    $end            reduce using rule 30 (assign -> ID ASSIGN type .)
+    RPAREN          reduce using rule 30 (assign -> ID ASSIGN type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 73
+
+    (24) autocomplete -> autocomplete type COMMA . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 78
+
+state 74
+
+    (44) type -> OLPAREN type ORPAREN .
+
+    PLUS            reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    MINUS           reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    TIMES           reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    DIVIDE          reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    GREATERTHEN     reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    GREATERTHENEQUAL reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    LESSTHEN        reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    LESSTHENEQUAL   reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    NEGATION        reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    EQUAL           reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    OLPAREN         reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    STRING          reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    NUMBER          reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    FLOAT           reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    ID              reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    FUNCTION_DEF    reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    CONDITION_DEF   reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    BOOKMARK        reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    GOTO            reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    WAVE            reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    LPAREN          reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    $end            reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    BLOCK_END       reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    IMPORTANT       reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    CONDITION_ELSE  reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    COMMA           reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    ORPAREN         reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+    RPAREN          reduce using rule 44 (type -> OLPAREN type ORPAREN .)
+
+
+state 75
+
+    (20) condition_def_else -> condition_def_else statement .
+    (1) statement -> statement . statement
+    (1) statement -> . statement statement
+    (2) statement -> . type
+    (3) statement -> . assign
+    (4) statement -> . func_def BLOCK_END
+    (5) statement -> . condition_def BLOCK_END
+    (6) statement -> . bookmark
+    (7) statement -> . goto
+    (8) statement -> . autocomplete
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (30) assign -> . ID ASSIGN type
+    (31) assign -> . assign assign
+    (14) func_def -> . FUNCTION_DEF ID
+    (15) func_def -> . func_def defargu
+    (16) func_def -> . func_def statement
+    (17) condition_def -> . CONDITION_DEF type
+    (18) condition_def -> . condition_def statement
+    (19) condition_def -> . condition_def condition_def_else
+    (12) bookmark -> . BOOKMARK ID
+    (13) goto -> . GOTO ID
+    (22) autocomplete -> . WAVE type
+    (23) autocomplete -> . autocomplete type
+    (24) autocomplete -> . autocomplete type COMMA type
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+  ! shift/reduce conflict for OLPAREN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for ID resolved as shift
+  ! shift/reduce conflict for FUNCTION_DEF resolved as shift
+  ! shift/reduce conflict for CONDITION_DEF resolved as shift
+  ! shift/reduce conflict for BOOKMARK resolved as shift
+  ! shift/reduce conflict for GOTO resolved as shift
+  ! shift/reduce conflict for WAVE resolved as shift
+  ! shift/reduce conflict for LPAREN resolved as shift
+    BLOCK_END       reduce using rule 20 (condition_def_else -> condition_def_else statement .)
+    CONDITION_ELSE  reduce using rule 20 (condition_def_else -> condition_def_else statement .)
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 14
+    FUNCTION_DEF    shift and go to state 15
+    CONDITION_DEF   shift and go to state 1
+    BOOKMARK        shift and go to state 3
+    GOTO            shift and go to state 8
+    WAVE            shift and go to state 13
+    LPAREN          shift and go to state 12
+
+  ! OLPAREN         [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! STRING          [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! NUMBER          [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! FLOAT           [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! ID              [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! FUNCTION_DEF    [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! CONDITION_DEF   [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! BOOKMARK        [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! GOTO            [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! WAVE            [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+  ! LPAREN          [ reduce using rule 20 (condition_def_else -> condition_def_else statement .) ]
+
+    function                       shift and go to state 7
+    goto                           shift and go to state 9
+    func_def                       shift and go to state 10
+    bookmark                       shift and go to state 2
+    autocomplete                   shift and go to state 17
+    statement                      shift and go to state 24
+    condition_def                  shift and go to state 19
+    type                           shift and go to state 6
+    assign                         shift and go to state 20
+
+state 76
+
+    (25) defargu -> defargu COMMA type .
+    (26) defargu -> defargu COMMA type . COMMA type
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+  ! shift/reduce conflict for COMMA resolved as shift
+    BLOCK_END       reduce using rule 25 (defargu -> defargu COMMA type .)
+    IMPORTANT       reduce using rule 25 (defargu -> defargu COMMA type .)
+    OLPAREN         reduce using rule 25 (defargu -> defargu COMMA type .)
+    STRING          reduce using rule 25 (defargu -> defargu COMMA type .)
+    NUMBER          reduce using rule 25 (defargu -> defargu COMMA type .)
+    FLOAT           reduce using rule 25 (defargu -> defargu COMMA type .)
+    ID              reduce using rule 25 (defargu -> defargu COMMA type .)
+    FUNCTION_DEF    reduce using rule 25 (defargu -> defargu COMMA type .)
+    CONDITION_DEF   reduce using rule 25 (defargu -> defargu COMMA type .)
+    BOOKMARK        reduce using rule 25 (defargu -> defargu COMMA type .)
+    GOTO            reduce using rule 25 (defargu -> defargu COMMA type .)
+    WAVE            reduce using rule 25 (defargu -> defargu COMMA type .)
+    LPAREN          reduce using rule 25 (defargu -> defargu COMMA type .)
+    COMMA           shift and go to state 79
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+  ! COMMA           [ reduce using rule 25 (defargu -> defargu COMMA type .) ]
+
+
+state 77
+
+    (10) function -> LPAREN ID assign RPAREN .
+
+    TABARGU         reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    PLUS            reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    MINUS           reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    TIMES           reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    DIVIDE          reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    GREATERTHEN     reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    GREATERTHENEQUAL reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    LESSTHEN        reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    LESSTHENEQUAL   reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    NEGATION        reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    EQUAL           reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    OLPAREN         reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    STRING          reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    NUMBER          reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    FLOAT           reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    ID              reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    FUNCTION_DEF    reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    CONDITION_DEF   reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    BOOKMARK        reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    GOTO            reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    WAVE            reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    LPAREN          reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    $end            reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    BLOCK_END       reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    CONDITION_ELSE  reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    IMPORTANT       reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    COMMA           reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    ORPAREN         reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+    RPAREN          reduce using rule 10 (function -> LPAREN ID assign RPAREN .)
+
+
+state 78
+
+    (24) autocomplete -> autocomplete type COMMA type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    OLPAREN         reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    STRING          reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    NUMBER          reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    FLOAT           reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    ID              reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    LPAREN          reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    FUNCTION_DEF    reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    CONDITION_DEF   reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    BOOKMARK        reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    GOTO            reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    WAVE            reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    $end            reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    BLOCK_END       reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    IMPORTANT       reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    CONDITION_ELSE  reduce using rule 24 (autocomplete -> autocomplete type COMMA type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+
+state 79
+
+    (26) defargu -> defargu COMMA type COMMA . type
+    (34) type -> . type PLUS type
+    (35) type -> . type MINUS type
+    (36) type -> . type TIMES type
+    (37) type -> . type DIVIDE type
+    (38) type -> . type GREATERTHEN type
+    (39) type -> . type GREATERTHENEQUAL type
+    (40) type -> . type LESSTHEN type
+    (41) type -> . type LESSTHENEQUAL type
+    (42) type -> . type NEGATION type
+    (43) type -> . type EQUAL type
+    (44) type -> . OLPAREN type ORPAREN
+    (45) type -> . function
+    (46) type -> . STRING
+    (47) type -> . NUMBER
+    (48) type -> . FLOAT
+    (49) type -> . ID
+    (9) function -> . LPAREN ID RPAREN
+    (10) function -> . LPAREN ID assign RPAREN
+    (11) function -> . function targ
+
+    OLPAREN         shift and go to state 18
+    STRING          shift and go to state 5
+    NUMBER          shift and go to state 11
+    FLOAT           shift and go to state 16
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 12
+
+    function                       shift and go to state 7
+    type                           shift and go to state 80
+
+state 80
+
+    (26) defargu -> defargu COMMA type COMMA type .
+    (34) type -> type . PLUS type
+    (35) type -> type . MINUS type
+    (36) type -> type . TIMES type
+    (37) type -> type . DIVIDE type
+    (38) type -> type . GREATERTHEN type
+    (39) type -> type . GREATERTHENEQUAL type
+    (40) type -> type . LESSTHEN type
+    (41) type -> type . LESSTHENEQUAL type
+    (42) type -> type . NEGATION type
+    (43) type -> type . EQUAL type
+
+    COMMA           reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    BLOCK_END       reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    IMPORTANT       reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    OLPAREN         reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    STRING          reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    NUMBER          reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    FLOAT           reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    ID              reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    FUNCTION_DEF    reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    CONDITION_DEF   reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    BOOKMARK        reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    GOTO            reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    WAVE            reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    LPAREN          reduce using rule 26 (defargu -> defargu COMMA type COMMA type .)
+    PLUS            shift and go to state 31
+    MINUS           shift and go to state 34
+    TIMES           shift and go to state 29
+    DIVIDE          shift and go to state 25
+    GREATERTHEN     shift and go to state 32
+    GREATERTHENEQUAL shift and go to state 30
+    LESSTHEN        shift and go to state 28
+    LESSTHENEQUAL   shift and go to state 33
+    NEGATION        shift and go to state 27
+    EQUAL           shift and go to state 26
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for OLPAREN in state 17 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 17 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 17 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 17 resolved as shift
+WARNING: shift/reduce conflict for ID in state 17 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 17 resolved as shift
+WARNING: shift/reduce conflict for ID in state 20 resolved as shift
+WARNING: shift/reduce conflict for OLPAREN in state 24 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 24 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 24 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 24 resolved as shift
+WARNING: shift/reduce conflict for ID in state 24 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION_DEF in state 24 resolved as shift
+WARNING: shift/reduce conflict for CONDITION_DEF in state 24 resolved as shift
+WARNING: shift/reduce conflict for BOOKMARK in state 24 resolved as shift
+WARNING: shift/reduce conflict for GOTO in state 24 resolved as shift
+WARNING: shift/reduce conflict for WAVE in state 24 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 24 resolved as shift
+WARNING: shift/reduce conflict for TABARGU in state 35 resolved as shift
+WARNING: shift/reduce conflict for OLPAREN in state 41 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 41 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 41 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 41 resolved as shift
+WARNING: shift/reduce conflict for ID in state 41 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION_DEF in state 41 resolved as shift
+WARNING: shift/reduce conflict for CONDITION_DEF in state 41 resolved as shift
+WARNING: shift/reduce conflict for BOOKMARK in state 41 resolved as shift
+WARNING: shift/reduce conflict for GOTO in state 41 resolved as shift
+WARNING: shift/reduce conflict for WAVE in state 41 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 41 resolved as shift
+WARNING: shift/reduce conflict for OLPAREN in state 50 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 50 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 50 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 50 resolved as shift
+WARNING: shift/reduce conflict for ID in state 50 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION_DEF in state 50 resolved as shift
+WARNING: shift/reduce conflict for CONDITION_DEF in state 50 resolved as shift
+WARNING: shift/reduce conflict for BOOKMARK in state 50 resolved as shift
+WARNING: shift/reduce conflict for GOTO in state 50 resolved as shift
+WARNING: shift/reduce conflict for WAVE in state 50 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 50 resolved as shift
+WARNING: shift/reduce conflict for OLPAREN in state 51 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 51 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 51 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 51 resolved as shift
+WARNING: shift/reduce conflict for ID in state 51 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION_DEF in state 51 resolved as shift
+WARNING: shift/reduce conflict for CONDITION_DEF in state 51 resolved as shift
+WARNING: shift/reduce conflict for BOOKMARK in state 51 resolved as shift
+WARNING: shift/reduce conflict for GOTO in state 51 resolved as shift
+WARNING: shift/reduce conflict for WAVE in state 51 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 51 resolved as shift
+WARNING: shift/reduce conflict for ID in state 52 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 55 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 55 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 55 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 55 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 55 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 55 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 55 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 55 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 55 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 55 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 56 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 56 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 56 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 56 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 56 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 56 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 56 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 56 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 56 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 56 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 57 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 57 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 57 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 57 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 57 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 57 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 57 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 57 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 57 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 57 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 59 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 59 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 59 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 59 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 59 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 59 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 59 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 59 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 59 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 59 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 61 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 61 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 61 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 61 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 61 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 61 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 61 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 61 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 61 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 61 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 62 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 62 resolved as shift
+WARNING: shift/reduce conflict for TIMES in state 62 resolved as shift
+WARNING: shift/reduce conflict for DIVIDE in state 62 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHEN in state 62 resolved as shift
+WARNING: shift/reduce conflict for GREATERTHENEQUAL in state 62 resolved as shift
+WARNING: shift/reduce conflict for LESSTHEN in state 62 resolved as shift
+WARNING: shift/reduce conflict for LESSTHENEQUAL in state 62 resolved as shift
+WARNING: shift/reduce conflict for NEGATION in state 62 resolved as shift
+WARNING: shift/reduce conflict for EQUAL in state 62 resolved as shift
+WARNING: shift/reduce conflict for TABARGU in state 64 resolved as shift
+WARNING: shift/reduce conflict for COMMA in state 66 resolved as shift
+WARNING: shift/reduce conflict for ID in state 69 resolved as shift
+WARNING: shift/reduce conflict for OLPAREN in state 75 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 75 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 75 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 75 resolved as shift
+WARNING: shift/reduce conflict for ID in state 75 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION_DEF in state 75 resolved as shift
+WARNING: shift/reduce conflict for CONDITION_DEF in state 75 resolved as shift
+WARNING: shift/reduce conflict for BOOKMARK in state 75 resolved as shift
+WARNING: shift/reduce conflict for GOTO in state 75 resolved as shift
+WARNING: shift/reduce conflict for WAVE in state 75 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 75 resolved as shift
+WARNING: shift/reduce conflict for COMMA in state 76 resolved as shift
