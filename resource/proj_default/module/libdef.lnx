@@ -164,9 +164,10 @@
 )
 
 !타이머(	
-	"<font color='#ffa02f'><b>타이머</b></font><br>지정한 '시간'에 한번씩 메크로를 호출합니다..",
+	"<font color='#ffa02f'><b>타이머</b></font><br>지정한 '시간'에 한번씩 메크로를 호출합니다.",
 	(1,아이디,"타이머아이디",""),
-	(1,함수,"함수목록"),
+	(1,매크로,"함수목록"),
+	(0,횟수,"",0),
 	(1,시간,"",1)
 )
 
@@ -255,103 +256,108 @@
 	(1,파일명,"","")
 )
 
-!LUA_FUNCTION(	
-	"<font color='#ffa02f'><b>LUA_FUNCTION</b></font><br>루아 global stack에 있는 함수를 호출합니다.",
-	(1,name,"","")
+!루아함수(	
+	"<font color='#ffa02f'><b>루아함수</b></font><br>루아 global stack에 있는 함수를 호출합니다.",
+	(1,이름,"","")
+)
+
+!루아(
+	"<font color='#ffa02f'><b>루아</b></font><br>--",
+	(1,모듈명,""),
 )
 
 @매크로 이미지:
-	[LUA_FUNCTION name="LNX_IMAGE"]
+	[루아함수 이름="LNX_IMAGE"]
 
 @매크로 텍스트:
-	[LUA_FUNCTION name="LNX_TEXT"]
+	[루아함수 이름="LNX_TEXT"]
 
 @매크로 삭제:
-	[LUA_FUNCTION name="LNX_DELETENODE"]
+	[루아함수 이름="LNX_DELETENODE"]
 
 @매크로 독백:
-	[LUA_FUNCTION name="LNX_MONOLOG"]
+	[루아함수 이름="LNX_MONOLOG"]
 
 @매크로 대화:
-	[LUA_FUNCTION name="LNX_DIALOG"]
+	[루아함수 이름="LNX_DIALOG"]
 
 @매크로 대화지우기:
-	[LUA_FUNCTION name="LNX_REMOVEDIALOG"]
+	[루아함수 이름="LNX_REMOVEDIALOG"]
 
 @매크로 애니메이션:
-	[LUA_FUNCTION name="LNX_ANIMATION"]
+	[루아함수 이름="LNX_ANIMATION"]
 
 @매크로 나가기:
-	[LUA_FUNCTION name="LNX_RETURN"]
+	[루아함수 이름="LNX_RETURN"]
 
 @매크로 멈춤:
-	[LUA_FUNCTION name="LNX_STOP"]
+	[루아함수 이름="LNX_STOP"]
 
 @매크로 대기:
-	[LUA_FUNCTION name="LNX_WAIT"]
+	[루아함수 이름="LNX_WAIT"]
 
 @매크로 클릭대기:
-	[LUA_FUNCTION name="LNX_CLICKWAIT"]
+	[루아함수 이름="LNX_CLICKWAIT"]
 
 @매크로 효과음:
-	[LUA_FUNCTION name="LNX_PLAYSOUND"]
+	[루아함수 이름="LNX_PLAYSOUND"]
 
 @매크로 게임종료:
-	[LUA_FUNCTION name="LNX_APP_EXIT"]
+	[루아함수 이름="LNX_APP_EXIT"]
 
 @매크로 배경음:
-	[LUA_FUNCTION name="LNX_PLAYBGM"]
+	[루아함수 이름="LNX_PLAYBGM"]
 
 @매크로 효과음끄기:
-	[LUA_FUNCTION name="LNX_STOPSOUND"]
+	[루아함수 이름="LNX_STOPSOUND"]
 
 @매크로 배경음끄기:
-	[LUA_FUNCTION name="LNX_STOPBGM"]
+	[루아함수 이름="LNX_STOPBGM"]
 
 @매크로 타이머:
-	[LUA_FUNCTION name="LNX_TIMER"]
+	[루아함수 이름="LNX_TIMER"]
 
 @매크로 타이머종료:
-	[LUA_FUNCTION name="LNX_TIMER_EXIT"]
+	[루아함수 이름="LNX_TIMER_EXIT"]
 
 @매크로 화면초기화:
-	[LUA_FUNCTION name="LNX_SCREENCLEAN"]
+	[루아함수 이름="LNX_SCREENCLEAN"]
 
 @매크로 인자변수초기화:
-	[LUA_FUNCTION name="LNX_CLEARVARIABLE"]
+	[루아함수 이름="LNX_CLEARVARIABLE"]
 
 @매크로 전환:
-	[LUA_FUNCTION name="LNX_TRANSITION"]
+	[루아함수 이름="LNX_TRANSITION"]
 
 @매크로 화면전환:
-	[LUA_FUNCTION name="LNX_SCENE_TRANSITION"]
+	[루아함수 이름="LNX_SCENE_TRANSITION"]
 
 @매크로 스크린샷:
-	[LUA_FUNCTION name="LNX_SCREENSHOT"]
+	[루아함수 이름="LNX_SCREENSHOT"]
 
 @매크로 저장체크:
-	[LUA_FUNCTION name="LNX_VM_CHECKSAVE"]
+	[루아함수 이름="LNX_VM_CHECKSAVE"]
 
 @매크로 저장:
-	[LUA_FUNCTION name="LNX_SAVE"]
+	[루아함수 이름="LNX_SAVE"]
 
 @매크로 불러오기:
-	[LUA_FUNCTION name="LNX_VM_LOAD"]
+	[루아함수 이름="LNX_VM_LOAD"]
 
 @매크로 비디오:
-	[LUA_FUNCTION name="LNX_MOVIE_PLAYER"]
+	[루아함수 이름="LNX_MOVIE_PLAYER"]
 
 @매크로 대화창수정:
-	[LUA_FUNCTION name="LNX_DIALOG_CONFIG"]
+	[루아함수 이름="LNX_DIALOG_CONFIG"]
 
 @매크로 이전터치막기:
-	[LUA_FUNCTION name="LNX_MODAL_NODE"]
+	[루아함수 이름="LNX_MODAL_NODE"]
 
 @매크로 키입력:
-	[LUA_FUNCTION name="LNX_REGIST_KEYBOARD"]
+	[루아함수 이름="LNX_REGIST_KEYBOARD"]
 
 @매크로 키입력해제:
-	[LUA_FUNCTION name="LNX_UNREGIST_KEYBOARD"]
+	[루아함수 이름="LNX_UNREGIST_KEYBOARD"]
 
 @매크로 랜덤:
-	[LUA_FUNCTION name="LNX_RANDOM"]
+	[루아함수 이름="LNX_RANDOM"]
