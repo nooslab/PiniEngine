@@ -68,15 +68,15 @@ WriteUninstaller $INSTDIR\Uninst.exe
 CreateDirectory "$SMPROGRAMS\${GAME_NAME}"
 CreateShortCut  "$DESKTOP\${GAME_NAME}.lnk"                      "$INSTDIR\${GAME_EXEFILE}"
 CreateShortCut  "$SMPROGRAMS\${GAME_NAME}\${GAME_NAME}.lnk"      "$INSTDIR\${GAME_EXEFILE}"
-CreateShortCut  "$SMPROGRAMS\${GAME_NAME}\${GAME_NAME} 제거.lnk" "$INSTDIR\Uninst.exe"
+CreateShortCut  "$SMPROGRAMS\${GAME_NAME}\Uninstall.lnk" "$INSTDIR\Uninst.exe"
 
 ; # 프로그램 추가/제거에 등록
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "DisplayName"     "${GAME_NAME}"
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "DisplayIcon"     "$INSTDIR\${GAME_EXEFILE}"
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "UninstallString" "$\"$INSTDIR\Uninst.exe$\""
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "QuietUninstallString" "$\"$INSTDIR\Uninst.exe$\""
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "InstallLocation" "$INSTDIR"
-WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "Publisher" "Pictorial"
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "DisplayName"     "${GAME_NAME}"
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "DisplayIcon"     "$INSTDIR\${GAME_EXEFILE}"
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "UninstallString" "$\"$INSTDIR\Uninst.exe$\""
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "QuietUninstallString" "$\"$INSTDIR\Uninst.exe$\""
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "InstallLocation" "$INSTDIR"
+WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}" "Publisher" "${GAME_DISTRIBUTOR}"
 
 SectionEnd
 
@@ -85,15 +85,15 @@ Section "Uninstall"
 ; # 바탕화면, 시작메뉴에 있는 바로가기 삭제
 Delete "$DESKTOP\${GAME_NAME}.lnk"
 Delete "$SMPROGRAMS\${GAME_NAME}\${GAME_NAME}.lnk"
-Delete "$SMPROGRAMS\${GAME_NAME}\${GAME_NAME} 제거.lnk"
+Delete "$SMPROGRAMS\${GAME_NAME}\Uninstall.lnk"
 RMDir  "$SMPROGRAMS\${GAME_NAME}"
 
 ; # 프로그램 추가/제거 등록 해제
-DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}"
+DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}"
 
 ; ----------------------------------------------------------------------------------------------------
     Delete "$INSTDIR\*.*"
-    RMDir "$INSTDIR"
+    RMDir /r "$INSTDIR"
 ; ----------------------------------------------------------------------------------------------------
 
 SectionEnd
