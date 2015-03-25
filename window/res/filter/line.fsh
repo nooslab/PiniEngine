@@ -43,4 +43,5 @@ void main()
     float b = (1.0-threshold)*color.b + threshold*c.b;
 
     gl_FragColor = vec4(r,g,b,color.a);
+    gl_FragColor *= vec4(1.0,1.0,1.0,v_fragmentColor.a);
 }

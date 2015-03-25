@@ -73,5 +73,6 @@ void main(void)
     float radiusSqrd = pow(pixelRadius,2.0);
     float gradient = smoothstep(radiusSqrd-tolerance, radiusSqrd+tolerance, powers.x+powers.y);
 
-      gl_FragColor = mix(avgColor, vec4(0.1,0.1,0.1,1.0), gradient);
+    gl_FragColor = mix(avgColor, vec4(0.1,0.1,0.1,1.0), gradient);
+    gl_FragColor *= vec4(1.0,1.0,1.0,v_fragmentColor.a);
 }
