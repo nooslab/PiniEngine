@@ -525,6 +525,11 @@
 	"<p class='title'>슬라이더값</p>슬라이더의 값을 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:getvalueslider'>..자세히</a>"|
 	{1| 아이디| ""| ""| "해당 슬라이더를 지칭하는 고유 아이디입니다."}
 }
+
+!수변환{
+	"<p class='title'>수변환</p>스트링 값을 숫자로 변환시킵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:toInt'>..자세히</a>"|
+	{1| 값| ""| ""| "숫자로 변환할 문자열 값을 입력합니다."}
+}
 #매크로 루아함수 목록
 
 
@@ -722,3 +727,6 @@
 
 @매크로 슬라이더값:
 	[루아함수 이름="LNX_SLIDERVALUE"]
+
+@매크로 수변환:
+	[루아함수 이름="LNX_TOINT"]
