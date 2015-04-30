@@ -1,0 +1,14 @@
+WARNING: Token 'LLPAREN' defined, but not used
+WARNING: Token 'WS' defined, but not used
+WARNING: Token 'LLT' defined, but not used
+WARNING: Token 'SUBSTRING' defined, but not used
+WARNING: Token 'DOTLINE' defined, but not used
+WARNING: There are 5 unused tokens
+WARNING: Symbol 'argument' is unreachable
+WARNING: Symbol 'arglist' is unreachable
+WARNING: Symbol 'varargslist' is unreachable
+Generating LALR tables
+WARNING: 39 shift/reduce conflicts
+WARNING: 13 reduce/reduce conflicts
+WARNING: reduce/reduce conflict in state 146 resolved using rule (power -> LPAREN atom RPAREN)
+WARNING: rejected rule (atom -> atom LPAREN atom RPAREN) in state 146
