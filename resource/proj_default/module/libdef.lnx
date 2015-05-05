@@ -294,6 +294,16 @@
 	{1| 아이템| ""| ""| ""}
 }
 
+!결제확인{
+	"<p class='title'>결제확인</p><a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:req_check'>..자세히</a>"|
+	{1| 아이템| ""| ""| "결제확인을 할 아이템의 아이디 값을 넣습니다."}
+}
+
+!결제소비{
+	"<p class='title'>결제소비</p><a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:req_consume'>..자세히</a>"|
+	{1| 아이템| ""| ""| "결제소비를 할 아이템의 아이디 값을 넣습니다."}
+}
+
 !전환{
 	"<p class='title'>전환</p>화면에 전환효과를 적용해 이미지를 출력합니다. 인자이미지 매개변수는 밝기로 시점(time)정보가 표현된 PNG이미지를 지정해야 합니다. 밝은 부분일 수록 더 늦게 보이게 됩니다.<img src='http://i.imgur.com/fMjwJnm.gif' width='100%'><a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:transition'>..자세히</a>"|
 	{1| 아이디| ""| ""| "전환이 완료가 되면 이미지 매크로로 이미지를 출력한 것과 동일하게 삭제 및 애니메이션 객체로 다룰 수 있게 됩니다. 이때 필요한 고유 아이디 입니다."}|
@@ -622,6 +632,12 @@
 
 @매크로 결제요청:
 	[루아함수 이름="LNX_IAP_REQUEST"]
+
+@매크로 결제확인:
+	[루아함수 이름="LNX_IAP_CHECK"]
+
+@매크로 결제소비:
+	[루아함수 이름="LNX_IAP_CONSUME"]
 
 @매크로 전환:
 	[루아함수 이름="LNX_TRANSITION"]
