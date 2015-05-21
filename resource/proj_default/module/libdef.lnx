@@ -466,7 +466,7 @@
 
 !진동{
 	"<p class='title'>진동</p>기기의 진동기능을 사용합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:Vibrator'>..자세히</a>"|
-	{1| 시간| ""| 10| "마이크로초(ms) 단위의 진동시간을 설정합니다. 1000ms = 1초"}
+	{1| 시간| ""| 10| "밀리초(ms) 단위의 진동시간을 설정합니다. 1000ms = 1초"}
 }
 
 !엑셀{
@@ -539,6 +539,29 @@
 !수변환{
 	"<p class='title'>수변환</p>스트링 값을 숫자로 변환시킵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:toInt'>..자세히</a>"|
 	{1| 값| ""| ""| "숫자로 변환할 문자열 값을 입력합니다."}
+}
+
+!확장파일검사{
+	"<p class='title'>확장파일검사</p>안드로이드 확장파일이 설치되어 있는지 확인합니다. 구글플레이에 업로드 한 뒤 테스트가 가능합니다. 테스트용으로는 구글플레이의 '알파 테스트'를 이용할 수 있습니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:AndroidExtensionFileCheck'>..자세히</a>"|
+	{1| 타입| ""| "메인"| "'메인','패치' 둘 중 하나가 기입 될 수 있습니다."}|
+	{1| 버전| ""| "1"| "버전코드가 기입됩니다. 확장파일을 구글에 업로드 한 뒤 할당 받는 코드입니다."}|
+	{1| 파일크기| ""| ""| "확장파일의 크기를 기입합니다. 확장파일이 다운로드 중 실패했다거나 끊기면 용량에 차이가 생기기 때문에 제대로 다운로드가 되었는지 확인을 합니다."}
+}
+
+!확장파일다운로드{
+	"<p class='title'>확장파일다운로드</p>안드로이드 확장파일을 다운로드할 수 있습니다. 구글플레이에 업로드 한 뒤 테스트가 가능합니다. 테스트용으로는 구글플레이의 '알파 테스트'를 이용할 수 있습니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:AndroidExtensionFileDownload'>..자세히</a>"|
+	
+}
+
+!확장파일마운트{
+	"<p class='title'>확장파일마운트</p>안드로이드 확장파일의 파일을 사용하기 위한 마운트를 합니다. 확장파일 내의 파일을 접근하려면 이 매크로를 사용해야합니다. 구글플레이에 업로드 한 뒤 테스트가 가능합니다. 테스트용으로는 구글플레이의 '알파 테스트'를 이용할 수 있습니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:AndroidExtensionFileMount'>..자세히</a>"|
+	{1| 타입| ""| ""| "'메인','패치' 둘 중 하나가 기입 될 수 있습니다."}|
+	{1| 버전| ""| ""| "버전코드가 기입됩니다. 확장파일을 구글에 업로드 한 뒤 할당 받는 코드입니다."}
+}
+
+!안드로이드공개키설정{
+	"<p class='title'>안드로이드공개키설정</p>안드로이드 퍼블릭키를 설정합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:AndroidPublicKeySet'>..자세히</a>"|
+	{1| 키| ""| ""| "안드로이드 구글 플레이에서 발급 받는 공개키를 기입합니다."}
 }
 #매크로 루아함수 목록
 
@@ -746,3 +769,15 @@
 
 @매크로 수변환:
 	[루아함수 이름="LNX_TOINT"]
+
+@매크로 확장파일검사:
+	[루아함수 이름="LNX_ANDROIDEXTENSION_CHECK"]
+
+@매크로 확장파일다운로드:
+	[루아함수 이름="LNX_ANDROIDEXTENSION_DOWNLOAD"]
+
+@매크로 확장파일마운트:
+	[루아함수 이름="LNX_ANDROIDEXTENSION_MOUNT"]
+
+@매크로 안드로이드공개키설정:
+	[루아함수 이름="LNX_ANDROIDSETPUBLICKKEY"]
