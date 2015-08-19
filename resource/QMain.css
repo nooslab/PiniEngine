@@ -270,6 +270,7 @@ QTextEdit
 
 QPlainTextEdit
 {
+	color: white;
 	background-color: #242424;
 	border: 0px;
 }

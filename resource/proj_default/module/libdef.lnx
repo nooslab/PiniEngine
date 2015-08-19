@@ -131,11 +131,6 @@
 	{1| 아이디| ""| ""| "중지할 개체의 아이디"}
 }
 
-!나가기{
-	"<p class='title'>나가기</p>나가기를 호출하면 현재 진행중인 스크립트 파일 혹은 매크로를 빠져나가게 됩니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:exit'>..자세히</a>"|
-	
-}
-
 !멈춤{
 	"<p class='title'>멈춤</p>실행중 멈춤 매크로가 실행되면 스크립트 진행이 대기 상태가 됩니다. 버튼 터치를 기다리는등의 주로 특정 유저의 입력을 기다리는 용도로 사용합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:stop'>..자세히</a>"|
 	
@@ -155,8 +150,7 @@
 	{0| 길이제한| ""| -1| "입력 될 값의 길이를 제한합니다. -1이면 길이제한 없음"}|
 	{0| 부모| "노드아이디"| ""| "정한 노드 아이디에 생성할 [입력필드]가 종속됩니다. 부모가 움직이거나 크기가 변경되면 종속된 노드들도 모두 같이 변형됩니다."}|
 	{0| 패스워드| "승락"| "아니오"| "예 를 입력하면 입력되는 값이 * 로 출력됩니다"}|
-	{0| x| ""| 0| "위치 매개변수 대신 넘겨줄 수 있는 인자 입니다. 이미지 위치의 x값을 지정해 줄 수 있습니다. x나 y가 쓰이면 위치는 무시됩니다."}|
-	{0| y| ""| 0| "위치매개변수 대신 넘겨줄 수 있는 인자 입니다. 이미지 위치의 y값을 지정해 줄 수 있습니다. x나 y가 쓰이면 위치는 무시됩니다."}
+	{0| GUI| "승락"| "아니오"| "화면의 최상단 레이어에 배치시킬지 여부입니다. 터치 입력도 가장 우선 받습니다."}
 }
 
 !입력필드가져오기{
@@ -413,7 +407,7 @@
 }
 
 !변수{
-	"<p class='title'>변수</p>변수에 값을 지정하거나 값을 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:GetSet_Variable'>..자세히</a>"|
+	"<p class='title'>변수</p>변수에 값을 지정하거나 값을 가져옵니다. '값' 매개변수를 사용할 경우, 해당 변수에 값을 저장하며, '값' 매개변수를 사용하지 않을 경우, 해당 변수의 값을 가져올 수 있습니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:GetSet_Variable'>..자세히</a>"|
 	{1| 아이디| ""| ""| ""}|
 	{1| 값| ""| "0"| ""}
 }
@@ -425,7 +419,7 @@
 }
 
 !시간정보{
-	"<p class='title'>시간정보</p>현재 기기의 시간 정보를 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:DateInfo'>..자세히</a>"|
+	"<p class='title'>시간정보</p>현재 기기의 시간 정보를 가져옵니다. 타입으로는 현재초, 년월일, 년월일시분초를 가져올 수 있습니다. 현재초는 현재 시간을 나타내는 숫자를 초 단위로 가져오며, 년월일은 yyyy-MM-dd 형태로 오늘의 날짜를 가져오며, 년월일시분초는 yyyy-MM-dd hh:mm:ss 형태로 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:DateInfo'>..자세히</a>"|
 	{1| 타입| "시간정보"| "현재초"| ""}
 }
 
@@ -452,7 +446,7 @@
 }
 
 !터치제스처{
-	"<p class='title'>터치제스처</p>터치제스처를 입력 받을 수 있는 매크로입니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:touchgesture'>..자세히</a>"|
+	"<p class='title'>터치제스처</p>터치제스처를 입력 받을 수 있는 매크로입니다. 매크로에서는 마지막으로 터치받은 터치의 개수가 '터치제스처.터치갯수'에, 터치타입은 '터치제스처.터치타입'에 저장됩니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:touchgesture'>..자세히</a>"|
 	{1| 아이디| ""| ""| "터치제스처 아이디를 설정합니다. 제스처를 해제할 때 사용됩니다."}|
 	{1| 매크로명| "함수목록"| ""| "제스처가 확인되면 해당 매크로가 실행됩니다."}
 }
@@ -500,7 +494,7 @@
 }
 
 !필터{
-	"<p class='title'>필터</p>현재 출력중인 화면에 흑백, 블러 등의 효과를 줍니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:filter'>..자세히</a>"|
+	"<p class='title'>필터</p>현재 출력중인 화면에 흑백, 블러 등의 효과를 줍니다. 기존의 이미지와 같은 아이디를 입력할 경우, 해당 이미지에만 필터가 적용되며, 전혀 새로운 아이디를 사용할 경우, 화면 전체에 적용됩니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:filter'>..자세히</a>"|
 	{1| 아이디| ""| ""| "필터의 아이디를 설정합니다. 삭제 등에서 사용됩니다."}|
 	{1| 타입| "필터타입"| ""| "필터의 타입입니다."}|
 	{1| 시간| ""| 1| "필터가 적용되는데 시간입니다."}
@@ -572,7 +566,7 @@
 }
 
 !전체화면전환{
-	"<p class='title'>전체화면전환</p>다음 실행시에 창모드/전체화면 모드의 동작을 변경합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:FullscreenSwitch'>..자세히</a>"|
+	"<p class='title'>전체화면전환</p>다음 실행시에 창모드/전체화면 모드의 동작을 변경합니다. PC 익스포트 버전에서만 유효한 기능이며, 피니 리모트나 안드로이드에서는 아무 일도 하지 않습니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:FullscreenSwitch'>..자세히</a>"|
 	{1| 전체화면| "승락"| "예"| "다음 실행시에 전체화면으로 실행할지 여부를 기입합니다."}
 }
 
@@ -624,7 +618,7 @@
 }
 
 !빨리감기시작{
-	"<p class='title'>빨리감기시작</p>빨리감기를 시작합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:StartSkip'>..자세히</a>"|
+	"<p class='title'>빨리감기시작</p>빨리감기를 시작합니다. 이 기능은 [빨리감기] 매크로와는 별개로 작동하며(즉, [빨리감기 허용='예'] 등과 무관하게 사용이 가능합니다), 자동으로 중단되지 않으므로, [빨리감기시작] 으로 빨리감기를 시작했다면, [빨리감기중단] 으로 중단해야만 합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:StartSkip'>..자세히</a>"|
 	
 }
 
@@ -642,260 +636,271 @@
 	"<p class='title'>대사창켜기</p>[대사창끄기] 로 숨긴 대사창을 다시 나타냅니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:ShowDialog'>..자세히</a>"|
 	
 }
+
+!저장변수적용{
+	"<p class='title'>저장변수적용</p>변경된 저장변수를 즉시 저장시킵니다. 해당 매크로를 사용하지 않아도 1초마다 한번씩 저장을 합니다. <a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:CommitSaveVar'>..자세히</a>"|
+	
+}
 #매크로 루아함수 목록
 
 
 @매크로 이미지:
-	[루아함수 이름="LNX_IMAGE"]
+	[[LNX_IMAGE]]
 
 @매크로 텍스트:
-	[루아함수 이름="LNX_TEXT"]
+	[[LNX_TEXT]]
 
 @매크로 삭제:
-	[루아함수 이름="LNX_DELETENODE"]
+	[[LNX_DELETENODE]]
 
 @매크로 독백:
-	[루아함수 이름="LNX_MONOLOG"]
+	[[LNX_MONOLOG]]
 
 @매크로 대화:
-	[루아함수 이름="LNX_DIALOG"]
+	[[LNX_DIALOG]]
 
 @매크로 대사지우기:
-	[루아함수 이름="LNX_REMOVEDIALOG"]
+	[[LNX_REMOVEDIALOG]]
 
 @매크로 기본값:
-	[루아함수 이름="LNX_SETDEFAULTARGU"]
+	[[LNX_SETDEFAULTARGU]]
 
 @매크로 기본값해제:
-	[루아함수 이름="LNX_DELDEFAULTARGU"]
+	[[LNX_DELDEFAULTARGU]]
 
 @매크로 애니메이션:
-	[루아함수 이름="LNX_ANIMATION"]
+	[[LNX_ANIMATION]]
 
 @매크로 애니메이션중지:
-	[루아함수 이름="LNX_ANIMATIONSTOP"]
-
-@매크로 나가기:
-	[루아함수 이름="LNX_RETURN"]
+	[[LNX_ANIMATIONSTOP]]
 
 @매크로 멈춤:
-	[루아함수 이름="LNX_STOP"]
+	[[LNX_STOP]]
 
 @매크로 입력필드:
-	[루아함수 이름="LNX_TEXTINPUT"]
+	[[LNX_TEXTINPUT]]
 
 @매크로 입력필드가져오기:
-	[루아함수 이름="LNX_TEXTINPUT_GET"]
+	[[LNX_TEXTINPUT_GET]]
 
 @매크로 비디오:
-	[루아함수 이름="LNX_MOVIE_PLAYER"]
+	[[LNX_MOVIE_PLAYER]]
 
 @매크로 대사창수정:
-	[루아함수 이름="LNX_DIALOG_CONFIG"]
+	[[LNX_DIALOG_CONFIG]]
 
 @매크로 이전터치막기:
-	[루아함수 이름="LNX_MODAL_NODE"]
+	[[LNX_MODAL_NODE]]
 
 @매크로 키입력:
-	[루아함수 이름="LNX_REGIST_KEYBOARD"]
+	[[LNX_REGIST_KEYBOARD]]
 
 @매크로 키입력해제:
-	[루아함수 이름="LNX_UNREGIST_KEYBOARD"]
+	[[LNX_UNREGIST_KEYBOARD]]
 
 @매크로 랜덤:
-	[루아함수 이름="LNX_RANDOM"]
+	[[LNX_RANDOM]]
 
 @매크로 효과음:
-	[루아함수 이름="LNX_PLAYSOUND"]
+	[[LNX_PLAYSOUND]]
 
 @매크로 효과음끄기:
-	[루아함수 이름="LNX_STOPSOUND"]
+	[[LNX_STOPSOUND]]
 
 @매크로 배경음:
-	[루아함수 이름="LNX_PLAYBGM"]
+	[[LNX_PLAYBGM]]
 
 @매크로 배경음끄기:
-	[루아함수 이름="LNX_STOPBGM"]
+	[[LNX_STOPBGM]]
 
 @매크로 타이머:
-	[루아함수 이름="LNX_TIMER"]
+	[[LNX_TIMER]]
 
 @매크로 타이머종료:
-	[루아함수 이름="LNX_TIMER_EXIT"]
+	[[LNX_TIMER_EXIT]]
 
 @매크로 화면초기화:
-	[루아함수 이름="LNX_SCREENCLEAN"]
+	[[LNX_SCREENCLEAN]]
 
 @매크로 사용자애니메이션:
-	[루아함수 이름="LNX_CUSTOMANIMATION"]
+	[[LNX_CUSTOMANIMATION]]
 
 @매크로 결제모듈셋팅:
-	[루아함수 이름="LNX_IAP_SETTING"]
+	[[LNX_IAP_SETTING]]
 
 @매크로 결제요청:
-	[루아함수 이름="LNX_IAP_REQUEST"]
+	[[LNX_IAP_REQUEST]]
 
 @매크로 결제확인:
-	[루아함수 이름="LNX_IAP_CHECK"]
+	[[LNX_IAP_CHECK]]
 
 @매크로 결제소비:
-	[루아함수 이름="LNX_IAP_CONSUME"]
+	[[LNX_IAP_CONSUME]]
 
 @매크로 전환:
-	[루아함수 이름="LNX_TRANSITION"]
+	[[LNX_TRANSITION]]
 
 @매크로 스크린샷:
-	[루아함수 이름="LNX_SCREENSHOT"]
+	[[LNX_SCREENSHOT]]
 
 @매크로 저장체크:
-	[루아함수 이름="LNX_VM_CHECKSAVE"]
+	[[LNX_VM_CHECKSAVE]]
 
 @매크로 게임종료:
-	[루아함수 이름="LNX_APP_EXIT"]
+	[[LNX_APP_EXIT]]
 
 @매크로 저장:
-	[루아함수 이름="LNX_SAVE"]
+	[[LNX_SAVE]]
 
 @매크로 저장삭제:
-	[루아함수 이름="LNX_SAVE_DELETE"]
+	[[LNX_SAVE_DELETE]]
 
 @매크로 불러오기:
-	[루아함수 이름="LNX_VM_LOAD"]
+	[[LNX_VM_LOAD]]
 
 @매크로 대기:
-	[루아함수 이름="LNX_WAIT"]
+	[[LNX_WAIT]]
 
 @매크로 클릭대기:
-	[루아함수 이름="LNX_CLICKWAIT"]
+	[[LNX_CLICKWAIT]]
 
 @매크로 타입체크:
-	[루아함수 이름="LNX_VALUE_TYPE_CHECK"]
+	[[LNX_VALUE_TYPE_CHECK]]
 
 @매크로 로그:
-	[루아함수 이름="LNX_LOG"]
+	[[LNX_LOG]]
 
 @매크로 로컬푸시:
-	[루아함수 이름="LNX_LOCAL_PUSH"]
+	[[LNX_LOCAL_PUSH]]
 
 @매크로 인터넷연결:
-	[루아함수 이름="LNX_HTTP_REQUEST"]
+	[[LNX_HTTP_REQUEST]]
 
 @매크로 문자열일부:
-	[루아함수 이름="LNX_STRING_SUB"]
+	[[LNX_STRING_SUB]]
 
 @매크로 변수:
-	[루아함수 이름="LNX_GETSET_VARIABLE"]
+	[[LNX_GETSET_VARIABLE]]
 
 @매크로 제이슨파싱:
-	[루아함수 이름="LNX_JSON_PARSE"]
+	[[LNX_JSON_PARSE]]
 
 @매크로 시간정보:
-	[루아함수 이름="LNX_DATEINFO"]
+	[[LNX_DATEINFO]]
 
 @매크로 메모리최적화:
-	[루아함수 이름="LNX_CLEANUP_MEMORY"]
+	[[LNX_CLEANUP_MEMORY]]
 
 @매크로 변수트리거:
-	[루아함수 이름="LNX_REGIST_VARIABLE_TRIGGER"]
+	[[LNX_REGIST_VARIABLE_TRIGGER]]
 
 @매크로 변수트리거해제:
-	[루아함수 이름="LNX_UNREGIST_VARIABLE_TRIGGER"]
+	[[LNX_UNREGIST_VARIABLE_TRIGGER]]
 
 @매크로 이전키입력막기:
-	[루아함수 이름="LNX_MODAL_KEY"]
+	[[LNX_MODAL_KEY]]
 
 @매크로 터치제스처:
-	[루아함수 이름="LNX_TOUCHGESTURE"]
+	[[LNX_TOUCHGESTURE]]
 
 @매크로 터치제스처해제:
-	[루아함수 이름="LNX_REMOVETOUCHGESTURE"]
+	[[LNX_REMOVETOUCHGESTURE]]
 
 @매크로 터치영역:
-	[루아함수 이름="LNX_TOUCHAREA"]
+	[[LNX_TOUCHAREA]]
 
 @매크로 진동:
-	[루아함수 이름="LNX_VIBRATE"]
+	[[LNX_VIBRATE]]
 
 @매크로 엑셀:
-	[루아함수 이름="LNX_GET_XLSX_DATA"]
+	[[LNX_GET_XLSX_DATA]]
 
 @매크로 소수점버림:
-	[루아함수 이름="LNX_FLOOR"]
+	[[LNX_FLOOR]]
 
 @매크로 반올림:
-	[루아함수 이름="LNX_ROUND"]
+	[[LNX_ROUND]]
 
 @매크로 북마크이동:
-	[루아함수 이름="LNX_GOTOBOOKMARK"]
+	[[LNX_GOTOBOOKMARK]]
 
 @매크로 필터:
-	[루아함수 이름="LNX_SCREENFILTER"]
+	[[LNX_SCREENFILTER]]
 
 @매크로 필터삭제:
-	[루아함수 이름="LNX_REMOVESCREENFILTER"]
+	[[LNX_REMOVESCREENFILTER]]
 
 @매크로 광고:
-	[루아함수 이름="LNX_ADS"]
+	[[LNX_ADS]]
 
 @매크로 브라우저:
-	[루아함수 이름="LNX_BROWSER_OPEN"]
+	[[LNX_BROWSER_OPEN]]
 
 @매크로 슬라이더:
-	[루아함수 이름="LNX_SLIDER"]
+	[[LNX_SLIDER]]
 
 @매크로 슬라이더값:
-	[루아함수 이름="LNX_SLIDERVALUE"]
+	[[LNX_SLIDERVALUE]]
 
 @매크로 수변환:
-	[루아함수 이름="LNX_TOINT"]
+	[[LNX_TOINT]]
 
 @매크로 확장파일검사:
-	[루아함수 이름="LNX_ANDROIDEXTENSION_CHECK"]
+	[[LNX_ANDROIDEXTENSION_CHECK]]
 
 @매크로 확장파일다운로드:
-	[루아함수 이름="LNX_ANDROIDEXTENSION_DOWNLOAD"]
+	[[LNX_ANDROIDEXTENSION_DOWNLOAD]]
 
 @매크로 확장파일마운트:
-	[루아함수 이름="LNX_ANDROIDEXTENSION_MOUNT"]
+	[[LNX_ANDROIDEXTENSION_MOUNT]]
 
 @매크로 안드로이드공개키설정:
-	[루아함수 이름="LNX_ANDROIDSETPUBLICKKEY"]
+	[[LNX_ANDROIDSETPUBLICKKEY]]
 
 @매크로 전체화면전환:
-	[루아함수 이름="LNX_FULLSCREENSWITCH"]
+	[[LNX_FULLSCREENSWITCH]]
 
 @매크로 백로그:
-	[루아함수 이름="LNX_BACKLOG"]
+	[[LNX_BACKLOG]]
 
 @매크로 백로그설정:
-	[루아함수 이름="LNX_BACKLOG_SETTING"]
+	[[LNX_BACKLOG_SETTING]]
 
 @매크로 백로그초기화:
-	[루아함수 이름="LNX_BACKLOG_CLEAR"]
+	[[LNX_BACKLOG_CLEAR]]
 
 @매크로 백로그숨김:
-	[루아함수 이름="LNX_BACKLOG_HIDE"]
+	[[LNX_BACKLOG_HIDE]]
 
 @매크로 빨리감기:
-	[루아함수 이름="LNX_SWITCH_SKIP_ALLOW"]
+	[[LNX_SWITCH_SKIP_ALLOW]]
 
 @매크로 자동읽기시작:
-	[루아함수 이름="LNX_START_AUTOREAD"]
+	[[LNX_START_AUTOREAD]]
 
 @매크로 자동읽기중단:
-	[루아함수 이름="LNX_STOP_AUTOREAD"]
+	[[LNX_STOP_AUTOREAD]]
 
 @매크로 배경음볼륨:
-	[루아함수 이름="LNX_CHANGE_BGM_VOLUME"]
+	[[LNX_CHANGE_BGM_VOLUME]]
 
 @매크로 빨리감기시작:
-	[루아함수 이름="LNX_START_FASTSKIP"]
+	[[LNX_START_FASTSKIP]]
 
 @매크로 빨리감기중단:
-	[루아함수 이름="LNX_STOP_FASTSKIP"]
+	[[LNX_STOP_FASTSKIP]]
 
 @매크로 대사창끄기:
-	[루아함수 이름="LNX_HIDE_DIALOG"]
+	[[LNX_HIDE_DIALOG]]
 
 @매크로 대사창켜기:
-	[루아함수 이름="LNX_SHOW_DIALOG"]
+	[[LNX_SHOW_DIALOG]]
+
+@매크로 저장변수적용:
+	[[LNX_SAVEVARFLUSH]]
+
+@매크로 벙글광고초기화:
+	[[LNX_VUNGLE_INIT]]
+
+@매크로 벙글광고표기:
+	[[LNX_VUNGLE_SHOW]]
