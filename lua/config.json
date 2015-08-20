@@ -1,6 +1,6 @@
 {
     "init_cfg":{
-       "isLandscape": true,
+       "isLandscape": false,
        "isWindowTop": false,
        "name": "pini_remote",
        "width": 960,
