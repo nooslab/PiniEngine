@@ -63,7 +63,7 @@ function LXVM:init()
 		-- end,
 
 		__index = function (t,k)
-			return _LNXGP[k]
+			return _LNXGP[k] or _LNXGP["___"..k]
 		end,
 
 		__newindex = function (t,k,v)
@@ -420,6 +420,10 @@ function LXVM:stop()
 end
 
 function LXVM:sleep(time)
+	if time <= 0 then
+		time = 0.001
+	end
+	
 	self.currentLoop[2] = false
 	self.currentLoop[3] = time
 end

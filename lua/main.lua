@@ -258,10 +258,38 @@ local function LanX_start(start,line)
 			-- end)
 			
 			--XVM:call("libdef.lnx")
+
+			if line and line > 1 then
+				local fname = ROOT_PATH..start..".lua"
+
+				local _in = io.open(fname, "r")
+				local fdata = _in:read("*all")
+				_in:close()
+
+				local matched = nil
+				local s_line = line
+				while matched == nil do
+					matched = (string.match(fdata, "lc:[0-9]* | ln:"..tostring(line)))
+					line = line + 1
+
+					if line > s_line + 10000 then
+						line = 0
+						break
+					end
+				end
+				
+				if matched then
+					matched = string.match(matched, ":[0-9]*")
+					matched = string.sub(matched, 2)
+					line = tonumber(matched)
+				end
+			end
+
 			require("PiniLib")()
 			XVM:Awake()
 			XVM:call("libdef.lnx")
-			XVM:call(start)
+			if line == 0 then line = 1 end
+			XVM:call(start,line)
 
 			consoleBack = nil
 		end,
@@ -406,7 +434,11 @@ local function main()
 	local targetPlatform = cc.Application:getInstance():getTargetPlatform()
 	local scene
 	if kTargetWindows == targetPlatform then
-		InitCocos2d(800,600,_FULLSCREEN)
+		if _FULLSCREEN then
+			InitCocos2d(nil,nil,_FULLSCREEN)
+		else
+			InitCocos2d(800,600,_FULLSCREEN)
+		end
 		scene=initRemoteScene(800,600)
 	else
 		InitCocos2d()

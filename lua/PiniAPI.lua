@@ -2807,6 +2807,7 @@ function Backlog:init()
 	self.limitYPos = 0
 
 	self.currentName = ""
+	self.nextName = ""
 
 	return true
 end
@@ -2820,7 +2821,8 @@ function Backlog:setConfig(newConfigs)
 end
 
 function Backlog:setName(name)
-	self.currentName = name
+	self.currentName = self.nextName
+	self.nextName = name
 end
 
 function Backlog:addPendingString(str)
