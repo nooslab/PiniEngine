@@ -177,6 +177,7 @@ function LNX_IMAGE(vm,stck)
 	local blendMode = vm:ARGU("이미지","색상모드","기본")
 	local keep = vm:ARGU("이미지","유지","아니오") == "예"
 	local angle = vm:ARGU("이미지","회전",0)
+	local enableAnti = vm:ARGU("이미지","안티","예")
 
 	x = tonumber(x)
 	y = tonumber(y)
@@ -188,6 +189,7 @@ function LNX_IMAGE(vm,stck)
 	GUI = GUI=="예"
 	screenshot = screenshot=="예"
 	isPreserve = isPreserve=="예"
+	enableAnti = enableAnti=="예"
 
 	local flipX = false
 	local flipY = false
@@ -221,7 +223,7 @@ function LNX_IMAGE(vm,stck)
 					node:changeId(deleteEffectId)
 
 					if fs_imageDeleteEffect[effect] then
-						pini.Timer(nil,effectSec+0.1,function(t)
+						pini.Timer(nil,effectSec+1.0,function(t)
 							local node = pini:FindNode(t.userdata.id)
 							if node then
 								pini:DetachDisplay(node)
@@ -263,6 +265,12 @@ function LNX_IMAGE(vm,stck)
 		node:setFlip(flipX,flipY)
 		node:setPreserve(isPreserve)
 		node:setRotate(angle)
+
+		if enableAnti then
+			node.node:getTexture():setAntiAliasTexParameters()
+		else
+			node.node:getTexture():setAliasTexParameters()
+		end
 
 		if type(connect)=="string" and connect:len() > 0 then
 			node.connect = connect
@@ -1143,14 +1151,12 @@ function LNX_ANIMATION(vm,stck)
 	if id == "" then
 		if fs_animation[t] then
 			stack = vm:stop()
-			vm:DoRemoveArgu(true)
 			for i,v in pairs(pini._regist_.Display) do
 				if string.sub(i,1,4) ~= "PINI" then
 					fs_animation[t][2](vm,v)
 					v.onAnim = true
 				end
 			end
-			vm:DoRemoveArgu(false)
 			vm:resume(stack)
 		end
 	else
@@ -2000,7 +2006,6 @@ function LNX_VM_LOAD(vm,stck)
 							n.onTouchMiss = loadstring(_in:read("*all"))
 							_in:close()
 						end
-						pini.TouchManager:registNode(n)
 					end
 
 					local event = v.exitEvent
@@ -2026,6 +2031,7 @@ function LNX_VM_LOAD(vm,stck)
 					else
 						pini:AttachDisplay(n,parent.id)
 					end
+					pini.TouchManager:registNode(n)
 				end
 
 				for k,v in ipairs(timer) do 
