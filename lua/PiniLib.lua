@@ -156,6 +156,46 @@ GUI_PRIORITY = 60000
 --##########################################################################
 -- LanXVM 라이브러리 기능
 --##########################################################################
+function LNX_NODE(vm,stck)
+	local id = vm:ARGU("노드","아이디","")
+	local pos = vm:ARGU("노드","위치","화면중앙")
+	local size = vm:ARGU("노드","크기","원본크기")
+	local parent  = vm:ARGU("노드","부모","")
+	local x = vm:ARGU("노드","x",nil)
+	local y = vm:ARGU("노드","y",nil)
+	local isPreserve = vm:ARGU("노드","항상표시","아니오")
+	local angle = vm:ARGU("노드","회전",0)
+
+	x = tonumber(x)
+	y = tonumber(y)
+	angle = tonumber(angle)
+
+	local acp = _LNXG["설정.이미지중심"] or "0.5,0.5"
+	acp = acp:explode(",")
+
+	isPreserve = isPreserve=="예"
+
+	local node = nil
+	node = pini.Node(id)
+
+	if node == nil then
+		return 
+	end
+
+	pini:AttachDisplay(node,parent)
+
+	node:setAnchorPoint(acp[1] or 0.5,1-(acp[2] or 0.5))
+	node:setScale(StrEnumToScale(node,size))
+	if x or y then
+		node:setPosition(x or 0,y or 0)
+	else
+		node:setPosition(StrEnumToPos(node,pos))
+	end
+
+	node:setPreserve(isPreserve)
+	node:setRotate(angle)
+end
+
 function LNX_IMAGE(vm,stck)
 	local id = vm:ARGU("이미지","아이디","")
 	local path = vm:ARGU("이미지","파일명","")
@@ -178,10 +218,12 @@ function LNX_IMAGE(vm,stck)
 	local keep = vm:ARGU("이미지","유지","아니오") == "예"
 	local angle = vm:ARGU("이미지","회전",0)
 	local enableAnti = vm:ARGU("이미지","안티","예")
+	local delayDelete = vm:ARGU("이미지","잔상시간",0.2)
 
 	x = tonumber(x)
 	y = tonumber(y)
 	angle = tonumber(angle)
+	delayDelete = tonumber(delayDelete)
 
 	local acp = _LNXG["설정.이미지중심"] or "0.5,0.5"
 	acp = acp:explode(",")
@@ -223,7 +265,7 @@ function LNX_IMAGE(vm,stck)
 					node:changeId(deleteEffectId)
 
 					if fs_imageDeleteEffect[effect] then
-						pini.Timer(nil,effectSec+1.0,function(t)
+						pini.Timer(nil,effectSec+delayDelete,function(t)
 							local node = pini:FindNode(t.userdata.id)
 							if node then
 								pini:DetachDisplay(node)
@@ -266,10 +308,12 @@ function LNX_IMAGE(vm,stck)
 		node:setPreserve(isPreserve)
 		node:setRotate(angle)
 
-		if enableAnti then
-			node.node:getTexture():setAntiAliasTexParameters()
-		else
-			node.node:getTexture():setAliasTexParameters()
+		if not OnPreview then
+			if enableAnti then
+				node.node:getTexture():setAntiAliasTexParameters()
+			else
+				node.node:getTexture():setAliasTexParameters()
+			end
 		end
 
 		if type(connect)=="string" and connect:len() > 0 then
@@ -876,6 +920,18 @@ function LNX_DELETENODE(vm,stck)
 							pini:DetachDisplay(node)
 						end
 					end,false,nil,{id=id}):run()
+
+					local function recursiveEff(node)
+						local children = node:children()
+						if children then
+							for k,v in ipairs(children) do
+								recursiveEff(v)
+								fs_imageDeleteEffect["페이드"](v,effectSec)
+							end
+						end
+					end
+
+					recursiveEff(node)
 				end
 			else
 				pini:DetachDisplay(node)

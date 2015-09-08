@@ -1725,6 +1725,18 @@ function Scene:init()
 
 			local x = e:getCursorX()
 			local y = e:getCursorY()
+
+			try{
+				function()
+					for k,v in pairs(pini.TouchManager.callbacks.touchBeganCallbacks) do
+						v(x, y, e:getMouseButton())
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			for k,v in pairs(self.keyboards) do
 				if v and v["stop"]==nil then 
 					v["func"](1,e:getMouseButton()+1000,v["arg"],x,y)
@@ -1735,12 +1747,20 @@ function Scene:init()
 		end
 
 		local function onMouseRelease(e)
-			if e:getMouseButton() == 0 then
-				return false
-			end
-			
 			local x = e:getCursorX()
 			local y = e:getCursorY()
+
+			try{
+				function()
+					for k,v in pairs(pini.TouchManager.callbacks.touchEndedCallbacks) do
+						v(x, y, e:getMouseButton())
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			for k,v in pairs(self.keyboards) do
 				if v and v["stop"]==nil then 
 					v["func"](0,e:getMouseButton()+1000,v["arg"],x,y)
@@ -1757,6 +1777,17 @@ function Scene:init()
 			-- 이벤트 처리에서 직접 예외를 거는 것은 좋은 처리가 아니나
 			-- 일정상, 직접 백로그 스크롤 처리 로직을 추가합니다..
 
+			try{
+				function()
+					for k,v in pairs(pini.TouchManager.callbacks.touchMovedCallbacks) do
+						v(0, 0, y)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			result = pini.Backlog:runScrollEvent(y * 30)
 
 			if not result then
@@ -1772,6 +1803,17 @@ function Scene:init()
 		local function onMouseMove(e)
 			local x = e:getCursorX()
 			local y = e:getCursorY()
+
+			try{
+				function()
+					for k,v in pairs(pini.TouchManager.callbacks.touchMovedCallbacks) do
+						v(x, y, 0)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
 
 			for k,v in pairs(pini._regist_.Display) do
 				if v and v.overoll and v.overoll:len() > 0 then
@@ -2401,6 +2443,15 @@ else
 			touchStartDistance = -1,
 			touchEndDistance = -1,
 		},
+		callbacks = {
+			touchBeganCallbacks = {},
+			touchMovedCallbacks = {},
+			touchEndedCallbacks = {},
+			multiTouchBeganCallbacks = {},
+			multiTouchMovedCallbacks = {},
+			multiTouchEndedCallbacks = {},
+			multiTouchCanceledCallbacks = {},
+		},
 		SetScene = function(self,scene)
 			scene = scene.scene
 			
@@ -2507,6 +2558,18 @@ else
 			tg.currentTouchCount = tg.currentTouchCount + count
 			local counts = tg.currentTouchCount
 
+			try{
+				function()
+					for k,v in pairs(self.callbacks.multiTouchBeganCallbacks) do
+						v(touches)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
+
 			for i,v in ipairs(touches) do
 				tg.touches[v:getId()] = v
 			end
@@ -2521,6 +2584,17 @@ else
 		onMultiTouchMoved = function(touches, event)
 			local self = TouchManager
 			local count = table.getn(touches)
+
+			try{
+				function()
+					for k,v in pairs(self.callbacks.multiTouchMovedCallbacks) do
+						v(touches)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
 		end,
 		onMultiTouchEnded = function(touches, event)
 			local self = TouchManager
@@ -2528,6 +2602,17 @@ else
 			local count = table.getn(touches)
 			tg.currentTouchCount = tg.currentTouchCount - count
 			local counts = tg.currentTouchCount
+
+			try{
+				function()
+					for k,v in pairs(self.callbacks.multiTouchEndedCallbacks) do
+						v(touches)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
 
 			if counts == tg.activeTouchCount - 1 then
 				tg.touchEndAvgX,tg.touchEndAvgY = self.touchesCenter(tg.touches)
@@ -2648,6 +2733,17 @@ else
 			tg.currentTouchCount = tg.currentTouchCount - count
 			local counts = tg.currentTouchCount
 
+			try{
+				function()
+					for k,v in pairs(self.callbacks.multiTouchCanceledCallbacks) do
+						v(touches)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			tg.touches = {}
 			if counts == 0 then
 				tg.activeTouchCount = 0
@@ -2666,6 +2762,17 @@ else
 
 			x=location.x
 			y=location.y
+
+			try{
+				function()
+					for k,v in pairs(self.callbacks.touchBeganCallbacks) do
+						v(x, y, 0)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
 
 			self.lastClicked["x"] = x
 			self.lastClicked["y"] = y
@@ -2725,6 +2832,17 @@ else
 			local x = location.x
 			local y = location.y
 
+			try{
+				function()
+					for k,v in pairs(self.callbacks.touchMovedCallbacks) do
+						v(x, y)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			local dx = x - self.lastClicked["x"]
 			local dy = y - self.lastClicked["y"]
 
@@ -2759,6 +2877,18 @@ else
 
 			x=location.x
 			y=location.y
+
+			try{
+				function()
+					for k,v in pairs(self.callbacks.touchEndedCallbacks) do
+						v(x, y, 0)
+					end
+				end,
+				catch{function(error)
+					print(error)
+				end}
+			}
+
 			if pini:scene().keyboards ~= nil then
 				for k,v in pairs(pini:scene().keyboards) do
 					if v and v["stop"]==nil then 
@@ -2780,7 +2910,49 @@ else
 					pini.Backlog:runScrollEvent(t.userdata.dy)
 				end,true,nil,{dy=self.lastClicked["dy"]}):run()
 			end
-		end
+		end,
+		addTouchBeganCallback = function (id, callback)
+			TouchManager.callbacks.touchBeganCallbacks[id] = callback
+		end,
+		removeTouchBeganCallback = function (id)
+			TouchManager.callbacks.touchBeganCallbacks[id] = nil
+		end,
+		addTouchMovedCallback = function (id, callback)
+			TouchManager.callbacks.touchMovedCallbacks[id] = callback
+		end,
+		removeTouchMovedCallback = function (id)
+			TouchManager.callbacks.touchMovedCallbacks[id] = nil
+		end,
+		addTouchEndedCallback = function (id, callback)
+			TouchManager.callbacks.touchEndedCallbacks[id] = callback
+		end,
+		removeTouchEndedCallback = function (id)
+			TouchManager.callbacks.touchEndedCallbacks[id] = nil
+		end,
+		addMultiTouchBeganCallback = function (id, callback)
+			TouchManager.callbacks.multiTouchBeganCallbacks[id] = callback
+		end,
+		removeMultiTouchBeganCallback = function (id)
+			TouchManager.callbacks.multiTouchBeganCallbacks[id] = nil
+		end,
+		addMultiTouchMovedCallback = function (id, callback)
+			TouchManager.callbacks.multiTouchMovedCallbacks[id] = callback
+		end,
+		removeMultiTouchMovedCallback = function (id)
+			TouchManager.callbacks.multiTouchMovedCallbacks[id] = nil
+		end,
+		addMultiTouchEndedCallback = function (id, callback)
+			TouchManager.callbacks.multiTouchEndedCallbacks[id] = callback
+		end,
+		removeMultiTouchEndedCallback = function (id)
+			TouchManager.callbacks.multiTouchEndedCallbacks[id] = nil
+		end,
+		addMultiTouchCanceledCallback = function (id, callback)
+			TouchManager.callbacks.multiTouchCanceledCallbacks[id] = callback
+		end,
+		removeMultiTouchCanceledCallback = function (id)
+			TouchManager.callbacks.multiTouchCanceledCallbacks[id] = nil
+		end,
 	}
 end
 
@@ -2894,6 +3066,7 @@ function Backlog:hide()
 end
 
 function Backlog:runScrollEvent(scrollY)
+
 	if self.isShowing then
 		self.yPos = self.yPos + scrollY
 
@@ -3532,9 +3705,11 @@ function Dialog:build(words)
 			y = y+maxY+lineGap+globalLineGap
 			maxY  = default_size
 			width = 0
+		elseif v == "" then
+			-- do nothing
 		else
 			if y == (config["marginY"] or 0) - (config["lineGap"] or 0) - additionalY then
-				y = (config["marginY"] or 0) - additionalY
+				y = (config["marginY"] or 0) - additionalY + lineGap
 			end
 
 			local label = pini.Label(pini:GetUUID(),v,font,size)
@@ -3747,7 +3922,9 @@ function Dialog:SetCursorVisible(v)
 		for i=0,#self.letters,1 do
 			txt = self.letters[#self.letters - i]
 			if txt and txt[1] == nil then
-				break
+				if #(txt:string()) > 0 then
+					break
+				end
 			end
 		end
 		if txt then
@@ -3818,12 +3995,14 @@ pini["Slider"] = Slider
 pini["ColorLayer"] = ColorLayer
 pini["TouchManager"] = TouchManager
 pini["Dialog"] = Dialog()
+pini["DialogType"] = Dialog
 pini["Anim"] = anim
 pini["Shader"] = Shader
 pini["VideoPlayer"] = VideoPlayer
 pini["TextInput"] = TextInput
 pini["RenderTexture"] = RenderTexture
 pini["Backlog"] = Backlog()
+pini["BacklogType"] = Backlog
 pini.FindZip = {}
 pini.password = ""
 
