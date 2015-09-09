@@ -2003,8 +2003,10 @@ function LNX_VM_LOAD(vm,stck)
 				pini.Dialog.configs = r.config
 				pini.Dialog:setName(r.name)
 				pini.Dialog:UseConfig(r.window)
+				local isRun = false
 				
 				for k,v in pairs(r.showingWords) do
+					isRun = true
 					if v[1] == 1 then
 						pini.Dialog:Add(v[2])
 					else
@@ -2013,8 +2015,11 @@ function LNX_VM_LOAD(vm,stck)
 				end
 
 				local dialogCallstack = r.callstack
+				local dialogFrameStopCallstack = r.frameStopCallstack
 
-				pini.Dialog:run()
+				if isRun then
+					pini.Dialog:run()
+				end
 
 				-------------------------------------------------------------
 				-------------------------------------------------------------
@@ -2044,7 +2049,7 @@ function LNX_VM_LOAD(vm,stck)
 				local loaded_node = {}
 				for k,v in ipairs(node) do 
 					local n = pini[v.type]:gen(v)
-					table.insert(loaded_node,{n,v.parent,n.drawOrder})
+					table.insert(loaded_node,{n,v.parent,n.drawOrder,v.touchRegisted})
 					if v.touchRegisted then
 						local _in = io.open(loadpath.."tu"..(k-1), "rb")
 						if _in then
@@ -2087,7 +2092,9 @@ function LNX_VM_LOAD(vm,stck)
 					else
 						pini:AttachDisplay(n,parent.id)
 					end
-					pini.TouchManager:registNode(n)
+					if v[4] then
+						pini.TouchManager:registNode(n)
+					end
 				end
 
 				for k,v in ipairs(timer) do 
@@ -2130,8 +2137,9 @@ function LNX_VM_LOAD(vm,stck)
 				-------------------------------------------------------------
 				-------------------------------------------------------------
 
-				dialogCallstack = vm:setState(lxvm_state, dialogCallstack)
+				dialogCallstack, dialogFrameStopCallstack = vm:setState(lxvm_state, dialogCallstack, dialogFrameStopCallstack)
 				pini.Dialog.callstack = dialogCallstack
+				pini.Dialog.frameStopCallstack = dialogFrameStopCallstack
 
 			end,false):run()
 		end,false):run()
@@ -2212,7 +2220,11 @@ function LNX_SAVE(vm,stck)
 			dialog["window"] = pini.Dialog.configIdx
 			dialog["config"] = pini.Dialog.configs
 			dialog["showingWords"] = pini.Dialog.showingWords
+			if pini.Dialog.showingDelFlag then
+				dialog["showingWords"] = {}
+			end
 			dialog["callstack"] = stckTransTable[pini.Dialog.callstack]
+			dialog["frameStopCallstack"] = stckTransTable[pini.Dialog.frameStopCallstack]
 
 			out = io.open(savepath.."dialog", "wb")
 			out:write(json.encode(dialog))

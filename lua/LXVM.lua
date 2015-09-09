@@ -42,16 +42,16 @@ function LXVM:init()
 	_LNXVT = {{}, {}} -- varable triggers
 
 	if _LNXG then
-		local nextLNXG = {}
+		local nextLNXGP = {}
 
 		for k,v in pairs(_LNXGP) do
 			if string.sub(k,1,1) == "$" then
-				nextLNXG[k] = v
+				nextLNXGP[k] = v
 			end
 		end
 
-		_LNXGP = {} -- proxy for variables
-		_LNXG = nextLNXG -- keep save-variables
+		_LNXGP = nextLNXGP -- proxy for variables; keep save-variables
+		_LNXG = {} -- keep null table
 	else
 		_LNXGP = {} -- proxy for variables
 		_LNXG = {} -- variables
@@ -133,7 +133,11 @@ end
 ONLY_PREVIEW_CODE = ""
 if OnPreview then
 	ONLY_PREVIEW_CODE = [[
-	stckInfo[5] = nil
+	if stckInfo[5] then
+		if string.sub(stckInfo[5],1,1) ~= "%" then
+			stckInfo[5] = nil
+		end
+	end
 	stckInfo[8] = nil
 ]]
 end
@@ -393,7 +397,12 @@ function LXVM:resume(idx)
 	-- print (debug.traceback())
 	-- print ("______resume, stacktrace End")
 
-	if (not self.loops[idx][10]) then
+	-- print ("loops length = "..#self.loops)
+
+	if (not self.loops[idx]) then
+		-- print ("______resume, invalid resume founded. skip it.")
+		return
+	elseif (not self.loops[idx][10]) then
 		-- print ("______resume, dead resume founded. skip it.")
 		return
 	end
@@ -596,9 +605,10 @@ function LXVM:getState()
 	return ret, stckTransTable
 end
 
-function LXVM:setState(state, targetStck)
+function LXVM:setState(state, targetStck1, targetStck2)
 
-	local retTarget = -1
+	local retTarget1 = -1
+	local retTarget2 = -1
 
 	-- print ""
 	-- print ("(Before original loop shutout)")
@@ -663,13 +673,16 @@ function LXVM:setState(state, targetStck)
 			self:resume(self:currentLoopIdx())
 		end
 
-		if i == targetStck then
-			retTarget = self:currentLoopIdx()
+		if i == targetStck1 then
+			retTarget1 = self:currentLoopIdx()
+		end
+		if i == targetStck2 then
+			retTarget2 = self:currentLoopIdx()
 		end
 	end
 	-- print ("____________LOOPSPLIT____________")
 
-	return retTarget
+	return retTarget1, retTarget2
 end
 
 function LXVM:Awake()
