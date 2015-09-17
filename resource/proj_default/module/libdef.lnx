@@ -921,3 +921,6 @@
 
 @매크로 벙글광고표기:
 	[[LNX_VUNGLE_SHOW]]
+
+@매크로 현재환경:
+	[[LNX_GET_ENVIRONMENT]]

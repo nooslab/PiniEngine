@@ -288,6 +288,7 @@ local function LanX_start(start,line)
 			require("PiniLib")()
 			XVM:Awake()
 			XVM:call("libdef.lnx")
+			XVM:call("scene/lnx_x8G4rrjewM4_") -- "프리메인.lnx"
 			if line == 0 then line = 1 end
 			XVM:call(start,line)
 

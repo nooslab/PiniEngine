@@ -287,13 +287,37 @@ function MoveBy:run(node)
 end
 ---------------------------------------------
 local MoveTo = class()
-function MoveTo:init(sec,x,y)
+function MoveTo:init(sec,x,y,parent)
 	self.x = x
+	self._y = y
+
 	if OnPreview then
 		self.y = y
 	else
-		self.y = WIN_HEIGHT-y
-		self._y = y
+		x = x/SCALE_FACTOR()
+		y = y/SCALE_FACTOR()
+
+		local height = WIN_HEIGHT
+		local dx = 0
+		local dy = 0
+		if parent then
+			local ax,ay,width
+
+			if parent.type ~= "Scene" then
+				width  = parent:contentSize().width
+				height = parent:contentSize().height
+				ax,ay  = parent:anchor()
+			else
+				width = WIN_WIDTH
+				ax,ay = 0,1
+			end
+
+			dx = width*ax
+			dy = height*(1-ay)
+		end
+
+		self.x = x+dx
+		self.y = height-y-dy
 	end
 	self.sec = sec
 	return true
@@ -2990,6 +3014,14 @@ end
 
 function Backlog:setConfig(newConfigs)
 	self.configs = newConfigs
+
+	while #self.logdatas > self.configs.logLimit do
+		if #self.logdatas == 0 then
+			break
+		end
+
+		table.remove(self.logdatas, 1)
+	end
 end
 
 function Backlog:setName(name)
@@ -3122,6 +3154,15 @@ function Dialog:init()
 	self.timerWait = 0
 	self.running = false
 	self.isConnectBlockBuilted = false
+	self.lastTextPos = nil
+
+	if not OnPreview then
+		self.wordRenderTexture = nil
+		self.animWords = {}
+		self.continuousBuild = false
+	end
+
+	self.nextBuildWords = {}
 
 	return true
 end
@@ -3158,7 +3199,6 @@ function Dialog:Clear()
 	self.cursor = nil
 	self.isConnectBlockBuilted = false
 	self.connects = {}
-	self.letters = {}
 	self.words = {}
 	self.allwords = {}
 end
@@ -3169,6 +3209,15 @@ function Dialog:Reset()
 	self.lastMaxY = 0
 	self.needUpdate = true
 	self.wait = false;
+
+	if not OnPreview then
+		self.wordRenderTexture = nil
+		self.continuousBuild = false
+	end
+
+	self.animWords = {}
+	self.nextBuildWords = {}
+
 	self:stop()
 	self:Clear()
 end
@@ -3179,7 +3228,7 @@ function Dialog:Preview()
 				if self.resetFlag then
 					self:Reset()
 				end
-				self:build(v[2])
+				self:insertPendingString(v[2])
 			else
 				self:ApplyMarkup(v[2])
 			end
@@ -3196,7 +3245,8 @@ function Dialog:Add(arg)
 			self.showingDelFlag = false
 		end
 		table.insert(self.showingWords,{1,arg})
-		self:build(arg)
+
+		self:insertPendingString(arg)
 		self:run()
 	end
 end
@@ -3350,7 +3400,7 @@ function Dialog:ApplyMarkup(arg)
 				self.nameWindow:setVisible(false)
 			end
 		else
-			table.insert(self.letters,{2,(tonumber(arg["args"][1]) or 0)})
+			table.insert(self.nextBuildWords,{2,(tonumber(arg["args"][1]) or 0)})
 		end
 
 	elseif name == "켜기" then
@@ -3362,16 +3412,20 @@ function Dialog:ApplyMarkup(arg)
 				self.nameWindow:setVisible(true)
 			end
 		else
-			table.insert(self.letters,{3,(tonumber(arg["args"][1]) or 0)})
+			table.insert(self.nextBuildWords,{3,(tonumber(arg["args"][1]) or 0)})
 		end
 
 	elseif name == "색상" then
-		self.default.R = tonumber(arg["args"][1]) or 255
-		self.default.G = tonumber(arg["args"][2]) or 255
-		self.default.B = tonumber(arg["args"][3]) or 255
+		table.insert(self.nextBuildWords,{4,function ()
+			self.default.R = tonumber(arg["args"][1]) or 255
+			self.default.G = tonumber(arg["args"][2]) or 255
+			self.default.B = tonumber(arg["args"][3]) or 255
+		end})
 
 	elseif name == "크기" then
-		self.default.size = tonumber(arg["args"][1]) or 40
+		table.insert(self.nextBuildWords,{4,function ()
+			self.default.size = tonumber(arg["args"][1]) or 40
+		end})
 
 	elseif name == "대기" then
 		if OnPreview then
@@ -3381,32 +3435,42 @@ function Dialog:ApplyMarkup(arg)
 		
 		local timer = pini:FindTimer("PINI_Dialog_Update")
 		if timer then
-			table.insert(self.letters,{0,(tonumber(arg["args"][1]) or 0)})
+			table.insert(self.nextBuildWords,{0,(tonumber(arg["args"][1]) or 0)})
 			return 
 		end
 
 	elseif name == "시간" then
 		local timer = pini:FindTimer("PINI_Dialog_Update")
 		if timer then
-			table.insert(self.letters,{1,tonumber(arg["args"][1]) or 0.05})
+			table.insert(self.nextBuildWords,{1,tonumber(arg["args"][1]) or 0.05})
 			return 
 		end
 
 	elseif name == "공백" then
-		self.lastX = self.lastX+tonumber(arg["args"][1]) or 0
+		table.insert(self.nextBuildWords,{4,function ()
+			self.lastX = self.lastX+tonumber(arg["args"][1]) or 0
+		end})
 
 	elseif name == "자간" then
-		self.default.wordGap = tonumber(arg["args"][1]) or 0
+		table.insert(self.nextBuildWords,{4,function ()
+			self.default.wordGap = tonumber(arg["args"][1]) or 0
+		end})
 
 	elseif name == "행간" then
-		self.default.lineGap = (tonumber(arg["args"][1]) or 0)+5
+		table.insert(self.nextBuildWords,{4,function ()
+			self.default.lineGap = (tonumber(arg["args"][1]) or 0)+5
+		end})
 
 	elseif name == "폰트" then
-		self.default.font = tostring(arg["args"][1]) or "NanumBarunGothic"
+		table.insert(self.nextBuildWords,{4,function ()
+			self.default.font = tostring(arg["args"][1]) or "NanumBarunGothic"
+		end})
 
 	elseif name == "연결" then
-		self.isConnectBlockBuilted = false
-		self.default.connect = tostring(arg["args"][1])
+		table.insert(self.nextBuildWords,{4,function ()
+			self.isConnectBlockBuilted = false
+			self.default.connect = tostring(arg["args"][1])
+		end})
 
 	elseif name == "=" then
 		args = self:EqualMarkup(tostring(arg["args"][1]) or "")
@@ -3428,15 +3492,23 @@ function Dialog:ApplyMarkup(arg)
 	elseif name == "/" then
 		for k,v in ipairs(arg["args"]) do
 			if v == "색상" then
-				self.default.R = nil
-				self.default.G = nil
-				self.default.B = nil
+				table.insert(self.nextBuildWords,{4,function ()
+					self.default.R = nil
+					self.default.G = nil
+					self.default.B = nil
+				end})
 			elseif v == "크기" then
-				self.default.size = nil
+				table.insert(self.nextBuildWords,{4,function ()
+					self.default.size = nil
+				end})
 			elseif v == "폰트" then
-				self.default.font = nil
+				table.insert(self.nextBuildWords,{4,function ()
+					self.default.font = nil
+				end})
 			elseif v == "연결" then
-				self.default.connect = nil
+				table.insert(self.nextBuildWords,{4,function ()
+					self.default.connect = nil
+				end})
 			end
 		end
 	end
@@ -3550,6 +3622,18 @@ function Dialog:_make(callback)
 		pini:AttachDisplay(self.background)
 		self:createNameWindow()
 		self:createCursor()
+
+		if not OnPreview then
+			if self.wordRenderTexture then
+				self.wordRenderTexture:release()
+				self.wordRenderTexture = nil
+			end
+
+			self.wordRenderTexture = cc.RenderTexture:create(
+				WIN_WIDTH, WIN_HEIGHT, cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
+			self.wordRenderTexture:retain()
+			self.wordRenderTexture:clear(0,0,0,0) 
+		end
 	end
 
 	self:updateName()
@@ -3610,6 +3694,7 @@ function Dialog:createConnectBlock(bmrk)
 	table.insert(self.connects,back)
 	return back
 end
+
 function Dialog:connectBlockModify(block,y,w,maxY)
 	local config = self.configs[self.configIdx]
 	local bconfig = config["linkBlock"] or {}
@@ -3636,126 +3721,7 @@ function Dialog:connectBlockModify(block,y,w,maxY)
 		block:setContentSize(sx,maxY)
 	end
 end
-function Dialog:build(words)
-	self:_make()
 
-	local config = self.configs[self.configIdx]
-	local font = config["font"] or "NanumBarunGothic"
-	local default_color = config["text_color"] or {255,255,255}
-	local default_size = config["size"] or 40
-	
-	local ax,ay = self.background:anchor();
-
-	local additionalX = 0--self.background:contentSize().width * ax
-	local additionalY = self.background:contentSize().height*(1-ay)
-
-	local lastedX = self.lastX + additionalX-(config["marginX"] or 0)
-	local lastedY = self.lastY + additionalY
-	if (self.lastX ==0 and self.lastY == 0) then
-		lastedX = 0
-		lastedY = (config["marginY"] or 0) - (config["lineGap"] or 0)
-	end
-
-	local originX = (config["marginX"] or 0)-additionalX--lastedX-additionalX
-	local originY = lastedY-additionalY
-	local x = originX+lastedX
-	local y = originY
-
-	local maxY = self.lastMaxY or default_size
-	
-	local outline = config["text_outline"];
-	local shadow = config["text_shadow"];
-	local glow = config["text_outglow"];
-
-	--GET COLOR
-	local R = default_color[1]
-	local G = default_color[2]
-	local B = default_color[3]
-	if self.default.R ~= nil then R=self.default.R end
-	if self.default.G ~= nil then G=self.default.G end
-	if self.default.B ~= nil then B=self.default.B end
-
-	--GET SIZE
-	local size = self.default.size or default_size
-
-	--GET FONT
-	font = self.default.font or font
-
-	local link = self.default.connect
-	local lineGap = self.default.lineGap or 5
-	local wordGap = self.default.wordGap or 0
-	local marginX = config["marginX"] or 0
-	local globalLineGap = config["lineGap"] or 0
-	local width = 0
-
-	local blcks = nil
-	for k,v in ipairs(words) do
-		pini.Backlog:addPendingString(v)
-
-		if link then
-			if blcks == nil then
-				if not self.isConnectBlockBuilted then
-					blcks = self:createConnectBlock(link)
-					self.isConnectBlockBuilted = true
-				end
-			end
-		end
-		if v == "\n" then
-			x = originX
-			y = y+maxY+lineGap+globalLineGap
-			maxY  = default_size
-			width = 0
-		elseif v == "" then
-			-- do nothing
-		else
-			if y == (config["marginY"] or 0) - (config["lineGap"] or 0) - additionalY then
-				y = (config["marginY"] or 0) - additionalY + lineGap
-			end
-
-			local label = pini.Label(pini:GetUUID(),v,font,size)
-			table.insert(self.allwords,label)
-			pini:AttachDisplay(label,self.background.id)
-			table.insert(self.letters,label)
-	
-			local cs = label:contentSize()
-			label:setPosition(x+cs.width/2,y+cs.height/2)
-			label:setVisible(false)
-			label:setColor(R,G,B)
-			x = x + cs.width + wordGap
-			
-			if outline then
-				local o = outline
-				label:setStroke(o[1] or 0,o[2] or 0,o[3] or 0,o[4] or 0,o[5] or 0)
-			end
-			if shadow then
-				local s = shadow
-				label:setShadow(s[1] or 0,s[2] or 0,s[3] or 0,s[4] or 0,s[5] or 0,-(s[6] or 0),s[7] or 0)
-			end
-			if glow then
-				local g = glow
-				label:setGlow(g[1] or 0,g[2] or 0,g[3] or 0,g[4] or 0)
-			end
-
-			if maxY < cs.height then
-				maxY = cs.height
-			end
-			self.lastMaxY = maxY
-			width = width + cs.width + wordGap
-
-			if x + cs.width + marginX - originX > config["width"] then
-				x = originX
-				y = y+maxY+globalLineGap
-				maxY = 0
-				width = 0
-			end
-		end
-		if link and blcks then
-			self:connectBlockModify(blcks,y+maxY,width,maxY)
-		end
-		self.lastX = x
-		self.lastY = y
-	end
-end
 function Dialog:stop()
 	if self.running then
 		pini:StopTimer("PINI_Dialog_Update")
@@ -3764,61 +3730,262 @@ function Dialog:stop()
 	end
 	self.running = false
 end
-function Dialog:VisibleOneWord()
-	local t = pini:FindTimer("PINI_Dialog_Update")
-	if t.userdata.doNext then
-		t.userdata.doNext = nil
+
+function Dialog:insertPendingString(words)
+	self:_make()
+
+	for k,v in ipairs(words) do
+		table.insert(self.nextBuildWords, v)
 	end
-	
-	if #self.letters > 0 then
+end
+
+function Dialog:CreateOneWord()
+	local t = pini:FindTimer("PINI_Dialog_Update")
+
+	if #self.nextBuildWords > 0 then
 		local config = self.configs[self.configIdx]
+		local font = config["font"] or "NanumBarunGothic"
+		local default_color = config["text_color"] or {255,255,255}
+		local default_size = config["size"] or 40
+		
+		local ax,ay = self.background:anchor();
+
+		local additionalX = 0--self.background:contentSize().width * ax
+		local additionalY = self.background:contentSize().height*(1-ay)
+
+		local lastedX = self.lastX + additionalX-(config["marginX"] or 0)
+		local lastedY = self.lastY + additionalY
+		if (self.lastX ==0 and self.lastY == 0) then
+			lastedX = 0
+			lastedY = (config["marginY"] or 0) - (config["lineGap"] or 0)
+		end
+
+		local originX = (config["marginX"] or 0)-additionalX--lastedX-additionalX
+		local originY = lastedY-additionalY
+		local x = originX+lastedX
+		local y = originY
+
+		local maxY = self.lastMaxY or default_size
+		
+		local outline = config["text_outline"];
+		local shadow = config["text_shadow"];
+		local glow = config["text_outglow"];
+
+		--GET COLOR
+		local R = default_color[1]
+		local G = default_color[2]
+		local B = default_color[3]
+		if self.default.R ~= nil then R=self.default.R end
+		if self.default.G ~= nil then G=self.default.G end
+		if self.default.B ~= nil then B=self.default.B end
+
+		--GET SIZE
+		local size = self.default.size or default_size
+
+		--GET FONT
+		font = self.default.font or font
+
+		local link = self.default.connect
+		local lineGap = self.default.lineGap or 5
+		local wordGap = self.default.wordGap or 0
+		local marginX = config["marginX"] or 0
+		local globalLineGap = config["lineGap"] or 0
+		local width = 0
+
 		local textAnim  = config["text_anim"]
-		local textSound = config["sound"] or ""
 		if textAnim and textAnim:len() <= 0 then
 			textAnim = nil
 		end
 
-		local v = self.letters[1]
-		if v[1] == 0 then
-			t.userdata.deltaTime = t.userdata.deltaTime - v[2]
-			t.userdata.doNext = true;
+		local blcks = nil
 
-		elseif v[1] == 1 then
-			t.userdata.textRate = v[2]
-			t.userdata.doNext = true;
+		local ch = self.nextBuildWords[1]
+		table.remove(self.nextBuildWords,1)
 
-		elseif v[1] == 2 then
-			if self.background then
-				self.background:setVisible(false)
-			end
-			if self.nameWindow then
-				self.nameWindow:setVisible(false)
-			end
-		elseif v[1] == 3 then
-			if self.background then
-				self.background:setVisible(true)
-			end
-			if self.nameWindow then
-				self.nameWindow:setVisible(true)
-			end
+		if type(ch) ~= "table" then
+			pini.Backlog:addPendingString(ch)
 
+			if link then
+				if blcks == nil then
+					if not self.isConnectBlockBuilted then
+						blcks = self:createConnectBlock(link)
+						self.isConnectBlockBuilted = true
+					end
+				end
+			end
+			if ch == "\n" then
+				x = originX
+				y = y+maxY+lineGap+globalLineGap
+				maxY  = default_size
+				width = 0
+
+				if self:isAllLettersShow() then
+					self:SetCursorVisible(true)
+				end
+			elseif ch == "" then
+				-- skip and try one more
+
+				if self:isAllLettersShow() then
+					self:SetCursorVisible(true)
+				else
+					self:CreateOneWord()
+				end
+
+				return
+			else
+				if y == (config["marginY"] or 0) - (config["lineGap"] or 0) - additionalY then
+					y = (config["marginY"] or 0) - additionalY + lineGap
+				end
+
+				local label = pini.Label(pini:GetUUID(),ch,font,size)
+
+				if OnPreview then
+					table.insert(self.allwords,label)
+				end
+				pini:AttachDisplay(label,self.background.id)
+
+				local cs = label:contentSize()
+				label:setPosition(x+cs.width/2,y+cs.height/2)
+				label:setColor(R,G,B)
+				x = x + cs.width + wordGap
+				
+				if outline then
+					local o = outline
+					label:setStroke(o[1] or 0,o[2] or 0,o[3] or 0,o[4] or 0,o[5] or 0)
+				end
+				if shadow then
+					local s = shadow
+					label:setShadow(s[1] or 0,s[2] or 0,s[3] or 0,s[4] or 0,s[5] or 0,-(s[6] or 0),s[7] or 0)
+				end
+				if glow then
+					local g = glow
+					label:setGlow(g[1] or 0,g[2] or 0,g[3] or 0,g[4] or 0)
+				end
+
+				if not OnPreview then
+					local function labelToRenderTexture(isDirect)
+						label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
+
+						if not self.continuousBuild then
+							self.wordRenderTexture:begin()
+						end
+
+						label.node:visit()
+
+						if not self.continuousBuild then
+							self.wordRenderTexture:endToLua()
+
+							Utils:forceRender()
+
+							local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
+								self.wordRenderTexture:getSprite():getTexture())
+							local contSize = self.background:contentSize()
+							if self.background.type == "ColorLayer" then
+								sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+							else
+								sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+							end
+							sprite:setFlippedY(true)
+							pini:AttachDisplay(sprite, self.background.id)
+						end
+
+						self.lastTextPos = {}
+						self.lastTextPos.s = label:contentSize()
+						self.lastTextPos.x, self.lastTextPos.y = label:position()
+
+						if not self.continuousBuild then
+							pini:DetachDisplay(label)
+						else
+							table.insert(self.processedWords, label)
+						end
+
+						if not isDirect then
+							table.remove(self.animWords, 1)
+						end
+
+						if self:isAllLettersShow() then
+							self:SetCursorVisible(true)
+						end
+					end
+
+					if textAnim and (not self.continuousBuild) then
+						AnimMgr:run(textAnim,0,0,nil,0.01,1,label,"", labelToRenderTexture)
+						table.insert(self.animWords, label)
+					else
+						if self.continuousBuild then
+							label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
+							label.node:visit()
+							self.lastTextPos = {}
+							self.lastTextPos.s = label:contentSize()
+							self.lastTextPos.x, self.lastTextPos.y = label:position()
+
+							pini:DetachDisplay(label)
+						else
+							labelToRenderTexture(true)
+						end
+					end
+				end
+
+				if maxY < cs.height then
+					maxY = cs.height
+				end
+				self.lastMaxY = maxY
+				width = width + cs.width + wordGap
+
+				if x + cs.width + marginX - originX > config["width"] then
+					x = originX
+					y = y+maxY+globalLineGap
+					maxY = 0
+					width = 0
+				end
+			end
+			if link and blcks then
+				self:connectBlockModify(blcks,y+maxY,width,maxY)
+			end
+			self.lastX = x
+			self.lastY = y
+		end
+
+		local textSound = config["sound"] or ""
+
+		if type(ch) == "table" then
+			if ch[1] == 0 then
+				t.userdata.deltaTime = t.userdata.deltaTime - ch[2]
+				t.userdata.doNext = true;
+
+			elseif ch[1] == 1 then
+				t.userdata.textRate = ch[2]
+				t.userdata.doNext = true;
+
+			elseif ch[1] == 2 then
+				if self.background then
+					self.background:setVisible(false)
+				end
+				if self.nameWindow then
+					self.nameWindow:setVisible(false)
+				end
+			elseif ch[1] == 3 then
+				if self.background then
+					self.background:setVisible(true)
+				end
+				if self.nameWindow then
+					self.nameWindow:setVisible(true)
+				end
+			elseif ch[1] == 4 then
+				ch[2]()
+			end
 		else 
-			v:setVisible(true)
-
-			self:SetCursorVisible(false)
-
-			if textAnim then
-				AnimMgr:run(textAnim,0,0,nil,0.01,1,v,"")
+			if not self:isAllLettersShow() then
+				self:SetCursorVisible(false)
 			end
+
 			if textSound then
 				pini:PlaySound("PINI_Dialog_TextSound",textSound,false,1)
 			end
 		end
-		table.remove(self.letters,1)
-	else
-		self:SetCursorVisible(true)
 	end
 end
+
 function Dialog:run()
 	if self.running == false then
 		--data
@@ -3844,7 +4011,6 @@ function Dialog:run()
 				else
 					v:showAllLetters()
 					v:SetCursorVisible(true)
-					v.letters={}
 				end
 			end
 		end
@@ -3874,9 +4040,9 @@ function Dialog:run()
 				end
 
 				t.userdata.deltaTime = t.userdata.deltaTime - t.userdata.textRate
-				pini.Dialog:VisibleOneWord()
+				pini.Dialog:CreateOneWord()
 			end
-			if #pini.Dialog.letters <= 0 then
+			if pini.Dialog:isAllLettersShow() then
 				if t.userdata.waitsec > 0 then
 					t.userdata.endtime = t.userdata.endtime + t.dt
 					if t.userdata.endtime > t.userdata.waitsec then
@@ -3896,6 +4062,7 @@ function Dialog:run()
 	end
 	self.running = true;
 end
+
 function Dialog:WaitConfig(key,sec)
 	self.enableInputWait = key
 	self.timerWait = sec
@@ -3919,15 +4086,19 @@ function Dialog:SetCursorVisible(v)
 		end
 
 		local txt = nil
-		for i=0,#self.letters,1 do
-			txt = self.letters[#self.letters - i]
+		for i=0,#self.allwords,1 do
+			txt = self.allwords[#self.allwords - i]
 			if txt and txt[1] == nil then
 				if #(txt:string()) > 0 then
 					break
 				end
 			end
 		end
-		if txt then
+		if self.lastTextPos then
+			local s   = self.lastTextPos.s
+			local x,y = self.lastTextPos.x, self.lastTextPos.y
+			self:SetCursorPosition(x+s.width/2,y+s.height/2)
+		elseif txt then
 			local s   = txt:contentSize()
 			local x,y = txt:position()
 			self:SetCursorPosition(x+s.width/2,y+s.height/2)
@@ -3948,19 +4119,59 @@ function Dialog:SetCursorPosition(x,y)
 	end
 end
 function Dialog:isAllLettersShow()
-	for k,v in ipairs(self.letters) do
-		if not v:isVisible() then
-			return false
-		end
-	end
-	return true
+	return #self.nextBuildWords == 0 and #self.animWords == 0
 end
 
 function Dialog:showAllLetters()
-	if self.background == nil or self.background.visible then
-		for k,v in ipairs(self.letters) do
-			v:setVisible(true)
+	if OnPreview then
+		self.continuousBuild = true
+
+		if self.background == nil or self.background.visible then
+			while #self.nextBuildWords > 0 do
+				self:CreateOneWord()
+			end
 		end
+
+		self.continuousBuild = false
+	else
+		self.continuousBuild = true
+		self.processedWords = {}
+		self.wordRenderTexture:begin()
+
+		while #self.animWords > 0 do
+			local l = self.animWords[1]
+
+			AnimMgr:forceFinalNodeAndStop(l)
+		end
+
+		if self.background == nil or self.background.visible then
+			while #self.nextBuildWords > 0 do
+				self:CreateOneWord()
+			end
+		end
+
+		self.wordRenderTexture:endToLua()
+
+
+		Utils:forceRender()
+
+		local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
+			self.wordRenderTexture:getSprite():getTexture())
+		local contSize = self.background:contentSize()
+		if self.background.type == "ColorLayer" then
+			sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+		else
+			sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+		end
+		sprite:setFlippedY(true)
+		pini:AttachDisplay(sprite, self.background.id)
+
+		for i,v in ipairs(self.processedWords) do
+			pini:DetachDisplay(v)
+		end
+
+		self.processedWords = nil
+		self.continuousBuild = false
 	end
 end
 function Dialog:setName(name)
@@ -3969,6 +4180,7 @@ function Dialog:setName(name)
 	end
 	self.name = name
 end
+
 -----------------------------------------------
 -----PINI MAINS
 -----------------------------------------------

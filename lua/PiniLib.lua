@@ -593,6 +593,47 @@ function LNX_SETDEFAULTARGU(vm,stck)
 	_LNXG["___"..macro.."."..argu] = value
 end
 
+function LNX_GET_ENVIRONMENT(vm,stck)
+	local envType = vm:ARGU("현재환경","종류","")
+	local targetPlatform = nil
+
+	if cc then
+		targetPlatform = cc.Application:getInstance():getTargetPlatform()
+	end
+
+	if envType == "리모트" then
+		vm:returnValue(OnPreview and 0 or 1)
+	elseif envType == "프리뷰" then
+		vm:returnValue(OnPreview and 1 or 0)
+	elseif envType == "익스포트" then
+		vm:returnValue(IS_RELEASE and 1 or 0)
+	elseif envType == "모바일" then
+		if targetPlatform then
+			if targetPlatform == kTargetWindows or targetPlatform == kTargetMacOS then
+				vm:returnValue(0)
+			else
+				vm:returnValue(1)
+			end
+		else
+			vm:returnValue(0)
+		end
+	elseif envType == "운영체제" then
+		local target = "알수없음"
+		if OnPreview then
+			target = "윈도우즈"
+		elseif targetPlatform == kTargetWindows then
+			target = "윈도우즈"
+		elseif targetPlatform == kTargetMacOS then
+			target = "맥OS"
+		elseif targetPlatform == kTargetAndroid then
+			target = "안드로이드"
+		elseif targetPlatform == kTargetIphone or targetPlatform == kTargetIpad then
+			target = "iOS"
+		end
+		vm:returnValue(target)
+	end
+end
+
 function LNX_TOUCHGESTURE(vm,stck)
 	local id = vm:ARGU("터치제스처","아이디","")
 	local func = vm:ARGU("터치제스처", "매크로명", "")
