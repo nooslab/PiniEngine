@@ -1476,7 +1476,11 @@ function Node:setColor(r,g,b)
 	self.color = {r,g,b}
 	if OnPreview then
 	else
-		self.node:setColor(cc.c3b(r,g,b))
+		if self.type == "Label" then
+			self.node:setTextColor(cc.c3b(r,g,b))
+		else
+			self.node:setColor(cc.c3b(r,g,b))
+		end
 	end
 end
 
@@ -1538,6 +1542,58 @@ function Node:setFlippedY(b)
 	end
 end
 
+---------------------------------------------
+-- Clipping Node
+---------------------------------------------
+local ClippingNode = class(Node)
+function ClippingNode:init(id)
+	self.id = id
+	self.type = "ClippingNode"
+	self:initialize()
+	if OnPreview then
+	else
+		self.node = cc.ClippingNode:create()
+		self.node.obj = self
+	end
+	self:initEventHandler()
+	return true
+
+end
+function ClippingNode:gen(v)
+	local n = ClippingNode(v.id)
+	n:OverrideDefault(v)
+
+	if v.clipXpos and v.clipYpos and v.clipWidth and v.clipHeight then
+		n:setClippingSize(v.clipXpos, v.clipYpos, v.clipWidth, v.clipHeight)
+	end
+
+	return n
+end
+
+function ClippingNode:setClippingSize(x,y,w,h)
+	x = x or 0
+	y = y or 0
+	if w ==nil or h==nil then 
+		return
+	end
+	if OnPreview then
+	else
+		if self.drawNode then
+			self.drawNode = nil
+		end
+
+		self.clipXpos = x
+		self.clipYpos = y
+		self.clipWidth  = w
+		self.clipHeight = h
+
+		local rect = {cc.p(x -w/2,y -h/2), cc.p(x + w/2,y -h/2), cc.p(x + w/2, y + h/2), cc.p(x -w/2, y + h/2)}
+
+		self.drawNode = cc.DrawNode:create()
+		self.drawNode:drawPolygon(rect, 4, cc.c4f(1,1,1,1), 0, cc.c4f(1,0,0,1))
+		self.node:setStencil(self.drawNode)
+	end
+end
 ---------------------------------------------
 -- Sprite 
 ---------------------------------------------
@@ -2044,7 +2100,20 @@ end
 function Label:gen(v)
 	local n = Label(v.id,v.text,v.font,v.size)
 	n:OverrideDefault(v)
-	n:setColor(v.color[1],v.color[2],v.color[3])
+	n:setTextColor(v.color[1],v.color[2],v.color[3])
+
+	if v.stroke then
+		n:setStroke(v.stroke[1],v.stroke[2],v.stroke[3],v.stroke[4],v.stroke[5])
+	end
+
+	if v.shadow then
+		n:setShadow(v.shadow[1],v.shadow[2],v.shadow[3],v.shadow[4],v.shadow[5],v.shadow[6],v.shadow[7])
+	end
+
+	if v.glow then
+		n:setGlow(v.glow[1],v.glow[2],v.glow[3],v.glow[4])
+	end
+
 	return n
 end
 
@@ -2067,6 +2136,7 @@ end
 function Label:setStroke(r,g,b,a,w)
 	if OnPreview then
 	else
+		self.stroke = {r,g,b,a,w}
 		self.node:enableOutline(cc.c4b(r,g,b,a),w)
 	end
 end
@@ -2074,6 +2144,7 @@ end
 function Label:setShadow(r,g,b,a,x,y,w)
 	if OnPreview then
 	else
+		self.shadow = {r,g,b,a,x,y,w}
 		self.node:enableShadow(cc.c4b(r,g,b,a),cc.size(x,y),w)
 	end
 end
@@ -2081,6 +2152,7 @@ end
 function Label:setGlow(r,g,b,a)
 	if OnPreview then
 	else
+		self.glow = {r,g,b,a}
 		self.node:enableGlow(cc.c4b(r,g,b,a))
 	end
 end
@@ -2846,7 +2918,7 @@ else
 					return true
 				end
 			end
-			return false
+			return true
 		end,
 		onTouchMoved = function (touch, event)
 			local self = TouchManager
@@ -3155,6 +3227,7 @@ function Dialog:init()
 	self.running = false
 	self.isConnectBlockBuilted = false
 	self.lastTextPos = nil
+	self.isRenderTextureEnabled = false
 
 	if not OnPreview then
 		self.wordRenderTexture = nil
@@ -3171,6 +3244,9 @@ function Dialog:config(idx)
 end
 function Dialog:SetConfig(idx,data)
 	self.configs[idx] = data
+end
+function Dialog:SetRenderTextureEnable(toEnable)
+	self.isRenderTextureEnabled = toEnable
 end
 function Dialog:UseConfig(idx)
 	if idx == nil then
@@ -3629,10 +3705,12 @@ function Dialog:_make(callback)
 				self.wordRenderTexture = nil
 			end
 
-			self.wordRenderTexture = cc.RenderTexture:create(
-				WIN_WIDTH, WIN_HEIGHT, cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
-			self.wordRenderTexture:retain()
-			self.wordRenderTexture:clear(0,0,0,0) 
+			if self.isRenderTextureEnabled then
+				self.wordRenderTexture = cc.RenderTexture:create(
+					WIN_WIDTH, WIN_HEIGHT, cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
+				self.wordRenderTexture:retain()
+				self.wordRenderTexture:clear(0,0,0,0) 
+			end
 		end
 	end
 
@@ -3864,39 +3942,41 @@ function Dialog:CreateOneWord()
 
 				if not OnPreview then
 					local function labelToRenderTexture(isDirect)
-						label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
+						if self.isRenderTextureEnabled then
+							label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
 
-						if not self.continuousBuild then
-							self.wordRenderTexture:begin()
-						end
-
-						label.node:visit()
-
-						if not self.continuousBuild then
-							self.wordRenderTexture:endToLua()
-
-							Utils:forceRender()
-
-							local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
-								self.wordRenderTexture:getSprite():getTexture())
-							local contSize = self.background:contentSize()
-							if self.background.type == "ColorLayer" then
-								sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-							else
-								sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+							if not self.continuousBuild then
+								self.wordRenderTexture:begin()
 							end
-							sprite:setFlippedY(true)
-							pini:AttachDisplay(sprite, self.background.id)
+
+							label.node:visit()
+
+							if not self.continuousBuild then
+								self.wordRenderTexture:endToLua()
+
+								local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
+									self.wordRenderTexture:getSprite():getTexture())
+								local contSize = self.background:contentSize()
+								if self.background.type == "ColorLayer" then
+									sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+								else
+									sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+								end
+								sprite:setFlippedY(true)
+								pini:AttachDisplay(sprite, self.background.id)
+							end
 						end
 
 						self.lastTextPos = {}
 						self.lastTextPos.s = label:contentSize()
 						self.lastTextPos.x, self.lastTextPos.y = label:position()
 
-						if not self.continuousBuild then
-							pini:DetachDisplay(label)
-						else
-							table.insert(self.processedWords, label)
+						if self.isRenderTextureEnabled then
+							if not self.continuousBuild then
+								pini:DetachDisplay(label)
+							else
+								table.insert(self.processedWords, label)
+							end
 						end
 
 						if not isDirect then
@@ -3913,13 +3993,18 @@ function Dialog:CreateOneWord()
 						table.insert(self.animWords, label)
 					else
 						if self.continuousBuild then
-							label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
-							label.node:visit()
+							if self.wordRenderTexture then
+								label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
+								label.node:visit()
+							end
+
 							self.lastTextPos = {}
 							self.lastTextPos.s = label:contentSize()
 							self.lastTextPos.x, self.lastTextPos.y = label:position()
 
-							pini:DetachDisplay(label)
+							if self.wordRenderTexture then
+								pini:DetachDisplay(label)
+							end
 						else
 							labelToRenderTexture(true)
 						end
@@ -4136,7 +4221,9 @@ function Dialog:showAllLetters()
 	else
 		self.continuousBuild = true
 		self.processedWords = {}
-		self.wordRenderTexture:begin()
+		if self.wordRenderTexture then
+			self.wordRenderTexture:begin()
+		end
 
 		while #self.animWords > 0 do
 			local l = self.animWords[1]
@@ -4150,24 +4237,25 @@ function Dialog:showAllLetters()
 			end
 		end
 
-		self.wordRenderTexture:endToLua()
+		if self.wordRenderTexture then
+			self.wordRenderTexture:endToLua()
 
+			Utils:forceRender()
 
-		Utils:forceRender()
+			local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
+				self.wordRenderTexture:getSprite():getTexture())
+			local contSize = self.background:contentSize()
+			if self.background.type == "ColorLayer" then
+				sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+			else
+				sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
+			end
+			sprite:setFlippedY(true)
+			pini:AttachDisplay(sprite, self.background.id)
 
-		local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
-			self.wordRenderTexture:getSprite():getTexture())
-		local contSize = self.background:contentSize()
-		if self.background.type == "ColorLayer" then
-			sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-		else
-			sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-		end
-		sprite:setFlippedY(true)
-		pini:AttachDisplay(sprite, self.background.id)
-
-		for i,v in ipairs(self.processedWords) do
-			pini:DetachDisplay(v)
+			for i,v in ipairs(self.processedWords) do
+				pini:DetachDisplay(v)
+			end
 		end
 
 		self.processedWords = nil
@@ -4198,6 +4286,7 @@ pini={
 }
 
 pini["Node"] = Node
+pini["ClippingNode"] = ClippingNode
 pini["Sprite"] = Sprite
 pini["Scene"] = Scene
 pini["GlobalTimer"] = GlobalTimer()

@@ -634,6 +634,26 @@ function LNX_GET_ENVIRONMENT(vm,stck)
 	end
 end
 
+function LNX_GET_NODEINFO(vm,stck)
+	local nodeId = vm:ARGU("노드정보","아이디","")
+	local _type = vm:ARGU("노드정보","타입","")
+
+	local node = pini:FindNode(nodeId)
+
+	if node then
+		local x, y = node:position()
+		local rot = node:getRotate()
+		
+		if _type == "X좌표" then
+			vm:returnValue(x)
+		elseif _type == "Y좌표" then
+			vm:returnValue(y)
+		elseif _type == "회전값" then
+			vm:returnValue(rot)
+		end
+	end
+end
+
 function LNX_TOUCHGESTURE(vm,stck)
 	local id = vm:ARGU("터치제스처","아이디","")
 	local func = vm:ARGU("터치제스처", "매크로명", "")
@@ -703,8 +723,10 @@ function LNX_REGIST_VARIABLE_TRIGGER(vm,stck)
 	vm:registVariableTrigger(id,variableName,loadstring([[
 	return function()
 		local f = "]]..func..[["
+		local vn = "]]..variableName..[["
 
 		pini.Timer(pini:GetUUID(),0,function()
+			_LNXG["변수트리거.변수이름"] = vn
 			pini.XVM:call(f)
 		end,false):run()
 	end]])())
@@ -2467,6 +2489,19 @@ function LNX_FULLSCREENSWITCH(vm,stck)
 	vm:SettingSave("fullscreen",isFullScreen)
 end
 
+function LNX_SKIP_DIALOG(vm,stck)
+	-- 대사넘김
+
+	dialogTouch = pini:FindNode("PINI_Dialog_touch")
+	if dialogTouch then
+		dialogTouch.onTouchUp(nil,dialogTouch)
+	end
+	clickTouch = pini:FindNode("ClickWait")
+	if clickTouch then
+		clickTouch.onTouchUp(nil,clickTouch)
+	end
+end
+
 function LNX_SWITCH_SKIP_ALLOW(vm,stck)
 	local isAllow = vm:ARGU("빨리감기","허용","예")
 
@@ -2627,6 +2662,15 @@ function LNX_SHOW_DIALOG(vm,stck)
 	if pini.Dialog.nameWindow then
 		pini.Dialog.nameWindow:setVisible(true)
 	end
+end
+
+function LNX_DIALOG_SET_ENABLE_RENDERTEXTURE(vm,stck)
+	-- 대사창렌더텍스쳐설정
+	local toEnable = vm:ARGU("대사창렌더텍스쳐설정","설정","아니오")
+
+	toEnable = toEnable == "예"
+
+	pini.Dialog:SetRenderTextureEnable(toEnable)
 end
 
 function LNX_DIALOG_CONFIG(vm,stck)

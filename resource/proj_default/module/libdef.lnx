@@ -655,6 +655,27 @@
 	"<p class='title'>저장변수적용</p>변경된 저장변수를 즉시 저장시킵니다. 해당 매크로를 사용하지 않아도 1초마다 한번씩 저장을 합니다. <a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:CommitSaveVar'>..자세히</a>"|
 	
 }
+
+!현재환경{
+	"<p class='title'>현재환경</p>현재 환경을 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:GetEnvironment'>..자세히</a>"|
+	{1| 종류| ""| "운영체제"| "얻어올 환경의 종류입니다. '리모트', '프리뷰', '익스포트', '모바일', '운영체제' 중 하나의 값을 가집니다."}
+}
+
+!노드정보{
+	"<p class='title'>노드정보</p>노드의 정보를 가져옵니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:GetNodeInfo'>..자세히</a>"|
+	{1| 아이디| ""| ""| "정보를 얻어올 노드의 아이디입니다."}|
+	{1| 타입| ""| ""| "노드에서 얻어올 정보의 종류입니다. 'X좌표', 'Y좌표', '회전값' 중 하나의 값을 가집니다."}
+}
+
+!대사넘김{
+	"<p class='title'>대사넘김</p>현재 진행중인 1개의 대사를 넘깁니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:SkipDialog'>..자세히</a>"|
+	
+}
+
+!대사창렌더텍스쳐설정{
+	"<p class='title'>대사창렌더텍스쳐설정</p>대사창에 렌더텍스처 설정을 켤지 끌지를 결정합니다.<a href='http://nooslab.com/piniengine/wiki/index.php?title=Reference:SetDialogRenderTextureSetting'>..자세히</a>"|
+	{1| 설정| "승락"| "아니오"| "대사창의 렌더텍스처를 켤지 여부입니다."}
+}
 #매크로 루아함수 목록
 
 
@@ -924,3 +945,12 @@
 
 @매크로 현재환경:
 	[[LNX_GET_ENVIRONMENT]]
+
+@매크로 노드정보:
+	[[LNX_GET_NODEINFO]]
+
+@매크로 대사넘김:
+	[[LNX_SKIP_DIALOG]]
+
+@매크로 대사창렌더텍스쳐설정:
+	[[LNX_DIALOG_SET_ENABLE_RENDERTEXTURE]]
