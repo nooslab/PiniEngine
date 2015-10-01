@@ -151,6 +151,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 		return 0
 	end
 	local LXVM = LXVM
+	local nscall = nil
 	if (not scall) and new_arg then
 		rets = rets or {}
 		new_arg(rets)
@@ -252,8 +253,19 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 				for k,b in pairs(_LNXB)do
 					local bb = b[bmk]
 					if bb then
+						local pi = bb
+
+						local forceCall = nscall
+
+						if forceCall then
+							pi = nil
+
+							forceCall = forceCall[1]
+						end	
+
+						stckInfo[9][2] = i - 1
+						_VM_LOOP_(k,_LNXF[k],stckInfo,nil,nil,pi,rets,forceCall)
 						stckInfo[9][2] = i + 1
-						_VM_LOOP_(k,_LNXF[k],stckInfo,nil,nil,bb)
 						break
 					end
 				end
@@ -307,6 +319,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 		end
 		i = i+1
 
+		nscall = scall
 		scall = nil
 		stckInfo[9][2] = i 
 	end

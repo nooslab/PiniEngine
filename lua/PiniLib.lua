@@ -1269,14 +1269,21 @@ function LNX_ANIMATION(vm,stck)
 	
 	if id == "" then
 		if fs_animation[t] then
-			stack = vm:stop()
+			local stack
+			if not OnPreview then
+				stack = vm:stop()
+			end
+
 			for i,v in pairs(pini._regist_.Display) do
 				if string.sub(i,1,4) ~= "PINI" then
 					fs_animation[t][2](vm,v)
 					v.onAnim = true
 				end
 			end
-			vm:resume(stack)
+
+			if not OnPreview then
+				vm:resume(stack)
+			end
 		end
 	else
 		local node = pini:FindNode(id)
@@ -1535,7 +1542,14 @@ function LNX_REMOVESCREENFILTER(vm,stck)
 
 	local node = pini:FindNode(id)
 	if node then
-		if node.shaderID then
+		if OnPreview then
+			if node.type == "ColorLayer" then
+				pini:DetachDisplay(node)
+			else
+				node:setColor(255,255,255)
+				node:setOpacity(255)
+			end
+		elseif node.shaderID then
 			local shader = pini:FindShader(node.shaderID)
 			if shader then
 				if sec == 0 then

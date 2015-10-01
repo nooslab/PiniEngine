@@ -1711,7 +1711,7 @@ function Slider:init(id,img1,img2,img3)
 	self:initEventHandler()
 	return true
 end
-function Slider:gen()
+function Slider:gen(v)
 	local n = Slider(v.id,v.img1,v.img2,v.img3)
 	n:OverrideDefault(v)
 	return n
@@ -2090,7 +2090,7 @@ function Label:init(id,str,fnt,size,contentSize)
 			end
 		end
 		if self.node == nil then
-			self.node = cc.LabelTTF:create(str, "Arial", size, cc.size(contentSize[1],contentSize[2]))
+			self.node = cc.Label:createWithTTF(str, "NanumBarunGothic.ttf", size, cc.size(contentSize[1],contentSize[2]))
 		end
 		self.node.obj = self
 	end
@@ -2100,7 +2100,7 @@ end
 function Label:gen(v)
 	local n = Label(v.id,v.text,v.font,v.size)
 	n:OverrideDefault(v)
-	n:setTextColor(v.color[1],v.color[2],v.color[3])
+	n:setColor(v.color[1],v.color[2],v.color[3])
 
 	if v.stroke then
 		n:setStroke(v.stroke[1],v.stroke[2],v.stroke[3],v.stroke[4],v.stroke[5])
@@ -3751,11 +3751,15 @@ function Dialog:createConnectBlock(bmrk)
 			-- pini.XVM:GotoBookmark(v.bmrk)
 		end
 		v.check = 1
-		v:setSprite(v.selectSprite)
+		if v.selectSprite then
+			v:setSprite(v.selectSprite)
+		end
 	end
 	back.onTouchMiss = function(location,v)
 		v.check = 0
-		v:setSprite(v.unselectSprite)
+		if v.unselectSprite then
+			v:setSprite(v.unselectSprite)
+		end
 	end
 
 	pini.TouchManager:registNode(back)
@@ -3868,14 +3872,11 @@ function Dialog:CreateOneWord()
 		local wordGap = self.default.wordGap or 0
 		local marginX = config["marginX"] or 0
 		local globalLineGap = config["lineGap"] or 0
-		local width = 0
 
 		local textAnim  = config["text_anim"]
 		if textAnim and textAnim:len() <= 0 then
 			textAnim = nil
 		end
-
-		local blcks = nil
 
 		local ch = self.nextBuildWords[1]
 		table.remove(self.nextBuildWords,1)
@@ -3884,18 +3885,21 @@ function Dialog:CreateOneWord()
 			pini.Backlog:addPendingString(ch)
 
 			if link then
-				if blcks == nil then
+				if self.lastCreatedblcks == nil then
 					if not self.isConnectBlockBuilted then
-						blcks = self:createConnectBlock(link)
+						self.lastCreatedblcks = self:createConnectBlock(link)
 						self.isConnectBlockBuilted = true
 					end
 				end
+			else
+				self.lastCreatedblcks = nil
 			end
+
 			if ch == "\n" then
 				x = originX
 				y = y+maxY+lineGap+globalLineGap
 				maxY  = default_size
-				width = 0
+				self.lastCreatedblckWidth = 0
 
 				if self:isAllLettersShow() then
 					self:SetCursorVisible(true)
@@ -3926,7 +3930,18 @@ function Dialog:CreateOneWord()
 				label:setPosition(x+cs.width/2,y+cs.height/2)
 				label:setColor(R,G,B)
 				x = x + cs.width + wordGap
-				
+			
+				if x + marginX - originX > config["width"] then
+					x = originX
+					y = y+maxY+globalLineGap
+
+					label:setPosition(x+cs.width/2,y+cs.height/2)
+					x = x + cs.width + wordGap
+
+					maxY = 0
+					self.lastCreatedblckWidth = 0
+				end	
+
 				if outline then
 					local o = outline
 					label:setStroke(o[1] or 0,o[2] or 0,o[3] or 0,o[4] or 0,o[5] or 0)
@@ -4015,17 +4030,11 @@ function Dialog:CreateOneWord()
 					maxY = cs.height
 				end
 				self.lastMaxY = maxY
-				width = width + cs.width + wordGap
-
-				if x + cs.width + marginX - originX > config["width"] then
-					x = originX
-					y = y+maxY+globalLineGap
-					maxY = 0
-					width = 0
-				end
+				self.lastCreatedblckWidth = self.lastCreatedblckWidth or 0
+				self.lastCreatedblckWidth = self.lastCreatedblckWidth + cs.width + wordGap
 			end
-			if link and blcks then
-				self:connectBlockModify(blcks,y+maxY,width,maxY)
+			if link and self.lastCreatedblcks then
+				self:connectBlockModify(self.lastCreatedblcks,y+maxY,self.lastCreatedblckWidth,maxY)
 			end
 			self.lastX = x
 			self.lastY = y
@@ -4059,6 +4068,10 @@ function Dialog:CreateOneWord()
 			elseif ch[1] == 4 then
 				ch[2]()
 			end
+
+			if self:isAllLettersShow() then
+				self:SetCursorVisible(true)
+			end
 		else 
 			if not self:isAllLettersShow() then
 				self:SetCursorVisible(false)
@@ -4076,9 +4089,6 @@ function Dialog:run()
 		--data
 		local config = self.configs[self.configIdx]
 		local textRate = config["text_rate"] or 0.01
-		if textRate <= 0 then
-			textRate = 0.005
-		end
 
 		--functions
 		local touches = pini.Node("PINI_Dialog_touch")
@@ -4126,6 +4136,10 @@ function Dialog:run()
 
 				t.userdata.deltaTime = t.userdata.deltaTime - t.userdata.textRate
 				pini.Dialog:CreateOneWord()
+
+				if #self.nextBuildWords <= 0 then
+					break
+				end
 			end
 			if pini.Dialog:isAllLettersShow() then
 				if t.userdata.waitsec > 0 then
@@ -4161,7 +4175,7 @@ function Dialog:SetCursorVisible(v)
 		if v and self.cursor:isVisible() == false then
 			local cursorConf = config["cursor"] or {}
 			if cursorConf["anim"] then
-				if AnimMgr:isAnim(cursorConf["anim"]) then
+				if not OnPreview and AnimMgr:isAnim(cursorConf["anim"]) then
 					AnimMgr:run(cursorConf["anim"],0,0,nil,0.01,nil,self.cursor,"")
 				else
 					local action = pini.Anim.Forever(pini.Anim.Sequence(pini.Anim.FadeTo(0.5,100),pini.Anim.FadeTo(0.5,255)))
