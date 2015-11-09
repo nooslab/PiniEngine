@@ -398,7 +398,7 @@ function LXVM:OpenLNX(file)
 		end,
 		catch {
 		function(error)
-			-- print(error)
+			print(error)
 		end
 		}
 	}

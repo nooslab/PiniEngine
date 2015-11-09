@@ -3,6 +3,7 @@ fileUtil:addSearchPath("src")
 fileUtil:addSearchPath("res")
 
 local basexx = require("basexx")
+socket = require("socket")
 
 PROJ_TITLE = "pini remote"
 IS_RELEASE = nil
@@ -14,6 +15,8 @@ local Utils = require("plua.utils")
 
 WIN_WIDTH = 0
 WIN_HEIGHT = 0
+
+print(fileUtil:getWritablePath())
 
 fileUtil:addSearchPath(fileUtil:getWritablePath())
 fileUtil:addSearchPath(fileUtil:getWritablePath().."scene")
@@ -147,7 +150,9 @@ local function LanX_start(start,line)
 
 			ScreenReSize(proj.width,proj.height)
 			package.loaded["FILEMANS"] = nil
+			package.loaded["IMGMANS"] = nil
 			require('FILEMANS')
+			require('IMGMANS')
 
 			XVM = require("LXVM")
 			XVM:init()
@@ -227,38 +232,6 @@ local function LanX_start(start,line)
 				pini:Clear()
 			end
 
-			-- XVM:registEvent(function(flag)
-			-- 	if flag.type == "FIN" then
-			-- 		XVM:registEvent(nil)
-			-- 		try{function()
-			-- 				require("PiniLib")(XVM)
-			-- 			end,
-			-- 			catch {function(error)
-			-- 				print("ERROR LOADING PINILIB")
-			-- 				print (error)
-			-- 			end}
-			-- 		}
-			-- 		try{function()
-			-- 				require(FILES["scene/"..start..".lnx"]:gsub("%.lua",""))(XVM)
-			-- 			end,
-			-- 			catch {function(error)
-			-- 				print("start 1 :",error)
-			-- 				try{function()
-			-- 						require(start)(XVM)
-			-- 					end,
-			-- 					catch {function(error)
-			-- 						print("start 2 :",error)
-			-- 						console("저장된 메인 씬이 없습니다 : \""..start.."\"")
-			-- 					end}
-			-- 				}
-			-- 			end}
-			-- 		}
-			-- 		XVM:Awake(line)
-			-- 	end
-			-- end)
-			
-			--XVM:call("libdef.lnx")
-
 			if line and line > 1 then
 				local fname = ROOT_PATH..start..".lua"
 
@@ -290,6 +263,8 @@ local function LanX_start(start,line)
 			XVM:call("libdef.lnx")
 			XVM:call("scene/lnx_x8G4rrjewM4_") -- "프리메인.lnx"
 			if line == 0 then line = 1 end
+
+			socket.select(nil, nil, 0.5)
 			XVM:call(start,line)
 
 			consoleBack = nil
@@ -364,7 +339,7 @@ local function initRemoteScene(width,height)
 	consoleBack = pBackgroundButton
 
 	--BUTTONS
-	pButton = makeBtn("저장된 파일 실행하기",function() LanX_start("메인") end)
+	pButton = makeBtn("저장된 파일 실행하기",function() LanX_start("scene/lnx_uN7Azg__") end)
 	pButton:setPosition(cc.p (width/2, height/2-100))
 	pLayer:addChild(pButton)
 
@@ -384,8 +359,6 @@ local function initRemoteScene(width,height)
 	else
 		cc.Director:getInstance():runWithScene(pScene)
 	end
-
-	Utils.loadSpriteFromZip("VisNovel.zip","potentiometerProgress.png","aaaa")
 
 	return pScene
 end
@@ -466,7 +439,6 @@ local function main()
 		print (error)
 		console(tostring(kTargetWindows == targetPlatform))
 
-		local socket = require("socket")
 		co = coroutine.create(
 		function ()
 			console("리모트 실행")

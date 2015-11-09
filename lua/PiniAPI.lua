@@ -16,6 +16,17 @@ else
 	SCALE_FACTOR = function ()
 		return cc.Director:getInstance():getContentScaleFactor()
 	end
+
+	fileUtil.fileExistCache = {}
+	fileUtil.fileExist = function(self,path)
+		if path == nil then
+			return false
+		end
+		if self.fileExistCache[path] == nil then
+			self.fileExistCache[path] = self:isFileExist(path)
+		end
+		return self.fileExistCache[path]
+	end
 end
 
 function ripairs(t)
@@ -77,6 +88,7 @@ end
 -- PINI API 
 ---------------------------------------------
 function StrEnumToPos(node,str)
+	-- "화면중앙", "왼쪽상단", "120,240" 등을 좌표로 변경합니다.
 	local x,y = unpack(str:explode(","))
 	if fs_position[x] then
 		local sx,sy,psx,psy
@@ -100,6 +112,7 @@ function StrEnumToPos(node,str)
 end
 
 function StrEnumToScale(node,str)
+	-- "원본크기", "두배", "2,2" 등을 배율로 변경합니다.
 	local x,y = unpack(str:explode(","))
 	if fs_size[x] then
 		local sx,sy,psx,psy
@@ -120,19 +133,19 @@ fs_position={}
 fs_size = {}
 ---------------------------------------------------------------
 fs_position["왼쪽상단"]=function(w,sx,sy)
-	return {sx/2,sy/2}
+	return {sx*0.5,sy*0.5}
 end
 fs_position["오른쪽상단"]=function(w,sx,sy)
-	return {w.width-sx/2,sy/2}
+	return {w.width-sx*0.5,sy*0.5}
 end
 fs_position["화면중앙"]=function(w,sx,sy)
-	return {w.width/2,w.height/2}
+	return {w.width*0.5,w.height*0.5}
 end
 fs_position["왼쪽하단"]=function(w,sx,sy)
-	return {sx/2,w.height-sy/2}
+	return {sx*0.5,w.height-sy*0.5}
 end
 fs_position["오른쪽하단"]=function(w,sx,sy)
-	return {w.width-sx/2,w.height-sy/2}
+	return {w.width-sx*0.5,w.height-sy*0.5}
 end
 fs_position["100,100"]=nil
 fs_position["200,200"]=nil
@@ -907,7 +920,7 @@ function Shader:setUniformFloat(name,value)
 	if OnPreview then
 	else
 		if self.bindNode == nil or self.bindNode.isDestroyed == false then
-			self.glprogramstate:setUniformFloat(name,value)
+			self.glprogramstate:setUniformFloat(name,tonumber(value))
 		end
 	end
 end
@@ -1006,6 +1019,8 @@ function Node:serialize(t)
 	return serial
 end
 function Node:OverrideDefault(v)
+	-- initialize from data v
+	-- 이 함수는 상속받지 않습니다. 공통적인 초기화 처리는 여기서 합니다.
 	self:setPosition(v._x,v._y)
 	self:setRotate(v.rotate)
 	self:setScale(v.scaleX,v.scaleY)
@@ -1023,11 +1038,15 @@ function Node:OverrideDefault(v)
 	self.callstack = v.callstack
 end
 function Node:gen(v)
+	-- initialize from data v
+	-- 이 함수는 반드시 상속받아야 합니다. 상속받은 클래스만의 처리는 여기서 합니다.
 	local n = Node(v.id)
 	n:OverrideDefault(v)
 	return n
 end
 function Node:initialize()
+	-- default initialize
+	-- 이 함수는 상속받지 않습니다. 공통적인 초기화 처리입니다.
 	self.visible = true
 	self.x = 0
 	self.y = 0
@@ -1076,9 +1095,7 @@ function Node:changeId(newId)
 	display = pini._regist_.Display
 
 	display[self.id] = nil
-
 	display[newId] = self
-
 	self.id = newId
 end
 
@@ -1587,7 +1604,7 @@ function ClippingNode:setClippingSize(x,y,w,h)
 		self.clipWidth  = w
 		self.clipHeight = h
 
-		local rect = {cc.p(x -w/2,y -h/2), cc.p(x + w/2,y -h/2), cc.p(x + w/2, y + h/2), cc.p(x -w/2, y + h/2)}
+		local rect = {cc.p(x -w*0.5,y -h*0.5), cc.p(x + w*0.5,y -h*0.5), cc.p(x + w*0.5, y + h*0.5), cc.p(x -w*0.5, y + h*0.5)}
 
 		self.drawNode = cc.DrawNode:create()
 		self.drawNode:drawPolygon(rect, 4, cc.c4f(1,1,1,1), 0, cc.c4f(1,0,0,1))
@@ -1598,7 +1615,7 @@ end
 -- Sprite 
 ---------------------------------------------
 local Sprite = class(Node)
-function Sprite:init(id,path,overoll)
+function Sprite:init(id,path,overoll,immediately)
 	self.id = id
 	self.type = "Sprite"
 	self.path = path
@@ -1607,12 +1624,28 @@ function Sprite:init(id,path,overoll)
 	if OnPreview then
 	else
 		if type(path) == "string" then
-			if fileUtil:isFileExist(FILES["image/"..path]) then
-				self.node = cc.Sprite:create(FILES["image/"..path])
-			elseif fileUtil:isFileExist(path) then
-				self.node = cc.Sprite:create(path)
+			if immediately then
+				if fileUtil:fileExist(FILES["image/"..path]) then
+					self.node = cc.Sprite:create(FILES["image/"..path])
+				elseif fileUtil:fileExist(path) then
+					self.node = cc.Sprite:create(path)
+				else
+					self.node = pini:getSpriteFromZips(path)
+				end
 			else
-				self.node = pini:getSpriteFromZips(path)
+				local fname = FILES["image/"..path]
+				if fileUtil:fileExist(ROOT_PATH+path) then
+					fname = ROOT_PATH+path
+				elseif fileUtil:fileExist(path) and fileUtil:fileExist("res.prz") == false then
+					fname = path
+				end
+				if fname then
+					self.node = Utils.CreateSpriteAsync(fname,"res.prz",pini.password)
+				end
+				local imgInfo = IMAGES["image/"..path] or IMAGES[path]
+				if imgInfo then
+					self:setContentSize(imgInfo["w"],imgInfo["h"])
+				end
 			end
 		else
 			self.node = cc.Sprite:createWithTexture(path)
@@ -1627,7 +1660,7 @@ function Sprite:init(id,path,overoll)
 	return true
 end
 function Sprite:gen(v)
-	local n = Sprite(v.id,v.path,v.overoll)
+	local n = Sprite(v.id,v.path,v.overoll,true)
 	n:OverrideDefault(v)
 
 	n:setColor(v.color[1],v.color[2],v.color[3])
@@ -1636,14 +1669,15 @@ function Sprite:gen(v)
 	return n
 end
 function Sprite:setSprite(path)
+	if self.isExited then return end
 	if OnPreview then
 		self.path = path
 	else
 		local cache = cc.Director:getInstance():getTextureCache()
 		local texture = nil
-		if fileUtil:isFileExist(FILES["image/"..path]) then
+		if fileUtil:fileExist(FILES["image/"..path]) then
 			texture = cache:addImage(FILES["image/"..path])
-		elseif fileUtil:isFileExist(path) then
+		elseif fileUtil:fileExist(path) then
 			texture = cache:addImage(path)
 		end
 		if texture == nil then
@@ -1665,6 +1699,7 @@ function Sprite:setSprite(path)
 end
 
 function Sprite:getTextureName()
+	if self.isExited then return 0 end
 	if OnPreview then
 	else
 		return self.node:getTexture():getName()
@@ -1689,9 +1724,9 @@ function Slider:init(id,img1,img2,img3)
 		local _img2 = FILES["image/"..img2] or img2
 		local _img3 = FILES["image/"..img3] or img3
 
-		if fileUtil:isFileExist(_img1) and 
-			fileUtil:isFileExist(_img2) and 
-			fileUtil:isFileExist(_img3) then
+		if fileUtil:fileExist(_img1) and 
+			fileUtil:fileExist(_img2) and 
+			fileUtil:fileExist(_img3) then
 			self.node = cc.ControlSlider:create(_img1,_img2,_img3)
 		end
 
@@ -2028,6 +2063,7 @@ end
 ---------------------------------------------
 local ColorLayer=class(Node)
 function ColorLayer:init(id,r,g,b,a,w,h)
+	-- 단순 단색 사각형을 표기하는 객체입니디ㅏ.
 	self.id = id
 	self.type = "ColorLayer"
 	
@@ -2072,25 +2108,27 @@ function Label:init(id,str,fnt,size,contentSize)
 	
 	if OnPreview then
 	else
-		self.node = nil
+		local lp = pini.ManagedNodePool["label"]
 
-		if self.node == nil then
-			self.node = cc.Label:createWithTTF(str, fnt..".ttf", size, cc.size(contentSize[1],contentSize[2]))
-		end
-		if self.node == nil then
-			self.node = cc.Label:createWithTTF(str, fnt, size, cc.size(contentSize[1],contentSize[2]))
-		end
-		if self.node == nil then
-			if FILES["font/"..fnt] then
-				self.node = cc.Label:createWithTTF(str,FILES["font/"..fnt],size, cc.size(contentSize[1],contentSize[2]))
-			else
-				if FILES["font/"..fnt..".ttf"] then
-					self.node = cc.Label:createWithTTF(str,FILES["font/"..fnt..".ttf"],size, cc.size(contentSize[1],contentSize[2]))
-				end 
+		self.node = nil
+		local a = self.text
+		local b = self.font
+		local c = tostring(self.size)
+		if lp[a] and lp[a][b] and lp[a][b][c] and #lp[a][b][c] > 0 then
+			self.node = lp[a][b][c][1]
+			Utils.AUTORELEASE(self.node)
+			table.remove(lp[a][b][c],1)
+		else
+			if fileUtil:fileExist(fnt..".fnt") then
+				fnt = fnt..".fnt"
+			elseif FILES["font/"..fnt] then
+				fnt = FILES["font/"..fnt]
+			elseif FILES["font/"..fnt..".ttf"] then
+				fnt = FILES["font/"..fnt..".ttf"]
+			elseif fileUtil:fileExist(fnt) == false then
+				fnt = "NanumBarunGothic.ttf"
 			end
-		end
-		if self.node == nil then
-			self.node = cc.Label:createWithTTF(str, "NanumBarunGothic.ttf", size, cc.size(contentSize[1],contentSize[2]))
+			self.node = cc.Label:createWithTTF(str, fnt, size, cc.size(contentSize[1],contentSize[2]))
 		end
 		self.node.obj = self
 	end
@@ -2115,6 +2153,32 @@ function Label:gen(v)
 	end
 
 	return n
+end
+
+function Label:registManagedNode()
+	if OnPreview then
+	else
+		local targetNode = self.node
+		targetNode:retain()
+		local function onNodeEvent(tag)
+			if self.isExited == nil then
+				if tag == "exit" then
+					local a = self.text
+					local b = self.font
+					local c = tostring(self.size)
+					local lp = pini.ManagedNodePool["label"]
+					lp[a] = lp[a] or {}
+					lp[a][b] = lp[a][b] or {}
+					lp[a][b][c] = lp[a][b][c] or {}
+
+					if #lp[a][b][c] <= 5 then
+						table.insert(lp[a][b][c],targetNode)
+					end
+				end
+			end
+		end
+		targetNode:registerScriptHandler(onNodeEvent)
+	end
 end
 
 function Label:string(v)
@@ -2334,7 +2398,7 @@ function RenderTexture:init(id,w,h,renderList)
 		self.timer = pini.Timer(pini:GetUUID(),0,self.update,nil,nil,{uid=id})
 		self.timer:run()
 	end
-	self:setPosition(w/2,h/2)
+	self:setPosition(w*0.5,h*0.5)
 	self:initEventHandler()
 	self:registOnExit("PINI_RENDERTEXTURE_EXIT",self.onExit)
 	return true
@@ -2403,6 +2467,7 @@ function RenderTexture:render(r,g,b,a)
 
 		self.node:endToLua()
 		Utils.forceRender()
+
 		for k,v in ipairs(noneVisible) do
 			v:setVisible(true)
 		end
@@ -2421,6 +2486,7 @@ end
 ---------------------------------------------
 local GlobalTimer = class()
 function GlobalTimer:init()
+	-- Timer 를 돌리기 위한 단일 고정타이머입니다.
 	self.entry = nil
 	self:run()
 	return true
@@ -2756,7 +2822,9 @@ else
 								v2:StopAction()
 								AnimMgr:stop(v2)
 								pini.Timer(pini:GetUUID(),0,function()
-									func(location,v2)
+									if v2.isExited == nil then
+										func(location,v2)
+									end
 								end,false):run()
 							end
 						end
@@ -2875,7 +2943,7 @@ else
 			self.lastClicked["dx"] = 0
 			self.lastClicked["dy"] = 0
 
-			pini:StopTimer("ScrollMomentum")
+			pini:StopTimer("PINI_ScrollMomentum")
 
 			if pini:scene().keyboards ~= nil then
 				for k,v in pairs(pini:scene().keyboards) do
@@ -2994,13 +3062,13 @@ else
 			end
 
 			if pini.Backlog.isShowing and self.lastClicked["dy"] ~= 0 then
-				pini.Timer("ScrollMomentum",0,function(t)
+				pini.Timer("PINI_ScrollMomentum",0,function(t)
 					if not pini.Backlog.isShowing then
-						pini:StopTimer("ScrollMomentum")
+						pini:StopTimer("PINI_ScrollMomentum")
 					end
 					t.userdata.dy = t.userdata.dy * 0.9
 					if t.userdata.dy > -1 and t.userdata.dy < 1 then
-						pini:StopTimer("ScrollMomentum")
+						pini:StopTimer("PINI_ScrollMomentum")
 					end
 
 					pini.Backlog:runScrollEvent(t.userdata.dy)
@@ -3226,15 +3294,8 @@ function Dialog:init()
 	self.timerWait = 0
 	self.running = false
 	self.isConnectBlockBuilted = false
-	self.lastTextPos = nil
-	self.isRenderTextureEnabled = false
-
-	if not OnPreview then
-		self.wordRenderTexture = nil
-		self.animWords = {}
-		self.continuousBuild = false
-	end
-
+	
+	self.animWords = {}
 	self.nextBuildWords = {}
 
 	return true
@@ -3244,9 +3305,6 @@ function Dialog:config(idx)
 end
 function Dialog:SetConfig(idx,data)
 	self.configs[idx] = data
-end
-function Dialog:SetRenderTextureEnable(toEnable)
-	self.isRenderTextureEnabled = toEnable
 end
 function Dialog:UseConfig(idx)
 	if idx == nil then
@@ -3285,11 +3343,6 @@ function Dialog:Reset()
 	self.lastMaxY = 0
 	self.needUpdate = true
 	self.wait = false;
-
-	if not OnPreview then
-		self.wordRenderTexture = nil
-		self.continuousBuild = false
-	end
 
 	self.animWords = {}
 	self.nextBuildWords = {}
@@ -3698,20 +3751,6 @@ function Dialog:_make(callback)
 		pini:AttachDisplay(self.background)
 		self:createNameWindow()
 		self:createCursor()
-
-		if not OnPreview then
-			if self.wordRenderTexture then
-				self.wordRenderTexture:release()
-				self.wordRenderTexture = nil
-			end
-
-			if self.isRenderTextureEnabled then
-				self.wordRenderTexture = cc.RenderTexture:create(
-					WIN_WIDTH, WIN_HEIGHT, cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A8888)
-				self.wordRenderTexture:retain()
-				self.wordRenderTexture:clear(0,0,0,0) 
-			end
-		end
 	end
 
 	self:updateName()
@@ -3726,6 +3765,7 @@ function Dialog:createConnectBlock(bmrk)
 	config = config["linkBlock"] or {}
 
 	local c = config["color"] or {255,255,255,60}
+	local ls = config["linkSound"]
 	local back=nil
 	if tostring(config["unselect"] or ""):len() > 0 then
 		back = pini.Sprite(pini:GetUUID(),config["unselect"])
@@ -3743,12 +3783,14 @@ function Dialog:createConnectBlock(bmrk)
 	back.check = 0
 	back.touchPriority = 50001
 	back.onTouchUp = function(loc,v)
+		if ls then
+			pini:PlaySound("PINI_Dialog_LinkSound",ls,false,1)
+		end
+
 		if v.check == 1 then
 			pini.Dialog:Reset()
 			pini.Dialog.showingDelFlag = true
 			pini.XVM:resumeAndGoBookmark(pini.Dialog.callstack,v.bmrk)
-			-- pini.XVM:resume(pini.Dialog.callstack)
-			-- pini.XVM:GotoBookmark(v.bmrk)
 		end
 		v.check = 1
 		if v.selectSprite then
@@ -3767,7 +3809,7 @@ function Dialog:createConnectBlock(bmrk)
 	local linkOp = c[4] or 60
 	back.onTouchAnim  = pini.Anim.Forever(
 							pini.Anim.Sequence(
-								pini.Anim.FadeTo(0.5,linkOp/10),
+								pini.Anim.FadeTo(0.5,linkOp*0.1),
 								pini.Anim.FadeTo(0.5,linkOp)
 							)
 						)
@@ -3920,14 +3962,13 @@ function Dialog:CreateOneWord()
 				end
 
 				local label = pini.Label(pini:GetUUID(),ch,font,size)
+				--label:registManagedNode()
 
-				if OnPreview then
-					table.insert(self.allwords,label)
-				end
+				table.insert(self.allwords,label)
 				pini:AttachDisplay(label,self.background.id)
 
 				local cs = label:contentSize()
-				label:setPosition(x+cs.width/2,y+cs.height/2)
+				label:setPosition(x+cs.width*0.5,y+cs.height*0.5)
 				label:setColor(R,G,B)
 				x = x + cs.width + wordGap
 			
@@ -3935,7 +3976,7 @@ function Dialog:CreateOneWord()
 					x = originX
 					y = y+maxY+globalLineGap
 
-					label:setPosition(x+cs.width/2,y+cs.height/2)
+					label:setPosition(x+cs.width*0.5,y+cs.height*0.5)
 					x = x + cs.width + wordGap
 
 					maxY = 0
@@ -3955,77 +3996,6 @@ function Dialog:CreateOneWord()
 					label:setGlow(g[1] or 0,g[2] or 0,g[3] or 0,g[4] or 0)
 				end
 
-				if not OnPreview then
-					local function labelToRenderTexture(isDirect)
-						if self.isRenderTextureEnabled then
-							label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
-
-							if not self.continuousBuild then
-								self.wordRenderTexture:begin()
-							end
-
-							label.node:visit()
-
-							if not self.continuousBuild then
-								self.wordRenderTexture:endToLua()
-
-								local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
-									self.wordRenderTexture:getSprite():getTexture())
-								local contSize = self.background:contentSize()
-								if self.background.type == "ColorLayer" then
-									sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-								else
-									sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-								end
-								sprite:setFlippedY(true)
-								pini:AttachDisplay(sprite, self.background.id)
-							end
-						end
-
-						self.lastTextPos = {}
-						self.lastTextPos.s = label:contentSize()
-						self.lastTextPos.x, self.lastTextPos.y = label:position()
-
-						if self.isRenderTextureEnabled then
-							if not self.continuousBuild then
-								pini:DetachDisplay(label)
-							else
-								table.insert(self.processedWords, label)
-							end
-						end
-
-						if not isDirect then
-							table.remove(self.animWords, 1)
-						end
-
-						if self:isAllLettersShow() then
-							self:SetCursorVisible(true)
-						end
-					end
-
-					if textAnim and (not self.continuousBuild) then
-						AnimMgr:run(textAnim,0,0,nil,0.01,1,label,"", labelToRenderTexture)
-						table.insert(self.animWords, label)
-					else
-						if self.continuousBuild then
-							if self.wordRenderTexture then
-								label.node:setBlendFunc({src=GL_ONE, dst=GL_ZERO})
-								label.node:visit()
-							end
-
-							self.lastTextPos = {}
-							self.lastTextPos.s = label:contentSize()
-							self.lastTextPos.x, self.lastTextPos.y = label:position()
-
-							if self.wordRenderTexture then
-								pini:DetachDisplay(label)
-							end
-						else
-							labelToRenderTexture(true)
-						end
-					end
-				end
-
 				if maxY < cs.height then
 					maxY = cs.height
 				end
@@ -4038,6 +4008,7 @@ function Dialog:CreateOneWord()
 			end
 			self.lastX = x
 			self.lastY = y
+			self:SetCursorVisible(false)
 		end
 
 		local textSound = config["sound"] or ""
@@ -4073,10 +4044,10 @@ function Dialog:CreateOneWord()
 				self:SetCursorVisible(true)
 			end
 		else 
-			if not self:isAllLettersShow() then
-				self:SetCursorVisible(false)
+			if textAnim then
+				AnimMgr:run(textAnim,0,0,nil,0.01,1,lb,"")
+				table.insert(self.animWords,textAnim)
 			end
-
 			if textSound then
 				pini:PlaySound("PINI_Dialog_TextSound",textSound,false,1)
 			end
@@ -4138,6 +4109,7 @@ function Dialog:run()
 				pini.Dialog:CreateOneWord()
 
 				if #self.nextBuildWords <= 0 then
+					t.userdata.deltaTime = 0
 					break
 				end
 			end
@@ -4151,6 +4123,7 @@ function Dialog:run()
 						end
 					end
 				end
+				pini.Dialog:SetCursorVisible(true)
 			end
 		end,true,nil,{
 			deltaTime = 0,
@@ -4193,14 +4166,10 @@ function Dialog:SetCursorVisible(v)
 				end
 			end
 		end
-		if self.lastTextPos then
-			local s   = self.lastTextPos.s
-			local x,y = self.lastTextPos.x, self.lastTextPos.y
-			self:SetCursorPosition(x+s.width/2,y+s.height/2)
-		elseif txt then
+		if txt then
 			local s   = txt:contentSize()
 			local x,y = txt:position()
-			self:SetCursorPosition(x+s.width/2,y+s.height/2)
+			self:SetCursorPosition(x+s.width*0.5,y+s.height*0.5)
 		end
 
 		self.cursor:setVisible(v)
@@ -4211,7 +4180,7 @@ function Dialog:SetCursorPosition(x,y)
 	if self.cursor then
 		if self.cursor.type == "Sprite" then
 			local s = self.cursor:contentSize()
-			self.cursor:setPosition(x + s.width/2,y - s.height/2)
+			self.cursor:setPosition(x + s.width*0.5,y - s.height*0.5)
 		else
 			self.cursor:setPosition(x,y)
 		end
@@ -4223,22 +4192,12 @@ end
 
 function Dialog:showAllLetters()
 	if OnPreview then
-		self.continuousBuild = true
-
 		if self.background == nil or self.background.visible then
 			while #self.nextBuildWords > 0 do
 				self:CreateOneWord()
 			end
 		end
-
-		self.continuousBuild = false
 	else
-		self.continuousBuild = true
-		self.processedWords = {}
-		if self.wordRenderTexture then
-			self.wordRenderTexture:begin()
-		end
-
 		while #self.animWords > 0 do
 			local l = self.animWords[1]
 
@@ -4250,30 +4209,6 @@ function Dialog:showAllLetters()
 				self:CreateOneWord()
 			end
 		end
-
-		if self.wordRenderTexture then
-			self.wordRenderTexture:endToLua()
-
-			Utils:forceRender()
-
-			local sprite = pini.Sprite("PINI_Dialog_WordDisplay",
-				self.wordRenderTexture:getSprite():getTexture())
-			local contSize = self.background:contentSize()
-			if self.background.type == "ColorLayer" then
-				sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-			else
-				sprite:setPosition(WIN_WIDTH / 2, -WIN_HEIGHT / 2)
-			end
-			sprite:setFlippedY(true)
-			pini:AttachDisplay(sprite, self.background.id)
-
-			for i,v in ipairs(self.processedWords) do
-				pini:DetachDisplay(v)
-			end
-		end
-
-		self.processedWords = nil
-		self.continuousBuild = false
 	end
 end
 function Dialog:setName(name)
@@ -4319,15 +4254,26 @@ pini["RenderTexture"] = RenderTexture
 pini["Backlog"] = Backlog()
 pini["BacklogType"] = Backlog
 pini.FindZip = {}
+pini.ManagedNodePool = {
+	["label"]={}
+}
 pini.password = ""
+
+function pini:clearNodePool()
+	for k,v in pairs(pini.ManagedNodePool) do
+		for j,node in ipairs(v) do
+			Utils.AUTORELEASE(node)
+		end
+		pini.ManagedNodePool[k]={}
+	end
+end
 
 function pini:getSpriteFromZips(path)
 	for k,v in ipairs(pini.FindZip) do
 		local node = nil
 		if FILES["image/"..path] then
 			node = Utils.loadSpriteFromZip(v,FILES["image/"..path],pini.password)
-		end
-		if node == nil then
+		else
 			node = Utils.loadSpriteFromZip(v,"image/"..path,pini.password)
 		end
 		if node then
@@ -4353,7 +4299,7 @@ end
 
 function pini:GetUUID()
 	local time = tostring(os.time())
-	local uuid = "PINI"..time
+	local uuid = "AUTO_"..time
 	local count = 0;
 	while true do
 		if self._regist_.Display[uuid] == nil and 
@@ -4362,7 +4308,7 @@ function pini:GetUUID()
 		   self._regist_.Shaders[uuid] == nil then
 			return uuid
 		end
-		uuid = "PINI"..time..count
+		uuid = "AUTO_"..time..count
 		count = count+1
 	end
 end
@@ -4553,7 +4499,7 @@ function pini:PlaySound(idx,path,loop,vol)
 		if OnPreview then
 		else
 			local relative = FILES["sound/"..path]
-			if not fileUtil:isFileExist(relative) then
+			if not fileUtil:fileExist(relative) then
 				relative = pini:copyFileFromZips(relative)
 			end
 			if relative == nil then
@@ -4591,7 +4537,7 @@ function pini:PlayBGM(path,brep,vol)
 			self:StopBGM()
 
 			local relative = FILES["sound/"..path]
-			if not fileUtil:isFileExist(relative) then
+			if not fileUtil:fileExist(relative) then
 				relative = pini:copyFileFromZips(relative)
 			end
 			if relative == nil then
@@ -4645,7 +4591,7 @@ function pini:takeScreenShot(callback,savefile)
 		Utils.forceRender()
 
 		local sprite = pini.Sprite("ScreenShot",target:getSprite():getTexture())
-		sprite:setPosition(WIN_WIDTH/2, WIN_HEIGHT/2)
+		sprite:setPosition(WIN_WIDTH*0.5, WIN_HEIGHT*0.5)
 		sprite:setFlippedY(true);
 		sprite:retain()
 
@@ -4665,17 +4611,14 @@ function pini:takeScreenShot(callback,savefile)
 	end
 end
 
-
-
 try{
 	function()
 		pini.password = require("pp")():sub(1,11)
 		-- pini.password = ""
-		if fileUtil:isFileExist("res.prz") then
+		if fileUtil:fileExist("res.prz") then
 			Utils.COPYPRZ()
 			table.insert(pini.FindZip,"res.prz")
 		end
 	end,
 	catch{function(error)end}
 }
-

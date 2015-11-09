@@ -218,12 +218,10 @@ function LNX_IMAGE(vm,stck)
 	local keep = vm:ARGU("이미지","유지","아니오") == "예"
 	local angle = vm:ARGU("이미지","회전",0)
 	local enableAnti = vm:ARGU("이미지","안티","예")
-	local delayDelete = vm:ARGU("이미지","잔상시간",0.2)
 
 	x = tonumber(x)
 	y = tonumber(y)
 	angle = tonumber(angle)
-	delayDelete = tonumber(delayDelete)
 
 	local acp = _LNXG["설정.이미지중심"] or "0.5,0.5"
 	acp = acp:explode(",")
@@ -258,24 +256,7 @@ function LNX_IMAGE(vm,stck)
 				node:setVisible(true)
 			end
 		else
-			if not OnPreview and effect:len() > 0 then
-				node = pini:FindNode(id)
-				if node ~= nil then
-					deleteEffectId = pini:GetUUID()
-					node:changeId(deleteEffectId)
-
-					if fs_imageDeleteEffect[effect] then
-						pini.Timer(nil,effectSec+delayDelete,function(t)
-							local node = pini:FindNode(t.userdata.id)
-							if node then
-								pini:DetachDisplay(node)
-							end
-						end,false,nil,{id=deleteEffectId}):run()
-					end
-				end
-			end
 			node = pini.Sprite(id,path,overoll)
-	
 			if node == nil then
 			-- 	Utils.MessageBox("이미지를 로딩할 수 없습니다. \n이미지 이름 : "..path,PROJ_TITLE)
 			-- 	if IS_RELEASE == nil then
@@ -934,7 +915,7 @@ function LNX_VIBRATE(vm,stck)
 	if OnPreview then
 	else
 		if cc.PLATFORM_OS_ANDROID == CurrentPlatform then
-			DeviceNativeCall("Device_Vibrator",{ sec })
+			--DeviceNativeCall("Device_Vibrator",{ sec })
 		end
 	end
 end
@@ -976,13 +957,15 @@ function LNX_DELETENODE(vm,stck)
 		if node then
 			if effect:len() > 0 then
 				if fs_imageDeleteEffect[effect] then
+					node:changeId(pini:GetUUID())
 					fs_imageDeleteEffect[effect](node,effectSec)
+
 					pini.Timer(nil,effectSec,function(t)
 						local node = pini:FindNode(t.userdata.id)
 						if node then
 							pini:DetachDisplay(node)
 						end
-					end,false,nil,{id=id}):run()
+					end,false,nil,{id=node.id}):run()
 
 					local function recursiveEff(node)
 						local children = node:children()
@@ -1275,7 +1258,7 @@ function LNX_ANIMATION(vm,stck)
 			end
 
 			for i,v in pairs(pini._regist_.Display) do
-				if string.sub(i,1,4) ~= "PINI" then
+				if i:startsWith("PINI") == false then
 					fs_animation[t][2](vm,v)
 					v.onAnim = true
 				end
@@ -1455,7 +1438,7 @@ function LNX_SCREENFILTER(vm,stck)
 			if node == nil then
 				local currentNodeList = {}
 				for k,v in pairs(pini._regist_.Display) do
-					if string.sub(k,1,4) ~= "PINI" then
+					if k:startsWith("PINI") == false then
 						if v:isVisible() then
 							table.insert(currentNodeList,v.id)
 						end
@@ -1789,6 +1772,11 @@ function LNX_JSON_PARSE(vm,stck)
 	vm:returnValue(d)
 end
 
+function LNX_IMAGE_LOAD(vm,stck)
+	local path = vm:ARGU("이미지로딩","파일명","")
+	pini.Sprite(pini:GetUUID(),path,nil,true)
+end
+
 function LNX_MOVIE_PLAYER(vm,stck)
 	local id = vm:ARGU("비디오","아이디","")
 	local path = vm:ARGU("비디오","파일명","")
@@ -1869,15 +1857,15 @@ function LNX_TRANSITION(vm,stck)
 			pini.Dialog:Clear()
 			pini:ClearNonPreserveDisplay()
 
-			newSprite = pini.Sprite(id,path)
+			newSprite = pini.Sprite(id,path,nil,true)
 			sprite.id = pini:GetUUID()
 			sprite.path = path
 
-			local img1 = pini.Sprite("transition1",scale)
-			local img2 = pini.Sprite("transition2",path)
+			local img1 = pini.Sprite("transition1",scale,nil,true)
+			local img2 = pini.Sprite("transition2",path,nil,true)
 
 			local ss = img2:contentSize()
-			local dx,dy = ss.width / WIN_WIDTH,ss.height / WIN_HEIGHT
+			local dx,dy = ss.width / WIN_WIDTH ,ss.height / WIN_HEIGHT
 			local sx,sy = StrEnumToScale(sprite,size)
 			sprite:setScale(sx * dx,sy * dy)
 			pini:AttachDisplay(newSprite)
@@ -2218,6 +2206,8 @@ function LNX_VM_LOAD(vm,stck)
 				pini.Dialog.callstack = dialogCallstack
 				pini.Dialog.frameStopCallstack = dialogFrameStopCallstack
 
+				pini:clearNodePool()
+
 			end,false):run()
 		end,false):run()
 
@@ -2318,8 +2308,7 @@ function LNX_SAVE(vm,stck)
 			local pin = {}
 			pin["node"] = {}
 			for k,v in pairs(pini._regist_.Display) do
-				if v.id:startsWith("PINI_dialog_") or 
-					(v.parent and v.parent.type ~= "Scene" and v.parent.id:startsWith("PINI_dialog_")) then
+				if v.id:startsWith("PINI") or (v.parent and v.parent.type ~= "Scene" and v.parent.id:startsWith("PINI")) then
 				else 
 					table.insert(pin["node"],v)
 					if v.touchRegisted then
@@ -2341,8 +2330,7 @@ function LNX_SAVE(vm,stck)
 					end
 					local h=0
 					for k,v in ipairs(v.exitEvent) do 
-						if v[1] ~= "PINI_TOUCHMANAGER_EXIT" and 
-						   v[1] ~= "PINI_RENDERTEXTURE_EXIT" then
+						if v[1]:startsWith("PINI") == false then
 							local out = io.open(savepath.."exit"..i.."."..h, "wb")
 							out:write(string.dump(v[2]))
 							out:close()
@@ -2377,10 +2365,7 @@ function LNX_SAVE(vm,stck)
 			i=0
 			pin["timer"]={}
 			for k,v in pairs(pini._regist_.Timers) do
-				if v.id ~= "PINI_DialogUpdate" and 
-				   v.id ~= "PINI_TakeScreenShot" and
-				   v.id ~= "PINI_CtrlSkip" and
-				   v.id ~= "PINI_FastSkip" then
+				if v.id:startsWith("PINI") == false then
 					table.insert(pin["timer"],{
 						id=v.id , 
 						time=v.time , 
@@ -2400,7 +2385,7 @@ function LNX_SAVE(vm,stck)
 			i=0
 			pin["keyboard"]={}
 			for k,v in pairs(keyboards) do
-				if k == "__DIALOG__CLICKED__" then
+				if k:startsWith("PINI") then
 				else
 					table.insert(pin["keyboard"],{id=k,arg=v["arg"],stop=v["stop"]})
 
@@ -2500,7 +2485,10 @@ function LNX_FULLSCREENSWITCH(vm,stck)
 
 	isFullScreen = isFullScreen == "예"
 
-	vm:SettingSave("fullscreen",isFullScreen)
+	if OnPreview then
+	else
+		vm:SettingSave("fullscreen",isFullScreen)
+	end
 end
 
 function LNX_SKIP_DIALOG(vm,stck)
@@ -2532,15 +2520,21 @@ function LNX_START_FASTSKIP(vm,stck)
 	-- 빨리감기시작
 
 	pini.Timer("PINI_FastSkip",0,function(t)
-		dialogTouch = pini:FindNode("PINI_Dialog_touch")
-		if dialogTouch then
-			dialogTouch.onTouchUp(nil,dialogTouch)
+		t.userdata.dt = t.userdata.dt+t.dt
+		if t.userdata.dt > 0.075 then
+			local dialogTouch = pini:FindNode("PINI_Dialog_touch")
+			if dialogTouch then
+				dialogTouch.onTouchUp(nil,dialogTouch)
+			end
+			local clickTouch = pini:FindNode("ClickWait")
+			if clickTouch then
+				clickTouch.onTouchUp(nil,clickTouch)
+			end
+			--if clickTouch== nil and dialogTouch == nil then
+				t.userdata.dt = 0
+			--end
 		end
-		clickTouch = pini:FindNode("ClickWait")
-		if clickTouch then
-			clickTouch.onTouchUp(nil,clickTouch)
-		end
-	end,true,nil,nil):run()
+	end,true,nil,{dt=0}):run()
 end
 
 function LNX_STOP_FASTSKIP(vm,stck)
@@ -2678,15 +2672,6 @@ function LNX_SHOW_DIALOG(vm,stck)
 	end
 end
 
-function LNX_DIALOG_SET_ENABLE_RENDERTEXTURE(vm,stck)
-	-- 대사창렌더텍스쳐설정
-	local toEnable = vm:ARGU("대사창렌더텍스쳐설정","설정","아니오")
-
-	toEnable = toEnable == "예"
-
-	pini.Dialog:SetRenderTextureEnable(toEnable)
-end
-
 function LNX_DIALOG_CONFIG(vm,stck)
 	local id 		  = vm:ARGU("대사창수정","아이디") 
 
@@ -2730,6 +2715,7 @@ function LNX_DIALOG_CONFIG(vm,stck)
 	local linkColor		= vm:ARGU("대사창수정","연결색상")
 	local linkWidthFit	= vm:ARGU("대사창수정","연결넓이맞춤")
 	local linkSelectImg = vm:ARGU("대사창수정","연결선택시이미지")
+	local linkSound     = vm:ARGU("대사창수정","연결선택효과음")
 
 	local textRate	  = vm:ARGU("대사창수정","시간")
 	local textAnimation = vm:ARGU("대사창수정","애니메이션")
@@ -2960,6 +2946,7 @@ function LNX_DIALOG_CONFIG(vm,stck)
 		end
 		bconfig["select"] = linkSelectImg or bconfig["select"]
 		bconfig["unselect"] = linkImg or bconfig["unselect"]
+		bconfig["linkSound"] = linkSound or bconfig["linkSound"]
 
 		--------------------------------------------
 		--cursor
