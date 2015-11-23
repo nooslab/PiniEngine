@@ -147,9 +147,6 @@ end
 fs_position["오른쪽하단"]=function(w,sx,sy)
 	return {w.width-sx*0.5,w.height-sy*0.5}
 end
-fs_position["100,100"]=nil
-fs_position["200,200"]=nil
-fs_position["300,300"]=nil
 
 ---------------------------------------------------------------
 --사이즈 선정
@@ -174,7 +171,7 @@ fs_imageDeleteEffect = {}
 fs_imageEffect["페이드"]=function(node,sec)
 	local op = node.opacity
 	node:setOpacity(0)
-	local action = pini.Anim.FadeTo(sec,op)
+	local action = pini.Anim.EaseIn(pini.Anim.FadeTo(sec,op),0.5)
 	action:run(node)
 end
 fs_imageEffect["업페이드"]=function(node,sec)
@@ -230,7 +227,7 @@ end
 --이미지 퇴장 효과 관리
 ---------------------------------------------------------------
 fs_imageDeleteEffect["페이드"]=function(node,sec)
-	local action = pini.Anim.FadeTo(sec,0)
+	local action = pini.Anim.EaseOut(pini.Anim.FadeTo(sec,0),0.5)
 	action:run(node)
 end
 fs_imageDeleteEffect["업페이드"]=function(node,sec)
@@ -846,6 +843,69 @@ function EaseElasticInOut:run(node)
 	end
 end
 ---------------------------------------------
+local EaseIn=class()
+function EaseIn:init(action,factor)
+	self.action = action
+	self.factor = factor
+	return true
+end
+function EaseIn:cocosObj()
+	return cc.EaseIn:create(self.action:cocosObj(),self.factor)
+end
+function EaseIn:changeValue(node)
+	self.action:changeValue(node)
+end
+function EaseIn:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		self:changeValue(node)
+		node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseOut=class()
+function EaseOut:init(action,factor)
+	self.action = action
+	self.factor = factor
+	return true
+end
+function EaseOut:cocosObj()
+	return cc.EaseOut:create(self.action:cocosObj(),self.factor)
+end
+function EaseOut:changeValue(node)
+	self.action:changeValue(node)
+end
+function EaseOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		self:changeValue(node)
+		node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
+local EaseInOut=class()
+function EaseInOut:init(action,factor)
+	self.action = action
+	self.factor = factor
+	return true
+end
+function EaseInOut:cocosObj()
+	return cc.EaseInOut:create(self.action:cocosObj(),self.factor)
+end
+function EaseInOut:changeValue(node)
+	self.action:changeValue(node)
+end
+function EaseInOut:run(node)
+	if OnPreview then
+		self.action:run(node)
+	else
+		self:changeValue(node)
+		node:runAction(self:cocosObj())
+	end
+end
+---------------------------------------------
 local anim = {}
 anim["MoveBy"] = MoveBy
 anim["MoveTo"] = MoveTo
@@ -873,6 +933,9 @@ anim["EaseBackInOut"] = EaseBackInOut
 anim["EaseElasticIn"] = EaseElasticIn
 anim["EaseElasticOut"] = EaseElasticOut
 anim["EaseElasticInOut"] = EaseElasticInOut
+anim["EaseIn"] = EaseIn
+anim["EaseOut"] = EaseOut
+anim["EaseInOut"] = EaseInOut
 
 ----------------------------------------------
 -- Shader
@@ -955,6 +1018,7 @@ function Node:init(id)
 	else
 		self.node = cc.Node:create()
 		self.node.obj = self
+		self.node:setCascadeColorEnabled(true)
 	end
 	self:initEventHandler()
 	return true
@@ -1624,21 +1688,22 @@ function Sprite:init(id,path,overoll,immediately)
 	if OnPreview then
 	else
 		if type(path) == "string" then
+			local fname = FILES["image/"..path]
+			if fileUtil:fileExist(ROOT_PATH+path) then
+				fname = ROOT_PATH+path
+			elseif fileUtil:fileExist(path) and fileUtil:fileExist("res.prz") == false then
+				fname = path
+			end
+			if fname == nil then
+				return false
+			end
 			if immediately then
-				if fileUtil:fileExist(FILES["image/"..path]) then
-					self.node = cc.Sprite:create(FILES["image/"..path])
-				elseif fileUtil:fileExist(path) then
-					self.node = cc.Sprite:create(path)
+				if fileUtil:fileExist(fname) then
+					self.node = cc.Sprite:create(fname)
 				else
 					self.node = pini:getSpriteFromZips(path)
 				end
 			else
-				local fname = FILES["image/"..path]
-				if fileUtil:fileExist(ROOT_PATH+path) then
-					fname = ROOT_PATH+path
-				elseif fileUtil:fileExist(path) and fileUtil:fileExist("res.prz") == false then
-					fname = path
-				end
 				if fname then
 					self.node = Utils.CreateSpriteAsync(fname,"res.prz",pini.password)
 				end
@@ -1654,6 +1719,7 @@ function Sprite:init(id,path,overoll,immediately)
 			return false
 		end
 		self.node.obj = self
+		self.node:setCascadeColorEnabled(true)
 	end
 	self:setPosition(0,0)
 	self:initEventHandler()
@@ -3995,6 +4061,14 @@ function Dialog:CreateOneWord()
 					local g = glow
 					label:setGlow(g[1] or 0,g[2] or 0,g[3] or 0,g[4] or 0)
 				end
+				if textAnim and (not self.continuousBuild) then
+					AnimMgr:run(textAnim,0,0,nil,0.01,1,label,"",function()
+						if #self.animWords > 0 then
+							table.remove(self.animWords,1)
+						end
+					end)
+					table.insert(self.animWords, label)
+				end
 
 				if maxY < cs.height then
 					maxY = cs.height
@@ -4044,10 +4118,6 @@ function Dialog:CreateOneWord()
 				self:SetCursorVisible(true)
 			end
 		else 
-			if textAnim then
-				AnimMgr:run(textAnim,0,0,nil,0.01,1,lb,"")
-				table.insert(self.animWords,textAnim)
-			end
 			if textSound then
 				pini:PlaySound("PINI_Dialog_TextSound",textSound,false,1)
 			end
@@ -4199,9 +4269,7 @@ function Dialog:showAllLetters()
 		end
 	else
 		while #self.animWords > 0 do
-			local l = self.animWords[1]
-
-			AnimMgr:forceFinalNodeAndStop(l)
+			AnimMgr:forceFinalNodeAndStop(self.animWords[1])
 		end
 
 		if self.background == nil or self.background.visible then

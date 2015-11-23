@@ -16,8 +16,6 @@ local Utils = require("plua.utils")
 WIN_WIDTH = 0
 WIN_HEIGHT = 0
 
-print(fileUtil:getWritablePath())
-
 fileUtil:addSearchPath(fileUtil:getWritablePath())
 fileUtil:addSearchPath(fileUtil:getWritablePath().."scene")
 fileUtil:addSearchPath(fileUtil:getWritablePath().."module")
@@ -35,6 +33,10 @@ require "utils"
 cclog = function(...)
 	print(string.format(...))
 end
+
+print(fileUtil:getWritablePath())
+print(fileUtil:getWritablePath())
+print(fileUtil:getWritablePath())
 
 -- for CCLuaEngine traceback
 function __G__TRACKBACK__(msg)

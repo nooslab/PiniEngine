@@ -1630,8 +1630,7 @@ end
 
 function LNX_CHANGE_BGM_VOLUME(vm,stck)
 	local vol = vm:ARGU("배경음볼륨","볼륨","1")
-
-	bgm_volume = tonumber(vol) or 1
+	local bgm_volume = tonumber(vol) or 1
 
 	pini:SoundVolume(bgm_volume)
 end
@@ -1641,19 +1640,19 @@ function LNX_STOPBGM(vm,stck)
 	if pini._regist_.BGM then
 		sec = tonumber(sec) or 0
 		if sec > 0 then
-			local step = 1 / (sec*20)
-			
 			local sid = pini._regist_.BGM[4]
+			local vol = pini._regist_.BGM[3]
+			local step = vol / (sec*20)
 			pini._regist_.BGM = nil
 
-			pini:SoundVolume( 1 , sid)
+			pini:SoundVolume( vol , sid)
 			pini.Timer(pini:GetUUID(),0.05,function(t)
 				pini:SoundVolume( t.userdata.v , t.userdata.sid )
 				t.userdata.v = t.userdata.v - t.userdata.step
 				if t.userdata.v <= 0 then
 					pini:StopSound( t.userdata.sid )
 				end
-			end,true,sec*20+1,{v=1,step=step,sid=sid}):run()
+			end,true,sec*20+1,{v=vol,step=step,sid=sid}):run()
 		else
 			pini:StopBGM()
 		end
@@ -1857,8 +1856,8 @@ function LNX_TRANSITION(vm,stck)
 			pini.Dialog:Clear()
 			pini:ClearNonPreserveDisplay()
 
-			newSprite = pini.Sprite(id,path,nil,true)
-			sprite.id = pini:GetUUID()
+			-- newSprite = pini.Sprite(id,path,nil,true)
+			sprite.id = id --pini:GetUUID()
 			sprite.path = path
 
 			local img1 = pini.Sprite("transition1",scale,nil,true)
@@ -1867,8 +1866,12 @@ function LNX_TRANSITION(vm,stck)
 			local ss = img2:contentSize()
 			local dx,dy = ss.width / WIN_WIDTH ,ss.height / WIN_HEIGHT
 			local sx,sy = StrEnumToScale(sprite,size)
-			sprite:setScale(sx * dx,sy * dy)
-			pini:AttachDisplay(newSprite)
+
+			sprite:setPosition(WIN_WIDTH/2,WIN_HEIGHT/2)
+			sprite:setAnchorPoint(0.5,0.5)
+
+			sprite:setScale(1,1)
+			--pini:AttachDisplay(newSprite)
 			pini:AttachDisplay(sprite)
 			sprite:release()
 			
@@ -1881,8 +1884,8 @@ function LNX_TRANSITION(vm,stck)
 			img2:setScale(StrEnumToScale(img2,size))
 			img2:setPosition(StrEnumToPos(img2,"화면중앙"))
 
-			newSprite:setScale(img2.scaleX,img2.scaleY)
-			newSprite:setPosition(img2._x,img2._y)
+			-- newSprite:setScale(img2.scaleX,img2.scaleY)
+			-- newSprite:setPosition(img2._x,img2._y)
 			sprite.scaleX = img2.scaleX
 			sprite.scaleY = img2.scaleY
 			sprite._x = img2._x
@@ -1900,8 +1903,8 @@ function LNX_TRANSITION(vm,stck)
 				if t.userdata.threshold > 1 then
 					t:stop()
 					shader:fin()
-					local toRemove = pini:FindNode(t.userdata.ssId)
-					pini:DetachDisplay(toRemove)
+					-- local toRemove = pini:FindNode(t.userdata.ssId)
+					-- pini:DetachDisplay(toRemove)
 				end
 			end,true,nil,{sid=shader.id,threshold=0,delta=0,max=sec,ssId=sprite.id}):run()
 		end)
@@ -2415,7 +2418,6 @@ function LNX_SAVE(vm,stck)
 				end
 			end
 			pin["bgm"] = pini._regist_.BGM
-			--print(print_r(pini._regist_.BGM))
 
 			pin["backlogEnabled"] = pini.SkipAllowStatus
 			pin["backLogConfig"] = pini.Backlog:config()

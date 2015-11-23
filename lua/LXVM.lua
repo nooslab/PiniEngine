@@ -58,10 +58,6 @@ function LXVM:init()
 	end
 
 	local mt = {
-		-- __pairs = function (t)
-		-- 	return pairs(_LNXGP), _LNXGP, nil
-		-- end,
-
 		__index = function (t,k)
 			return _LNXGP[k] or _LNXGP["___"..k]
 		end,
@@ -110,8 +106,6 @@ function LXVM:init()
 		},
 		f=function(vm,idx) end},
 	} end
-
-
 	setmetatable(_LNXG, mt)
 end
 
@@ -142,6 +136,43 @@ if OnPreview then
 ]]
 end
 
+function LXVM:PRE_LOOP(stckInfo,pres,forceCall,f)
+	local rets = {}
+
+	local pi = 1
+
+	if forceCall then
+		pi = forceCall[3]
+		rets = forceCall[5]
+		stckInfo[9][5] = rets
+
+		forceCall = forceCall[1]
+	end
+
+	if pres then
+		while pi <= #pres do
+			stckInfo[9][3] = pi
+			rets[pi] = pres[pi](LXVM,stckInfo,rets,forceCall)
+			stckInfo[9][5][pi] = rets[pi]
+			pi = pi + 1
+		end
+	end
+
+	stckInfo[9][2] = stckInfo[9][2] + 1
+	stckInfo[9][3] = 1
+
+	try{
+		function()
+			f(rets)
+		end,
+		catch {
+		function(error)
+			print(error)
+		end
+		}
+	}	
+end
+
 tabb = ""
 _VM_LOOP_ =
 loadstring([[return
@@ -160,7 +191,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 	-- print ("_VM_LOOP_ begin. fname="..fname)
 	-- print ("_loopidx="..tostring(LXVM:currentLoopIdx()))
 
-	tabb = tabb.."\t"
+	--tabb = tabb.."\t"
 
 	fns = fns()
 	local fns_max = #fns
@@ -179,43 +210,6 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 		{}, -- rets [5]
 		fname, -- scriptName [6]
 	}
-
-	local preloop = function(pres,forceCall,f)
-		local rets = {}
-
-		local pi = 1
-
-		if forceCall then
-			pi = forceCall[3]
-			rets = forceCall[5]
-			stckInfo[9][5] = rets
-
-			forceCall = forceCall[1]
-		end
-
-		if pres then
-			while pi <= #pres do
-				stckInfo[9][3] = pi
-				rets[pi] = pres[pi](LXVM,stckInfo,rets,forceCall)
-				stckInfo[9][5][pi] = rets[pi]
-				pi = pi + 1
-			end
-		end
-
-		stckInfo[9][2] = stckInfo[9][2] + 1
-		stckInfo[9][3] = 1
-
-		try{
-			function()
-				f(rets)
-			end,
-			catch {
-			function(error)
-				print(error)
-			end
-			}
-		}	
-	end
 
 	if scall and scall[1] == nil then
 		stckInfo[2] = false
@@ -288,7 +282,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 		local t = v["t"]
 		--print(tabb..fname.." : "..i.."("..t..")")
 		if t == 1 or t == 5 then
-			preloop(v["pre"], scall, function(rets)
+			LXVM:PRE_LOOP(stckInfo,v["pre"], scall, function(rets)
 				v["f"](LXVM,stckInfo,rets)
 			end)
 
@@ -296,7 +290,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 			v["f"](LXVM,stckInfo)
 		
 		elseif t == 2 then --ifgoto
-			preloop(v["pre"], scall, function(rets)
+			LXVM:PRE_LOOP(stckInfo,v["pre"], scall, function(rets)
 				local ifgoto_ = v["test"](LXVM,stckInfo,rets)
 				if ifgoto_ == false then
 					stckInfo[5] = v["else"]
@@ -307,7 +301,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 			stckInfo[5] = v["n"]
 
 		elseif t == 7 then -- return
-			preloop(v["pre"], scall, function(rets)
+			LXVM:PRE_LOOP(stckInfo,v["pre"], scall, function(rets)
 				LXVM:returnValue(v["f"](LXVM,stckInfo,rets))
 			end)
 
@@ -327,7 +321,7 @@ function (fname,fns,stckInfo,new_arg,del_arg,start_i,rets,scall)
 		del_arg()
 	end
 
-	tabb = string.sub(tabb,0,-2)
+	--tabb = string.sub(tabb,0,-2)
 	
 	local ret = LXVM.currentLoop[7]
 	LXVM.currentLoop[7] = 0
@@ -405,18 +399,9 @@ function LXVM:OpenLNX(file)
 end
 
 function LXVM:resume(idx)
-	-- print ("______resume, idx="..tostring(idx))
-	-- print ("______resume, stacktrace Start")
-	-- print (debug.traceback())
-	-- print ("______resume, stacktrace End")
-
-	-- print ("loops length = "..#self.loops)
-
 	if (not self.loops[idx]) then
-		-- print ("______resume, invalid resume founded. skip it.")
 		return
 	elseif (not self.loops[idx][10]) then
-		-- print ("______resume, dead resume founded. skip it.")
 		return
 	end
 
