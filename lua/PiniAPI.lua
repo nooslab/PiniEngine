@@ -1523,7 +1523,7 @@ function Node:contentSize()
 			local size = self.node:getContentSize();
 			if self.type=="Label" then
 				if self.text ~= " " then
-					size.width = size.width
+					size.width = size.width-2
 				else
 					size.width = size.width + self.size / 3
 				end 
